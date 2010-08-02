@@ -1,0 +1,86 @@
+init();
+
+mouseMoved({int}449, {int}38);
+mouseButton1Pressed({int}449, {int}38, {long}1271766598460);
+mouseDragged({int}453, {int}42, {long}1271766598602);
+mouseDragged({int}455, {int}45, {long}1271766598612);
+mouseDragged({int}458, {int}48, {long}1271766598618);
+mouseDragged({int}461, {int}50, {long}1271766598626);
+mouseDragged({int}465, {int}54, {long}1271766598634);
+mouseDragged({int}471, {int}58, {long}1271766598642);
+mouseDragged({int}475, {int}62, {long}1271766598650);
+mouseDragged({int}479, {int}67, {long}1271766598658);
+mouseDragged({int}483, {int}74, {long}1271766598666);
+mouseDragged({int}486, {int}80, {long}1271766598676);
+mouseDragged({int}487, {int}85, {long}1271766598682);
+mouseDragged({int}490, {int}93, {long}1271766598690);
+mouseDragged({int}493, {int}101, {long}1271766598698);
+mouseDragged({int}495, {int}108, {long}1271766598706);
+mouseDragged({int}496, {int}116, {long}1271766598714);
+mouseDragged({int}499, {int}124, {long}1271766598722);
+mouseDragged({int}499, {int}132, {long}1271766598730);
+mouseDragged({int}499, {int}140, {long}1271766598738);
+mouseDragged({int}501, {int}146, {long}1271766598746);
+mouseDragged({int}501, {int}152, {long}1271766598754);
+mouseDragged({int}501, {int}159, {long}1271766598762);
+mouseDragged({int}501, {int}165, {long}1271766598771);
+mouseDragged({int}501, {int}169, {long}1271766598779);
+mouseDragged({int}501, {int}172, {long}1271766598786);
+mouseDragged({int}501, {int}173, {long}1271766598794);
+mouseDragged({int}501, {int}174, {long}1271766598802);
+mouseDragged({int}501, {int}176, {long}1271766598818);
+mouseDragged({int}501, {int}178, {long}1271766598826);
+mouseDragged({int}499, {int}179, {long}1271766598834);
+mouseDragged({int}499, {int}181, {long}1271766598842);
+mouseDragged({int}498, {int}184, {long}1271766598850);
+mouseDragged({int}496, {int}185, {long}1271766598858);
+mouseDragged({int}496, {int}188, {long}1271766598866);
+mouseDragged({int}492, {int}192, {long}1271766598874);
+mouseDragged({int}491, {int}193, {long}1271766598882);
+mouseDragged({int}488, {int}196, {long}1271766598890);
+mouseDragged({int}486, {int}198, {long}1271766598898);
+mouseDragged({int}483, {int}200, {long}1271766598906);
+mouseDragged({int}481, {int}202, {long}1271766598914);
+mouseDragged({int}478, {int}204, {long}1271766598922);
+mouseDragged({int}474, {int}206, {long}1271766598930);
+mouseDragged({int}469, {int}209, {long}1271766598938);
+mouseDragged({int}464, {int}213, {long}1271766598946);
+mouseDragged({int}460, {int}214, {long}1271766598954);
+mouseDragged({int}455, {int}216, {long}1271766598962);
+mouseDragged({int}451, {int}218, {long}1271766598970);
+mouseDragged({int}447, {int}220, {long}1271766598978);
+mouseDragged({int}443, {int}222, {long}1271766598986);
+mouseDragged({int}438, {int}222, {long}1271766598994);
+mouseDragged({int}433, {int}223, {long}1271766599002);
+mouseDragged({int}427, {int}223, {long}1271766599010);
+mouseDragged({int}420, {int}223, {long}1271766599018);
+mouseDragged({int}405, {int}223, {long}1271766599034);
+mouseDragged({int}399, {int}223, {long}1271766599042);
+mouseDragged({int}395, {int}223, {long}1271766599050);
+mouseDragged({int}391, {int}223, {long}1271766599058);
+mouseDragged({int}388, {int}225, {long}1271766599066);
+mouseDragged({int}387, {int}225, {long}1271766599074);
+mouseDragged({int}386, {int}225, {long}1271766599083);
+mouseDragged({int}385, {int}225, {long}1271766599090);
+mouseDragged({int}384, {int}225, {long}1271766599098);
+mouseDragged({int}383, {int}225, {long}1271766599122);
+mouseReleased({int}383, {int}225, {int}1);
+
+mouseMoved({int}489, {int}187);
+mouseButton1Pressed({int}489, {int}187, {long}1271766600749);
+mouseReleased({int}489, {int}187, {int}1);
+
+mouseMoved({int}492, {int}188);
+mouseButton1Pressed({int}492, {int}188, {long}1271766601509);
+mouseReleased({int}492, {int}188, {int}1);
+
+writeText({int}447, {int}43, {java.lang.String}3);
+
+mouseMoved({int}528, {int}114);
+mouseButton1Pressed({int}528, {int}114, {long}1271766625090);
+mouseReleased({int}528, {int}114, {int}1);
+
+writeText({int}453, {int}24, {java.lang.String}3.0);
+
+writeText({int}453, {int}24, {java.lang.String}45a);
+

@@ -1,0 +1,47 @@
+init();
+
+mouseMoved({int}156, {int}181);
+mouseButton1Pressed({int}156, {int}181, {long}1254322634709);
+mouseDragged({int}162, {int}178, {long}1254322634718);
+mouseDragged({int}164, {int}177, {long}1254322634725);
+mouseDragged({int}168, {int}173, {long}1254322634733);
+mouseDragged({int}173, {int}167, {long}1254322634741);
+mouseDragged({int}179, {int}163, {long}1254322634749);
+mouseDragged({int}184, {int}160, {long}1254322634757);
+mouseDragged({int}189, {int}158, {long}1254322634766);
+mouseDragged({int}193, {int}157, {long}1254322634773);
+mouseDragged({int}213, {int}148, {long}1254322634805);
+mouseReleased({int}213, {int}148);
+
+mouseMoved({int}250, {int}136);
+mouseButton1Pressed({int}250, {int}136, {long}1254322635021);
+mouseReleased({int}249, {int}136);
+
+mouseMoved({int}164, {int}167);
+mouseButton1Pressed({int}164, {int}167, {long}1254322636213);
+mouseDragged({int}170, {int}165, {long}1254322636311);
+mouseDragged({int}171, {int}165, {long}1254322636317);
+mouseDragged({int}172, {int}165, {long}1254322636325);
+mouseDragged({int}176, {int}165, {long}1254322636333);
+mouseDragged({int}177, {int}165, {long}1254322636341);
+mouseDragged({int}179, {int}165, {long}1254322636357);
+mouseDragged({int}179, {int}166, {long}1254322636373);
+mouseDragged({int}179, {int}167, {long}1254322636381);
+mouseDragged({int}180, {int}167, {long}1254322636397);
+mouseDragged({int}180, {int}168, {long}1254322636437);
+mouseDragged({int}180, {int}169, {long}1254322636445);
+mouseDragged({int}180, {int}170, {long}1254322636461);
+mouseDragged({int}180, {int}172, {long}1254322636469);
+mouseDragged({int}180, {int}173, {long}1254322636477);
+mouseDragged({int}180, {int}174, {long}1254322636485);
+mouseDragged({int}180, {int}175, {long}1254322636493);
+mouseDragged({int}180, {int}176, {long}1254322636501);
+mouseDragged({int}180, {int}177, {long}1254322636517);
+mouseDragged({int}180, {int}178, {long}1254322636525);
+mouseDragged({int}179, {int}179, {long}1254322636565);
+mouseDragged({int}179, {int}180, {long}1254322636573);
+mouseDragged({int}178, {int}180, {long}1254322636581);
+mouseDragged({int}177, {int}180, {long}1254322636621);
+mouseDragged({int}176, {int}178, {long}1254322636717);
+mouseReleased({int}176, {int}178);
+

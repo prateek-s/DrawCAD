@@ -1,0 +1,7 @@
+init();
+
+mouseMoved({int}422, {int}117);
+mouseButton1Pressed({int}422, {int}117, {long}1253020755699);
+mouseDragged({int}564, {int}101, {long}1253020755983);
+mouseReleased({int}564, {int}101);
+

@@ -1,0 +1,106 @@
+init();
+
+mouseMoved({int}263, {int}191);
+mouseButton1Pressed({int}263, {int}191, {long}1271774680645);
+mouseDragged({int}270, {int}191, {long}1271774680715);
+mouseDragged({int}279, {int}193, {long}1271774680723);
+mouseDragged({int}294, {int}193, {long}1271774680731);
+mouseDragged({int}310, {int}193, {long}1271774680739);
+mouseDragged({int}329, {int}193, {long}1271774680746);
+mouseDragged({int}348, {int}193, {long}1271774680754);
+mouseDragged({int}369, {int}193, {long}1271774680763);
+mouseDragged({int}388, {int}191, {long}1271774680771);
+mouseDragged({int}407, {int}188, {long}1271774680779);
+mouseDragged({int}428, {int}188, {long}1271774680786);
+mouseDragged({int}451, {int}186, {long}1271774680795);
+mouseDragged({int}476, {int}186, {long}1271774680803);
+mouseDragged({int}516, {int}186, {long}1271774680818);
+mouseDragged({int}535, {int}186, {long}1271774680827);
+mouseDragged({int}550, {int}186, {long}1271774680835);
+mouseDragged({int}570, {int}186, {long}1271774680850);
+mouseDragged({int}575, {int}186, {long}1271774680858);
+mouseDragged({int}576, {int}186, {long}1271774680867);
+mouseReleased({int}576, {int}186, {int}1);
+
+mouseMoved({int}459, {int}188);
+mouseButton1Pressed({int}459, {int}188, {long}1271774685469);
+mouseReleased({int}459, {int}188, {int}1);
+
+writeText({int}263, {int}188, {java.lang.String}3);
+
+writeText({int}362, {int}188, {java.lang.String}45a);
+
+mouseMoved({int}360, {int}337);
+mouseButton1Pressed({int}360, {int}337, {long}1271774696237);
+mouseReleased({int}360, {int}337, {int}1);
+
+mouseMoved({int}443, {int}187);
+mouseButton1Pressed({int}443, {int}187, {long}1271774700541);
+mouseReleased({int}443, {int}187, {int}1);
+
+writeText({int}362, {int}188, {java.lang.String}30a);
+
+mouseMoved({int}477, {int}191);
+mouseButton3Pressed({int}477, {int}191);
+mouseDragged({int}477, {int}186, {long}1271774708747);
+mouseDragged({int}475, {int}183, {long}1271774708763);
+mouseDragged({int}474, {int}180, {long}1271774708779);
+mouseDragged({int}474, {int}178, {long}1271774708787);
+mouseDragged({int}474, {int}177, {long}1271774708794);
+mouseDragged({int}474, {int}176, {long}1271774708811);
+mouseDragged({int}474, {int}175, {long}1271774708819);
+mouseDragged({int}474, {int}174, {long}1271774708835);
+mouseDragged({int}474, {int}173, {long}1271774708859);
+mouseDragged({int}474, {int}172, {long}1271774708867);
+mouseDragged({int}474, {int}171, {long}1271774708883);
+mouseDragged({int}474, {int}170, {long}1271774708899);
+mouseDragged({int}474, {int}169, {long}1271774708915);
+mouseDragged({int}474, {int}168, {long}1271774708923);
+mouseDragged({int}474, {int}167, {long}1271774708939);
+mouseDragged({int}474, {int}166, {long}1271774708963);
+mouseDragged({int}474, {int}164, {long}1271774708979);
+mouseDragged({int}473, {int}163, {long}1271774708995);
+mouseDragged({int}473, {int}162, {long}1271774709003);
+mouseDragged({int}473, {int}161, {long}1271774709011);
+mouseDragged({int}473, {int}160, {long}1271774709043);
+mouseDragged({int}473, {int}159, {long}1271774709075);
+mouseDragged({int}473, {int}158, {long}1271774709099);
+mouseDragged({int}473, {int}157, {long}1271774709243);
+mouseReleased({int}473, {int}157, {int}3);
+
+mouseMoved({int}359, {int}160);
+mouseButton3Pressed({int}359, {int}160);
+mouseDragged({int}359, {int}165, {long}1271774710251);
+mouseDragged({int}358, {int}166, {long}1271774710259);
+mouseDragged({int}358, {int}168, {long}1271774710266);
+mouseDragged({int}358, {int}171, {long}1271774710283);
+mouseDragged({int}358, {int}173, {long}1271774710291);
+mouseDragged({int}358, {int}175, {long}1271774710299);
+mouseDragged({int}358, {int}176, {long}1271774710307);
+mouseDragged({int}358, {int}178, {long}1271774710315);
+mouseDragged({int}358, {int}179, {long}1271774710322);
+mouseDragged({int}358, {int}180, {long}1271774710339);
+mouseDragged({int}358, {int}181, {long}1271774710346);
+mouseDragged({int}358, {int}182, {long}1271774710371);
+mouseDragged({int}358, {int}183, {long}1271774710387);
+mouseDragged({int}358, {int}184, {long}1271774710443);
+mouseReleased({int}358, {int}184, {int}3);
+
+mouseMoved({int}436, {int}213);
+mouseButton1Pressed({int}436, {int}213, {long}1271774711293);
+mouseReleased({int}436, {int}213, {int}1);
+
+mouseMoved({int}399, {int}214);
+mouseButton1Pressed({int}399, {int}214, {long}1271774714829);
+mouseReleased({int}399, {int}214, {int}1);
+
+mouseMoved({int}423, {int}184);
+mouseButton1Pressed({int}423, {int}184, {long}1271774715981);
+mouseReleased({int}423, {int}184, {int}1);
+
+writeText({int}358, {int}184, {java.lang.String}45a);
+
+mouseMoved({int}455, {int}272);
+mouseButton1Pressed({int}455, {int}272, {long}1271774721397);
+mouseReleased({int}455, {int}272, {int}1);
+
