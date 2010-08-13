@@ -13,11 +13,16 @@ import dcad.model.geometry.AnchorPoint;
 import dcad.model.geometry.GeometryElement;
 import dcad.model.geometry.ImpPoint;
 
+
 public class SegPoint extends Segment
 {
 	private final static int DEF_POINT_SIZE = 1;
 	private AnchorPoint m_pt = null;
 
+	/**
+	 * First point of vector is the anchor point. Length of segpoint is 1
+	 * @param points
+	 */
 	public SegPoint(Vector points)
 	{
 		super();

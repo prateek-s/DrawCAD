@@ -50,7 +50,10 @@ public class AnchorPoint extends ImpPoint
 		this(x1, y1);
 		setM_label(label);
 	}
-		
+	
+	/**
+	 * Draw all the anchor-point AND also all the associated constraints.
+	 */
 	public void draw(Graphics g)
 	{
 		if(!isEnabled()) return;
