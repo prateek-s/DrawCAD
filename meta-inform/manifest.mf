@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: dcad.ui.main.DrawCAD
+Class-Path: lib/applib.jar  lib/bij.jar  lib/g.jar  lib/ij.jar  lib/Jama-1.0.2.jar  lib/new.jar  lib/p.jar  lib/t.jar
+

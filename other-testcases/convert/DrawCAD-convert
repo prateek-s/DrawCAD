@@ -1,0 +1,24 @@
+init();
+
+mouseMoved({int}485, {int}102);
+mouseButton1Pressed({int}485, {int}102, {long}1272566440617);
+mouseDragged({int}492, {int}112, {long}1272566440695);
+mouseDragged({int}516, {int}139, {long}1272566440711);
+mouseDragged({int}531, {int}155, {long}1272566440719);
+mouseDragged({int}547, {int}172, {long}1272566440727);
+mouseDragged({int}563, {int}190, {long}1272566440735);
+mouseDragged({int}576, {int}207, {long}1272566440743);
+mouseDragged({int}588, {int}224, {long}1272566440751);
+mouseDragged({int}597, {int}237, {long}1272566440759);
+mouseDragged({int}604, {int}249, {long}1272566440767);
+mouseDragged({int}604, {int}258, {long}1272566440775);
+mouseDragged({int}604, {int}265, {long}1272566440783);
+mouseDragged({int}604, {int}271, {long}1272566440791);
+mouseDragged({int}602, {int}278, {long}1272566440799);
+mouseDragged({int}601, {int}284, {long}1272566440807);
+mouseDragged({int}599, {int}292, {long}1272566440815);
+mouseDragged({int}594, {int}306, {long}1272566440831);
+mouseDragged({int}591, {int}318, {long}1272566440847);
+mouseDragged({int}591, {int}320, {long}1272566440855);
+mouseReleased({int}591, {int}320, {int}1);
+

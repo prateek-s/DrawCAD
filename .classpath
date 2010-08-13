@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="bij.jar"/>
+	<classpathentry kind="lib" path="applib.jar"/>
+	<classpathentry kind="lib" path="g.jar"/>
+	<classpathentry kind="lib" path="ij.jar"/>
+	<classpathentry kind="lib" path="Jama-1.0.2.jar"/>
+	<classpathentry kind="lib" path="new.jar"/>
+	<classpathentry kind="lib" path="p.jar"/>
+	<classpathentry kind="lib" path="t.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
