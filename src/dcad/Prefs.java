@@ -50,7 +50,11 @@ public class Prefs
 			|| (scheme == GConstants.SEG_SCHEME_CURVATURE)
 			|| (scheme == GConstants.SEG_SCHEME_SPEED)
 			|| (scheme == GConstants.SEG_SCHEME_TIME)
-			|| (scheme == GConstants.SEG_SCHEME_SPEED_CURVATURE)) segScheme = scheme;
+			|| (scheme == GConstants.SEG_SCHEME_SPEED_CURVATURE) 
+			|| (scheme == GConstants.SEG_SCHEME_SIMPLE))
+			
+				segScheme = scheme;
+		
 		else segScheme = GConstants.SEG_SCHEME_SPEED_CURVATURE;
 //		System.out.println("scheme: "+scheme);
 	}

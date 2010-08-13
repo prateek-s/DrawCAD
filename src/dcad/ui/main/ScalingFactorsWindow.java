@@ -33,7 +33,7 @@ public class ScalingFactorsWindow extends JDialog implements ActionListener
 {
 	private JPanel m_panel;
 	private static final String SET = "set";
-	private String segScheme[] = {"Curvature","Speed","Speed+Curvature"};
+	private String segScheme[] = {"Curvature","Speed","Speed+Curvature","Simple"};
 	ToolBar tbBar = ToolBar.getInstance();
 	JPanel panel = new JPanel(null);
     JScrollPane scrollpane = null;
@@ -160,6 +160,9 @@ public class ScalingFactorsWindow extends JDialog implements ActionListener
 			    }
 			    else if(index == 1){
 			    	Prefs.setSegScheme(3);
+			    }
+			    else if (index == 3) { //SIMPLE?
+			    	Prefs.setSegScheme(5) ;
 			    }
 			    else {
 			    	Prefs.setSegScheme(4);
