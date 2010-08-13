@@ -78,7 +78,8 @@ public class LineRecognizer extends SegmentRecognitionScheme
 		
 		// find the perpendicular spl
 		double perp_m = -ACCURACY/(line.y2 - line.y1);
-		
+		 
+		 
 		
 		// c = y-mx
 		double c1 = m_points[0][1] - perp_m*m_points[0][0];
