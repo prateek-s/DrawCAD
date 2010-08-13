@@ -343,9 +343,16 @@ public class Segmentor
 	{
 		Vector seg_pt_list = new Vector() ;
 		Vector stroke_pt_list = theStroke.getM_ptList() ;
-		seg_pt_list.add(new Integer(0)) ; //START
-		seg_pt_list.add(new Integer(stroke_pt_list.size()-1)) ; //END
+		Integer START = new Integer(0) ; //START
+		Integer END = new Integer(stroke_pt_list.size()-1) ;
+		//no segment recognized when start and end co-incide!
+		if (START == END)
+		{
+			END = new Integer(END.intValue()-1) ;
+		}
 		
+		seg_pt_list.add(START) ;
+		seg_pt_list.add(END) ;
 		return seg_pt_list ;
 		
 	}
@@ -360,6 +367,7 @@ public class Segmentor
 		return segPt_speed;
 	}
 
+	
 	private Vector getTimeSeg(Stroke theStroke)
 	{
 		// detect segment points based of time data
@@ -369,6 +377,7 @@ public class Segmentor
 		return segPt_time;
 	}
 
+	
 	private Vector getCurvatureSeg(Stroke theStroke)
 	{
 		// detect segment points based of curvature data

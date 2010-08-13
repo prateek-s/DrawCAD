@@ -18,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.awt.event.ActionListener;
 import java.awt.event.*;
+
+
 public class DebugApplet extends JApplet implements ActionListener{
 	
   JButton nextIteration;

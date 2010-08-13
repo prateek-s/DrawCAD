@@ -31,6 +31,7 @@ public abstract class Constraint implements Serializable
 	
 	/**
 	 * The minmum value of allowed gap between two points to be called as touching
+	 * why 2 not 0? ? ?
 	 */
 	public final static int MIN_ALLOWED_CONNECT_GAP = 2;
 	

@@ -334,6 +334,8 @@ public class Stroke extends GeometryElement
 	/**
 	 * Recognizes all the Independent constraints of the segments of this stroke.
 	 */
+//WHy is this even here? Segment class a better place ?
+	
 	public Vector recognizeConstraints(IndConstraintRecognizer indConsRecog)
 	{
 		// to store all the constraints
@@ -543,6 +545,7 @@ public class Stroke extends GeometryElement
 		}
 		return false;
 	}
+	
 	
 	public Vector recognizeAllConstraints(Vector strokeList)
 	{
