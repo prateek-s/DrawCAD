@@ -603,9 +603,14 @@ public abstract class Segment extends GeometryElement
 		return closePtDiff;
 	}
 
+	
+	/**
+	 * clear ALL the constraints of this segment (SOFT AND HARD) and all the imp points
+	 */
+	
 	public void delete()
 	{
-		// clear ALL the constraints of this segment (SOFT AND HARD) and all the imp points
+		
 		clearConstraints(Constraint.SOFT);
 		clearConstraints(Constraint.HARD);
 		for(int l=0;l<m_impPoints.size();l++)
@@ -640,6 +645,7 @@ public abstract class Segment extends GeometryElement
 			}
 		}
 	}
+	
 	
 	public void changePoint(ImpPoint ip1,ImpPoint ip2)
 	{

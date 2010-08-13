@@ -23,7 +23,7 @@ import dcad.process.preprocess.*;
 import dcad.process.recognition.RecognitionManager;
 import dcad.process.recognition.segment.SegmentRecognitionScheme;
 import dcad.process.recognition.segment.SegmentRecognizer;
-
+import dcad.util.MagicConstant;
 /**
  * Class contains functions to do segmentation on the raw data. Finds
  * segment points by various algorithms.
@@ -35,14 +35,17 @@ public class Segmentor
 	private SpeedBasedDetection m_speedSeg = null;
 	private TimeBasedDetection m_timeSeg = null;
 	private CurvatureBasedDetection m_curvatureSeg = null;
+	
 	private static final int COMMON_SEG_WINDOW = 3;
 	private static final double COMMON_SEG_DISTANCE = Prefs.getAnchorPtSize()*2+1;
 	//19-09-09
-	private static final double TolerantDistance = 4.0; // distance to be ignored while selecting common segment   
+	private static final double TolerantDistance = MagicConstant.SegmentorTolerantDistance ; // distance to be ignored while selecting common segment   
 														//points from both the algorithms( Speed + Curvature)
-	private static final int PixelIndexWindow = 4; 
+	private static final int PixelIndexWindow = MagicConstant.SegmentorPixelIndexWindow ; 
+	
 	private static final double  DEFAULT = 999999.0;
-	private static double errorTolerance = 100.0;
+	private static double errorTolerance = MagicConstant.SegmentorErrorTolerance ;
+	
 	Vector CommonSegmentPts;    //vector to store segments from both Speed + Curvature Schemes
 	Vector CurvVector;
 	Vector SpeedVector;
@@ -50,6 +53,7 @@ public class Segmentor
 	private ProcessManager m_processManager;
 	double CurvPts[][];
 	int CurvPtCount;
+	
 	public Segmentor()
 	{
 	}
@@ -61,15 +65,19 @@ public class Segmentor
 	 */
 	private void setPixelInfo(Stroke theStroke)
 	{
-		// get the data from the stroke in the required format
+		// get the data from the stroke. (x,y,t)
 		Vector ptList = theStroke.getM_ptList();
 		//double [][] strokeMat = theStroke.getPointsAs2DMatrix_Double();
 		int stkLen = ptList.size();
 		// init local variables
 		PixelInfo prevPixel = null;
 		PixelInfo currPixel = null;
+		
 		int winSize_speed = 0;
 		int winSize_slope = 0;
+		/**
+		 * Cumulative distance for speed calculations
+		 */
 		double cummDist_speed = 0.0;
 		
 		Iterator iter = ptList.iterator();
@@ -77,6 +85,7 @@ public class Segmentor
 		if(iter.hasNext())
 		{
 			// init the curvature and curvature of first pixel, set them to 0
+			
 			prevPixel = (PixelInfo)iter.next();
 			prevPixel.setCurvature(0);
 			prevPixel.setSpeed(0);
@@ -89,7 +98,7 @@ public class Segmentor
 		while(iter.hasNext())
 		{
 			index++;
-
+			
 			// get the second pixel
 			currPixel = (PixelInfo)iter.next();
 
@@ -115,9 +124,11 @@ public class Segmentor
 			//System.out.println("summ distance: "+cummDist_speed);
 			
 			// do speed calculations for this pixel
-			PixelInfo a = (PixelInfo) ptList.get(index - winSize_speed);
+			PixelInfo a = (PixelInfo) ptList.get(index - winSize_speed); //index - 2
 			double cummTime_speed = currPixel.getTime() - a.getTime();
 			currPixel.setSpeed(cummDist_speed/cummTime_speed);
+			
+			/* Speed is just d(i,i-winSize)/(t(i(-t(i-winSize)) */
 			
 			// set slope for the current pixel
 			if(winSize_slope < CurvatureBasedDetection.DEF_WIN_SIZE_SLOPE)
@@ -161,7 +172,7 @@ public class Segmentor
 				if(slopeChange == 0.0 && thisDist == 0.0){
 					currPixel.setCurvature(prevPixel.getCurvature());
 				}
-				else{
+				else {
 				currPixel.setCurvature(slopeChange/thisDist);
 				}
 			}
@@ -229,12 +240,14 @@ public class Segmentor
 		}
 	}
 	
+	
+	
 	public Vector performSegmentation(Stroke theStroke)
 	{
 		
 		// get information about speed and direction (and hence curvature data) for the stroke.
 		setPixelInfo(theStroke);
-		// this vector stores vectors of segment points detected through various methods
+		/* this vector stores vectors of segment points detected through various methods */
 		Vector segVectorList = new Vector();
 		int segScheme=0;
 		switch (segScheme = Prefs.getSegScheme())
@@ -263,6 +276,11 @@ public class Segmentor
 			segVectorList.add(getCurvatureSeg(theStroke));
 			break;
 		
+		case GConstants.SEG_SCHEME_SIMPLE : 
+			segVectorList.add(getSimpleSeg(theStroke)) ;
+			break ;
+			
+			
 		default:
 			segVectorList.add(getSpeedSeg(theStroke));
 			segVectorList.add(getCurvatureSeg(theStroke));
@@ -288,7 +306,10 @@ public class Segmentor
 			
 		}
 		else{*/
+		
 		selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
+		
+		
 		//selectedSegPos = combinationAlgorithm(theStroke);
 		//}
 //		Vector selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
@@ -311,6 +332,25 @@ public class Segmentor
 		return selectedSegPos;
 	}
 
+	
+	/**
+	 * Just return the first and last points of the stroke as segment points.
+	 * Simple semantics
+	 * @param theStroke
+	 * @return Vector 
+	 */
+	private Vector getSimpleSeg(Stroke theStroke)
+	{
+		Vector seg_pt_list = new Vector() ;
+		Vector stroke_pt_list = theStroke.getM_ptList() ;
+		seg_pt_list.add(new Integer(0)) ; //START
+		seg_pt_list.add(new Integer(stroke_pt_list.size()-1)) ; //END
+		
+		return seg_pt_list ;
+		
+	}
+	
+	
 	private Vector getSpeedSeg(Stroke theStroke)
 	{
 		// detect segment points based of speed data
@@ -453,7 +493,8 @@ public class Segmentor
 	 * calling function  
 	 * @author Sunil Kumar
 	 */
-	private Vector returnRelevantVector(Vector segVectorList){
+	private Vector returnRelevantVector(Vector segVectorList)
+	{
 		Vector segPts = new Vector();
 		Iterator iter = segVectorList.iterator();
 		Vector element = (Vector) iter.next();
@@ -468,9 +509,11 @@ public class Segmentor
 	}
 	
 	/**Function to find segment points by using modified Hybrid fits approach 
+	 * Not used anywhere?
 	 * @author Sunil Kumar
 	 */
-	private Vector combinationAlgorithm(Stroke theStroke){
+	private Vector combinationAlgorithm(Stroke theStroke)
+	{
 		CurvatureBasedDetection cbd = new CurvatureBasedDetection();
 		SpeedBasedDetection sbd = new SpeedBasedDetection();
 		CommonSegmentPts = new Vector();

@@ -12,7 +12,7 @@ import dcad.process.beautification.ConstraintSolver;
  * @author vishalk
  *
  */
-public class GConstants
+public class GConstants 
 {
 	public static final String APP_NAME = "DrawCAD";
 	
@@ -29,6 +29,7 @@ public class GConstants
 	public static final int SEG_SCHEME_TIME=2;
 	public static final int SEG_SCHEME_SPEED=3;
 	public static final int SEG_SCHEME_SPEED_CURVATURE=4;
+	public static final int  SEG_SCHEME_SIMPLE = 5 ;
 	
 	public static final int DRAW_MODE = 0;
 	public static final int EDIT_MODE = 1;
