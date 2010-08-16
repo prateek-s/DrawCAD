@@ -437,7 +437,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		
 	}
 
-	/** draw all the strokes */
+	/** draw all the strokes, segments and segment ponints */
 	private void drawStrokes(Graphics gc, Vector strokes)
 	{
 		Iterator iter = strokes.iterator();
@@ -477,7 +477,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	/**
-	 * 
+	 * Called on mouse released and pressed(left) events. 
 	 * @param x
 	 * @param y
 	 * @param time
@@ -651,6 +651,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			m_drawData.addMarker((Marker) gEle);
 	}
 
+	
 	public void removeGeoElement(GeometryElement gEle)
 	{
 		if (gEle instanceof Stroke)
@@ -661,6 +662,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			m_drawData.removeMarker((Marker) gEle);
 	}
 
+	
 	public void mouseClicked(MouseEvent e)
 	{
 	}

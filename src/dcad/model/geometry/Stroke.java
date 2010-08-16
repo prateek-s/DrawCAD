@@ -102,6 +102,9 @@ public class Stroke extends GeometryElement
 	
 	/*************************   Drawing Functions   *****************************/
 	
+	/**
+	 * Draw the segment points and the segments associated with this stroke.
+	 */
 	public void draw(Graphics gc)
 	{
 		// only if the stroke is enabled show it along with its segment points
@@ -156,6 +159,7 @@ public class Stroke extends GeometryElement
 
 	/**
 	 * Display all the recognized segments
+	 * Draw all the segments associated with this stroke.
 	 */
 	public void drawSegments(Graphics gc)
 	{
