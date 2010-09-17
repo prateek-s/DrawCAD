@@ -168,6 +168,7 @@ public class RelConstraintRecognizer
 		return m_constraints;
 	}
 	
+	
 	private Vector recogLengthConstraints()
 	{
 		if(m_relLengthRecog == null) m_relLengthRecog = new RelLengthRecognizer(m_seg1, m_seg2);
@@ -176,6 +177,7 @@ public class RelConstraintRecognizer
 			return m_relLengthRecog.recognize();
 		//return null;
 	}	
+	
 	
 	public Vector recogAngleConstraints()
 	{

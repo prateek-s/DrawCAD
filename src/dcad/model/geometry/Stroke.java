@@ -78,6 +78,9 @@ public class Stroke extends GeometryElement
 	 */
 	private int m_type = TYPE_NORMAL;
 	
+	/**
+	 * point-number of the end-point of the previous stroke.
+	 */
 	private int m_prevEnd;
 	
 	public Stroke()
@@ -176,50 +179,20 @@ public class Stroke extends GeometryElement
 	
 	
 	
-	/*************************   Segments Functions   *****************************/
+	/*************************   Segment Functions   *****************************/
 
 	/**
-	 * Recognizes all the segments of this stroke.
+	 * Recognizes all the segments of this stroke. 
 	 */
 	public void recognizeSegments(SegmentRecognizer segRecog) throws Exception
 	{
-//ISHWAR		System.out.println("Stroke.recognizeSegments()");
-		// remove all the segments of this stroke
-		//26-01-10
-/*		if(tBar == null ){
-			tBar = MainWindow.getM_toolBar();
-		}
-		if(tBar.isConvertActiveBitSet()){
-			if(dv == null){
-			    dv = MainWindow.getDv();
-			}
-			GeometryElement ge = tBar.getGeomElement();
-			Stroke stk = tBar.getParentStroke();
-			Vector segList = new Vector();
-			segList = stk.getM_segList();
-			Iterator iter = segList.iterator();
-			Point2D start = null,end = null;
-			while(iter.hasNext()){
-				Segment seg = (Segment)iter.next();
-				if(seg.equals((Segment)ge)){
-					Vector impPoints = new Vector();
-					impPoints = seg.getM_impPoints();
-					start = (Point2D)impPoints.get(0);
-					end = (Point2D)impPoints.get(1);
-					break;
-				}
-			}
-			detectSeg(segRecog,start,end);
-			//tBar.setConvertActiveBit(INIT_VALUE);
-		}
-		
-		else{
-	*/	
+
 		deleteSegments();
 		
 		m_prevEnd = 0;
 		
-		// break the stroke into segments and use BasicRecognition to recognize each of the segments
+		// Stroke segmentation already performed.
+	
 		Iterator iter = m_segPtList.iterator();
 
 		// get the first segment point. There will be atleast one point in every stroke (in the case of a point)
@@ -258,16 +231,19 @@ public class Stroke extends GeometryElement
 	}
 
 	
+	
 	private Segment detectSeg(SegmentRecognizer segRecog, Point2D startPt, Point2D endPt) throws Exception
 	{
-//ISHWAR		System.out.println("Stroke.detectSeg()");
-		List ptList = getM_ptList().subList(m_prevEnd, getM_ptList().size());
-		int start = ptList.indexOf(startPt)+m_prevEnd;
-		int end = ptList.indexOf(endPt)+m_prevEnd;
+
+		List ptList = getM_ptList().subList(m_prevEnd , getM_ptList().size());
+		int start = ptList.indexOf(startPt) + m_prevEnd;
+		int end = ptList.indexOf(endPt) + m_prevEnd;
+		
 		m_prevEnd = end;
+		
 		// get the pixels with the segment
-//ISHWAR		System.out.println("START: "+start+" END: "+end);
 		double[][] seg = getWindowElemAs2DMatrix_Double(start, end);
+		
 		if(seg != null)
 		{
 			SegmentRecognitionScheme brs = segRecog.recognizeSegment(seg);
@@ -275,7 +251,7 @@ public class Stroke extends GeometryElement
 			else
 			{
 				// retrieve the segment  
-				Segment recogSeg = brs.getSegment();//basicRecog.getSegmentApprox();
+				Segment recogSeg = brs.getSegment(); 	//basicRecog.getSegmentApprox();
 				
 				// set the basic properties of the segment the segment would contain its type.
 				recogSeg.setM_rawStartIdx(start);
@@ -335,11 +311,11 @@ public class Stroke extends GeometryElement
 
 	
 	/*************************   Constraint Functions   *****************************/
+	//WHy is this even here? Segment class a better place ?
+
 	/**
 	 * Recognizes all the Independent constraints of the segments of this stroke.
 	 */
-//WHy is this even here? Segment class a better place ?
-	
 	public Vector recognizeConstraints(IndConstraintRecognizer indConsRecog)
 	{
 		// to store all the constraints
@@ -720,6 +696,7 @@ public class Stroke extends GeometryElement
 		return null;
 	}
 	
+	
 	public double[][] getWindowElemAs2DMatrix_Double(int start, int end)
 	{
 		// check if the values are legitimate
@@ -758,39 +735,51 @@ public class Stroke extends GeometryElement
 		return getLength(0, m_ptList.size()-1);
 	}
 	
-	public PixelInfo findPrevPI(double x, double y)
+	/**
+	 * what does this do?
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public PixelInfo findPrevPI(double xc, double yc)
 	{
 		PixelInfo prevPt = null;
 		Iterator iter = m_ptList.iterator();
 		if(iter.hasNext())
 		{
 			prevPt = ((PixelInfo)iter.next());
-			if(Line2D.linesIntersect(prevPt.x, prevPt.y, prevPt.x+1, prevPt.y+1, x, y, x+1, y+1)) return prevPt;
+			if(Line2D.linesIntersect(prevPt.x, prevPt.y, prevPt.x+1, prevPt.y+1, xc, yc, xc+1, yc+1)) return prevPt;
 		}
 		
 		while (iter.hasNext())
 		{
 			PixelInfo nextPt = ((PixelInfo)iter.next());
-			if(Line2D.linesIntersect(prevPt.x, prevPt.y, nextPt.x, nextPt.y, x, y, x+1, y+1)) return prevPt;
+			if(Line2D.linesIntersect(prevPt.x, prevPt.y, nextPt.x, nextPt.y, xc, yc, xc+1, yc+1)) return prevPt;
 			prevPt = nextPt;
 		}
 		return null;
 	}
 
-	public PixelInfo findNextPI(double x, double y)
+	/**
+	 * what does this do?
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public PixelInfo findNextPI(double xc, double yc)
 	{
 		PixelInfo prevPt = null;
 		Iterator iter = m_ptList.iterator();
 		if(iter.hasNext())
 		{
 			prevPt = ((PixelInfo)iter.next());
-			if(Line2D.linesIntersect(prevPt.x, prevPt.y, prevPt.x+1, prevPt.y+1, x, y, x+1, y+1)) return prevPt;
+			if(Line2D.linesIntersect(prevPt.x, prevPt.y, prevPt.x+1, prevPt.y+1, xc, yc, xc+1, yc+1)) return prevPt;
 		}
 		
 		while (iter.hasNext())
 		{
 			PixelInfo nextPt = ((PixelInfo)iter.next());
-			if(Line2D.linesIntersect(prevPt.x, prevPt.y, nextPt.x, nextPt.y, x, y, x+1, y+1)) return nextPt;
+			if(Line2D.linesIntersect(prevPt.x, prevPt.y, nextPt.x, nextPt.y, xc, yc, xc+1, yc+1)) return nextPt;
 			prevPt = nextPt;
 		}
 		return null;

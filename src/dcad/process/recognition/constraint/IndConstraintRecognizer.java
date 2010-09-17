@@ -27,8 +27,8 @@ public class IndConstraintRecognizer
 	}
 	
 	/**
-	 * recognize constraints for the segment 
-	 * There will be another method for recognizing constraints for a perticular segment 
+	 * recognize *angle* constraints for the segment 
+	 * There will be another method for recognizing constraints for a particular segment 
 	 * @param seg the first segment
 	 * @return Vector of all the constraints recognized.
 	 */
@@ -47,7 +47,11 @@ public class IndConstraintRecognizer
 		
 		return m_constraints;
 	}
-
+	
+	/** 
+	 *  Horizontal/Vertical soft constraints.
+	 * @return
+	 */
 	private Vector recogAngleConstraints()
 	{
 //		System.out.println("IndConstraintRecognizer.recogAngleConstraints()");

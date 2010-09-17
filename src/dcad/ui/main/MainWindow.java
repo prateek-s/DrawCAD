@@ -31,6 +31,7 @@ import dcad.ui.help.HelpRecognizeView;
 import dcad.ui.help.HelpView;
 import dcad.ui.main.TempClass;
 import dcad.ui.recognize.RecognizedView;
+import dcad.ui.recognize.OptionsPane;
 import dcad.util.GConstants;
 
 public class MainWindow extends ScrollPane implements ActionListener, AdjustmentListener
@@ -60,6 +61,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 	private static JComponent drawingTab;
 	private static JComponent helpTab;
 	private static JComponent recognizedTab;
+	private static JComponent optionsTab;
 	private static JComponent helpSubTab;
 	private static JComponent helpRecognizeTab;
 	private static JComponent horizontalScale;
@@ -160,6 +162,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		//helpTab = new HelpView();
 		recognizedTab = new JScrollPane(new RecognizedView());
 		
+		optionsTab = new JScrollPane(new OptionsPane());
 		// 25-09-09
 		helpDrawingView = new HelpDrawingView();
 		helpSubTab = helpDrawingView.DrawingWindow();
@@ -214,8 +217,9 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 					
 		//m_upperPane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_vtScaleDraw,helpSubTab, RIGHT_VERTICAL_DIVIDER);
 
-		m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , recognizedTab, BOTTOM_DIVIDER);	
-		
+		//m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , recognizedTab, BOTTOM_DIVIDER);	
+		m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , optionsTab, BOTTOM_DIVIDER);	
+
 		m_splitpane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_LowerPane, helpSubTab,RIGHT_VERTICAL_DIVIDER);
 		//m_splitpane.setResizeWeight(0.7);
 		

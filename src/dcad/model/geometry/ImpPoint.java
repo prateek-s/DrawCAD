@@ -31,6 +31,7 @@ public abstract class ImpPoint extends GeometryElement
 	public static final int TYPE_CIRCLE = 1;
 	public static final int TYPE_SQUARE = 2;
 	public static final int TYPE_TRIANGLE = 3;
+	
 	protected Vector vecParent = new Vector();
 	
 

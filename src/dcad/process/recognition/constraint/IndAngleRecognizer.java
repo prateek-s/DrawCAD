@@ -19,6 +19,7 @@ public class IndAngleRecognizer extends IndConstraintRecognitionScheme
 		super(seg);
 	}
 
+	
 	public Vector recognize()
 	{
 		if(m_seg instanceof SegLine)
@@ -29,31 +30,50 @@ public class IndAngleRecognizer extends IndConstraintRecognitionScheme
 			
 			Constraint cons = null;
 			
+			double err_limit = Prefs.getIndAngleLimit() ;
 			// compute angles such that angles are positive.
-			if(seg_angle < 0) seg_angle += 360;
+			if(seg_angle < 0) 
+				seg_angle += 360;
 
-			if((seg_angle <= Prefs.getIndAngleLimit()) || (seg_angle >=360-Prefs.getIndAngleLimit())) 
+			if( (seg_angle <= err_limit) || (seg_angle >=360-err_limit) ) 
 				cons = addParallelConstraint(line, seg_angle,Constraint.HARD,true);
-			else if((seg_angle <= (90+Prefs.getIndAngleLimit())) && (seg_angle >= (90-Prefs.getIndAngleLimit())))
+			
+			else if((seg_angle <= (90+err_limit)) && (seg_angle >= (90-err_limit)))
 				cons = addPerpendicularConstraint(line, seg_angle,Constraint.HARD,true);
-			else if ((seg_angle <= (180+Prefs.getIndAngleLimit())) && (seg_angle >= (180-Prefs.getIndAngleLimit())))
+			
+			else if ((seg_angle <= (180+err_limit)) && (seg_angle >= (180-err_limit)))
 				cons = addParallelConstraint(line, seg_angle,Constraint.HARD,true);
-			else if((seg_angle <= (270+Prefs.getIndAngleLimit())) && (seg_angle >= (270-Prefs.getIndAngleLimit())))
+			
+			else if((seg_angle <= (270+err_limit)) && (seg_angle >= (270-err_limit)))
 				cons = addPerpendicularConstraint(line, seg_angle,Constraint.HARD,true);
+			
 			else
 				;
+			
 			addConstraint(cons,new Segment[]{m_seg});
 		}
+	//	System.out.println("FROM RECOGNIZE CONSTRAINTS"+m_constraints);
 		return m_constraints;
 	}			
 
+	/**
+	 * If horizontal/parallel constraint already exists return null else return a newly created one.
+	 * @param seg
+	 * @param angle
+	 * @param category
+	 * @param promoted
+	 * @return
+	 */
 	public static Constraint addParallelConstraint(SegLine seg, double angle,int category,boolean promoted)
 	{
 		Vector v=constraintsHelper.getConstraintsByType(seg.getM_constraints(),ParallelIndConstraint.class);
+		
 		if(v.size()==0)
 			return new ParallelIndConstraint(seg, angle,category,promoted);
+		
 		if(!promoted)
 			((Constraint)v.get(0)).setPromoted(false);
+		
 		return null;
 	}
 	

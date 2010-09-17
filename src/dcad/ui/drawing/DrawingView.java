@@ -967,9 +967,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		return false;
 	}
 
+	
 	public void mergePoints(ImpPoint ip1, ImpPoint ip2)
-	{
-		
+	{	
 		if(constraintsHelper.getNoMergeConstraintBetweenPoints((AnchorPoint)ip1,(AnchorPoint)ip2) != null)
 			return;
 		
@@ -2827,6 +2827,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
+	/**
+	 * Merges the segments of the stroke by ensuring end-points coincide. 
+	 * @param theStroke
+	 */
 	public void adjustStroke(Stroke theStroke)
 	{
 		// connect the end points of the stroke
