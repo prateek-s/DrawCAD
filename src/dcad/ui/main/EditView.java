@@ -1,41 +1,19 @@
-/*
- * Copyright (c) 1995 - 2008 Sun Microsystems, Inc.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   - Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Sun Microsystems nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
-// 
+
 
 package dcad.ui.main;
+
 import java.awt.Component;
+import java.awt.DefaultKeyboardFocusManager;
+import java.awt.KeyEventDispatcher;
 import java.awt.Point;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Iterator;
@@ -46,33 +24,36 @@ import javax.swing.*;
 import static javax.swing.GroupLayout.Alignment.*;
 
 import dcad.model.constraint.Constraint;
+import dcad.model.constraint.IndependentConstraint;
+import dcad.model.constraint.IndependentPointConstraints;
+import dcad.model.constraint.PointSegmentConstraint;
+import dcad.model.constraint.RelativeConstraint;
+import dcad.model.geometry.AnchorPoint;
 import dcad.model.geometry.GeometryElement;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
 import dcad.process.io.Command;
 import dcad.ui.drawing.*;
+import dcad.util.GConstants;
 import dcad.util.GMethods;
 
-/**Class to set line's parameters through GUI. This needs to be called whenever there is a need to display/edit 
- * the properties of a segment. The properties are hard-coded (line:len/angle , etc). This is called by only 
- * one method in drawingView.
-* @author Sunil Kumar
-*/
-// 21-04-10
-public class LineParameterWindow implements ActionListener
+public class EditView extends JPanel implements ActionListener,
+ MouseListener,MouseMotionListener, KeyListener,KeyEventDispatcher
 {
-	/* UI components*/
 	JLabel labelLineLength = new JLabel("Length :");;
-	JTextField textLineLength = new JTextField();
+	JTextField textLineLength = new JTextField(3);
 	JLabel labelLineAngle = new JLabel("Angle :");;
-    JTextField textLineAngle = new JTextField();     
+    JTextField textLineAngle = new JTextField(3);     
     JButton buttonSubmit = new JButton("Submit");
     JButton buttonCancel = new JButton("Cancel");
+    
+	JLabel labelArcRadius = new JLabel("Radius :");;
+	JTextField textArcRadius = new JTextField();
+	JLabel labelArcAngle = new JLabel("Arc Angle :");;
+    JTextField textArcAngle = new JTextField();
 
-    private static JFrame jf= null;
+    
 	DrawingView dv = null;
-	
-	/* Defaults*/
 	private double ANGLE_TEXT_BOX_NULL = -1.0 ;
 	private double LENGTH_TEXT_BOX_NULL = 0.0 ;
 	private double length = LENGTH_TEXT_BOX_NULL ;
@@ -80,78 +61,89 @@ public class LineParameterWindow implements ActionListener
 	private String lengthString = "";
 	private String angleString = "";
 
-	static Segment seg = null;
+	private Segment seg = null;
 	Point pt = null;
-	
-	public LineParameterWindow() 
-	{
-		if(jf == null)
-		{
-		jf = new JFrame();
-		
-		jf.setTitle("Set Properties of Line");
+    
+    /****************************************************************************/
+    
+    public EditView() 
+    {
+    	super();
+    	super.add(labelLineLength);
+    	super.add(buttonCancel);
+    	super.add(buttonSubmit);
+    	super.add(textLineLength);
+    	super.add(textLineAngle);
+   // 	super.add();
+   // 	super.add();
+   // 	super.add();
 		dv = MainWindow.getDv();
 		pt = new Point();
-		pt.setLocation(dv.getMousePointerLocation());
-		jf.setLocation((int)pt.getX(),(int) pt.getY());
-		jf.setSize(210,140);
-		jf.setResizable(false);
-		//jf.setState(JFrame.NORMAL);
-		//jf.setUndecorated(true);
-		//jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);
-		jf.setVisible(true);
-		//jf.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
-		seg = dv.getGeoElementClicked();
-		setPropertiesWhileLoading();
+	//	pt.setLocation(dv.getMousePointerLocation());
+    	seg = dv.getGeoElementClicked();
+    	if (seg==null) {
+    		;
+    	}
+    	else {System.out.println("**************SEGMENT**********"+seg.toString());
+    	setPropertiesWhileLoading() ;
+    }
+    }
+    
+    
 	
-		/*Layout*/
-		GroupLayout layout = new GroupLayout(jf.getContentPane());
-			jf.getContentPane().setLayout(layout);
-			layout.setAutoCreateGaps(true);
-			layout.setAutoCreateContainerGaps(true);
-        
-			layout.setHorizontalGroup(layout.createSequentialGroup()
-        	    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-        	        .addComponent(labelLineLength)
-        	        .addComponent(labelLineAngle)
-        	        .addComponent(buttonSubmit))
-        	    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-        	        .addComponent(textLineLength)
-        	        .addComponent(textLineAngle)
-        	        .addComponent(buttonCancel))
-        	);
-        
-        
-			layout.setVerticalGroup(layout.createSequentialGroup()
-        	    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        	        .addComponent(labelLineLength)
-        	        .addComponent(textLineLength))
-        	    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)        	                
-        	                .addComponent(labelLineAngle)
-        	                .addComponent(textLineAngle))
-        	    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        	                .addComponent(buttonCancel)
-        	                .addComponent(buttonSubmit))
-        	        
-        	);
-        /*Layout end*/
-			buttonSubmit.addActionListener(this);
-			buttonCancel.addActionListener(this);
-			
-			jf.addWindowListener (new WindowAdapter() {
-	            public void windowClosing(WindowEvent e) {
-	            	dv.setParameterWinBitSet(false);
-	            	jf.dispose();
-	            	jf=null;   	
-	            }
-	          }
-			);
-		}
-		else
+	// set the textboxes with the values of currently existing constraints
+	/**Function to show previously added constraints in the GUI 
+	 * while loading
+	 * @author Sunil Kumar
+	 */
+	public void setPropertiesWhileLoading()
+	{
+		System.out.println("SETTING THE PROPERTIES, DISPLAYING............");
+		Vector constraints = new Vector();
+		constraints = seg.getM_constraints();
+		Iterator itr = constraints.iterator();
+		while (itr.hasNext())
 		{
-			;
+			String cons = itr.next().toString();
+			String parsedCons[];
+			
+			parsedCons = cons.split("[ ]+");
+			for(int i =0; i < parsedCons.length ; i++){
+				System.out.println("PARSED CONSTRAINT           "+parsedCons[i]);
+				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("length") == 0)){
+					length = Double.parseDouble(parsedCons[5]);
+				}
+				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("angle") == 0)){
+					angle = Double.parseDouble(parsedCons[5]);
+				}
+				else if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Vertical") == 0) && (parsedCons[4].compareToIgnoreCase("line") == 0)){
+					angle = 90.0;
+				}
+				else if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Horizontal") == 0) && (parsedCons[4].compareToIgnoreCase("line") == 0)){
+					angle = 0.0;
+				}
+			}
+			
+			if(Double.compare(length, 0.0) == 0){
+				// do nothing
+			}
+			else{
+				textLineLength.setText(Double.toString(length));
+				
+			}
+				
+			if(Double.compare(angle, -1.0) == 0){
+				// do nothing
+			}
+			else{
+				textLineAngle.setText(Double.toString(angle));
+			}
+			
 		}
+		updateUI();
 	}
+    
+    
 	/**Function to get particular constraint on an element if it exists
 	 * @author Sunil Kumar
 	 */
@@ -174,6 +166,7 @@ public class LineParameterWindow implements ActionListener
 						return cons;
 				}
 			}
+	
 		}
 		return null;
 	}
@@ -318,87 +311,168 @@ public class LineParameterWindow implements ActionListener
 		
 		//dv.logEvent(Command.PAUSE);
 		System.out.println("Submit Clicked");
-		jf.dispose();
-		jf = null;
+
 	}
 	
-	/**Function to close the window
-	 * @author Sunil Kumar
-	 */
-	public void performCancelActionLineParam(){
-		
-		//dv.logEvent("LineParameterWindow|performCancelActionLineParam();" );
-		jf.dispose();
-		jf = null;
-	}
-	
+    
+    
+/*********************************************************************************/
+
 	
 	public void actionPerformed(ActionEvent e)
 	{
-		String cmd = e.getActionCommand();
+		System.out.println("EVENT"+e.toString());
 
-		
+		String cmd = e.getActionCommand();
+		Vector list = dv.getCurrentStroke().getM_segList();
+		if (list!=null) 
+		{
+			seg = (Segment) list.elementAt(0);
+			System.out.println("some segment drawn");
+			setPropertiesWhileLoading();
+			
+		}
 		if(cmd.compareToIgnoreCase("Submit") == 0){
 			//dv.logEvent("setParamsLine();");
 			performSubmitActionLineParam(textLineLength,textLineAngle);
-			dv.setParameterWinBitSet(false);
+			//dv.setParameterWinBitSet(false);
 		}
 		else if(cmd.compareToIgnoreCase("Cancel") == 0){
 			//dv.logEvent("closeParamsLine();");
 			System.out.println("Cancel Clicked");
-			performCancelActionLineParam();
-			dv.setParameterWinBitSet(false);
+		//	performCancelActionLineParam();
+		//	dv.setParameterWinBitSet(false);
 		}
 		//dv.logEvent(Command.PAUSE);
 	}
 	
-	
-	// set the textboxes with the values of currently existing constraints
-	/**Function to show previously added constraints in the GUI 
-	 * while loading
-	 * @author Sunil Kumar
-	 */
-	public void setPropertiesWhileLoading()
-	{
-		Vector constraints = new Vector();
-		constraints = seg.getM_constraints();
-		Iterator itr = constraints.iterator();
-		while (itr.hasNext())
-		{
-			String cons = itr.next().toString();
-			String parsedCons[];
+
+    
+	public void mouseReleased(MouseEvent e){
+
+		if(e.getButton() == MouseEvent.BUTTON2){
+/*			if(list.getCellBounds(0,0)!=null) // There is at least one constraint
+			{
+				int index = (int)(e.getPoint().getY()/list.getCellBounds(0, 0).getHeight());
+				deleteConstraint(index);
+			}*/
+		}
+		if(e.getButton() == MouseEvent.BUTTON1){
+/*			int index = (int)(e.getPoint().getY()/list.getCellBounds(0, 0).getHeight());
+			Constraint cons=(Constraint)listConstraints.get(index);
+			if(!(cons.getM_category()==Constraint.SOFT))
+				cons.setPromoted(false);
+			//GMethods.getCurrentView().repaint(); */
 			
-			parsedCons = cons.split("[ ]+");
-			for(int i =0; i < parsedCons.length ; i++){
-				System.out.println(parsedCons[i]);
-				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("length") == 0)){
-					length = Double.parseDouble(parsedCons[5]);
-				}
-				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("angle") == 0)){
-					angle = Double.parseDouble(parsedCons[5]);
-				}
-				else if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Vertical") == 0) && (parsedCons[4].compareToIgnoreCase("line") == 0)){
-					angle = 90.0;
-				}
-				else if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Horizontal") == 0) && (parsedCons[4].compareToIgnoreCase("line") == 0)){
-					angle = 0.0;
-				}
-			}
 			
-			if(Double.compare(length, 0.0) == 0){
-				// do nothing
-			}
-			else{
-				textLineLength.setText(Double.toString(length));
-			}
-				
-			if(Double.compare(angle, -1.0) == 0){
-				// do nothing
-			}
-			else{
-				textLineAngle.setText(Double.toString(angle));
-			}
 		}
 	}
-}
 
+	public void mouseMoved(MouseEvent e){
+//		int index = -1;
+//		if(list.getCellBounds(0,0) !=null )
+//			index = (int)(e.getPoint().getY()/list.getCellBounds(0, 0).getHeight());
+//		clearHighlighting();
+//		if(index>=0 && index<listConstraints.size()){
+//			Constraint c=(Constraint)listConstraints.get(index);
+//			if(c instanceof RelativeConstraint){
+//				RelativeConstraint rc=(RelativeConstraint)c;
+//				rc.getM_seg1().setHighlighted(true);
+//				rc.getM_seg2().setHighlighted(true);
+//				highlightedElements.add(rc.getM_seg1());
+//				highlightedElements.add(rc.getM_seg2());
+//			}
+//			else if(c instanceof IndependentConstraint){
+//				IndependentConstraint ic=(IndependentConstraint)c;
+//				ic.getM_seg().setHighlighted(true);
+//				highlightedElements.add(ic.getM_seg());
+//			}
+//			else if(c instanceof IndependentPointConstraints){
+//				IndependentPointConstraints ip=(IndependentPointConstraints)c;
+//				Vector v=ip.getPoints();
+//				AnchorPoint p;
+//				for(int i=0;i<v.size();i++){
+//					p=(AnchorPoint)v.get(i);
+//					p.setHighlighted(true);
+//					highlightedElements.add(p);
+//				}
+//			}
+//			else if(c instanceof PointSegmentConstraint){
+//				PointSegmentConstraint p=(PointSegmentConstraint)c;
+//				p.getM_seg().setHighlighted(true);
+//				p.getM_ap().setHighlighted(true);
+//				highlightedElements.add(p.getM_seg());
+//				highlightedElements.add(p.getM_ap());
+//			}
+//			
+//			list.setSelectedIndex(index);
+//		}
+//			
+//		GMethods.getCurrentView().repaint();
+	}
+	
+
+    
+	/**
+	 * Display all the options for the given segment.
+	 * @param seg
+	 */
+	public void displayOptions(Segment seg)
+	{
+		this.seg = seg ;
+		setPropertiesWhileLoading() ;
+	}
+    
+    
+	public void mouseExited(MouseEvent e) {
+	//	clearHighlighting();
+		GMethods.getCurrentView().repaint();
+		removeKeyListener(this);
+		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
+		MainWindow.getM_statusBar().setCoordLabelText("");
+	//	helpDrawView.unselectRows();
+	}
+	
+	public void mouseDragged(MouseEvent e) {}
+	
+	public void mousePressed(MouseEvent e) {}
+
+	public void mouseClicked(MouseEvent e) {}
+	
+	public void mouseEntered(MouseEvent e) {
+		requestFocusInWindow();
+		removeKeyListener(this);
+		addKeyListener(this);
+		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+		
+	//	if(helpDrawView == null){
+	//		helpDrawView = MainWindow.getHelpDrawingView();
+	//	}
+	//	helpDrawView.selectRows(GConstants.CONSTRAINT_VIEW);
+	}
+
+	public void keyTyped(KeyEvent e){
+		char c = e.getKeyChar();
+		switch (c){
+		case KeyEvent.VK_DELETE:
+			// Delete the selected elements
+			deleteKeyPressed();
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void deleteKeyPressed(){
+	}
+	
+	public void keyPressed(KeyEvent e) {}
+	
+	public void keyReleased(KeyEvent e) {}
+	
+	public boolean dispatchKeyEvent(KeyEvent e){
+		processKeyEvent(e);
+		return true;
+	}
+
+}

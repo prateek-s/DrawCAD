@@ -46,14 +46,8 @@ import dcad.util.GMethods;
 import dcad.util.GVariables;
 import dcad.process.recognition.*;
 
-/**
- * List of all constraints are displayed. <location is at the bottom>. List is editable.
- * @author prateek
- *
- */
-public class RecognizedView extends JPanel implements MouseListener,MouseMotionListener, KeyListener,
-KeyEventDispatcher
-{
+public class OptionsPane extends JPanel implements MouseListener,MouseMotionListener, KeyListener,
+KeyEventDispatcher{
     private JList list;
     private DefaultListModel listModel;
     private String str4DeletedCons = " X ";
@@ -68,7 +62,8 @@ KeyEventDispatcher
     //Selection of an element changes this list. Movement / Drawing operation by user changes this list.
     Vector listConstraints=new Vector();
 
-	public RecognizedView(){
+	public OptionsPane ()
+	{
 		super(new BorderLayout());
 
 		setAutoscrolls(true);
@@ -103,11 +98,6 @@ KeyEventDispatcher
 		updateUI();
 	}
 	
-	/**
-	 * Is the method called by other parts of the program, displays the argument vector
-	 * (constraints), updates UI etc.
-	 * @param cons
-	 */
 	public void reset(Vector cons){
 		clear();
 		Iterator iterator = cons.iterator();
@@ -424,3 +414,4 @@ KeyEventDispatcher
 		return listConstraints;
 	}
 }
+

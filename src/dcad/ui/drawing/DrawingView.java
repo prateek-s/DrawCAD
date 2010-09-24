@@ -71,6 +71,7 @@ import dcad.process.recognition.stroke.StrokeRecognizer;
 import dcad.ui.help.HelpDrawingView;
 import dcad.ui.help.HelpView;
 import dcad.ui.main.CircularArcParameterWindow;
+import dcad.ui.main.EditView;
 import dcad.ui.main.LineParameterWindow;
 import dcad.ui.main.MainWindow;
 import dcad.ui.main.StatusBar;
@@ -152,6 +153,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	private Vector highlightedSegWhileDragging = null;
 	
+	/**
+	 * Mouse is over this segment.
+	 */
+	private Segment segUnderCursor = null ;
+	
 	//added on 02-06-10
 	/** if the segment is converted */
 	private static boolean isSegmentConverted = false;
@@ -221,6 +227,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	Point pt = null;
 	Segment seg = null;
 	Segment movedPointSegment = null;
+	
+	
 	public Segment getMovedPointSegment() {
 		return movedPointSegment;
 	}
@@ -597,7 +605,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			Marker marker = strokeRecog.getMarker();
 			if (marker != null)
 				addGeoElement(marker);
-			MainWindow.getRecognizedView().reset(m_drawData.getM_constraints());
+			UpdateUI(1,m_drawData.getM_constraints());
 			return null;
 		} else
 		{
@@ -1122,14 +1130,17 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = e.getY();
 	}
 
+	/**
+	 * todo
+	 */
 	public void mousePressed(MouseEvent e)
 	{
-		if(!isParameterWinBitSet()){
+	//	if(!isParameterWinBitSet()){
 			mousePressed(e.getButton(), e.getClickCount(), e.getX(), e.getY(), e.getWhen());
-		}
-		else{
-			 JOptionPane.showMessageDialog(MainWindow.getDv(),"Please close the properties window first");
-		}
+	//	}
+	//	else{
+	//		 JOptionPane.showMessageDialog(MainWindow.getDv(),"Please close the properties window first");
+	//	}
 			
 	}
 
@@ -1325,7 +1336,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 						}
 					}
 					snapIPsAndRecalculateConstraints();
-					MainWindow.getRecognizedView().reset(justAddedConstraints);
+					UpdateUI(1,justAddedConstraints);
 				}
 
 			}
@@ -1657,7 +1668,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			Segment seg = null;
 			// check whether the point is on any segment
 			seg = isPtOnAnySegment((Point2D)pt); 
-		
+			this.segUnderCursor = seg ;
 			int count = ptOnSegments(pt);
 			//System.out.println("Count =" +count);
 			// count <2 
@@ -1665,33 +1676,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			// count >=1 means that the anchor point is a child of # elements
 			if((seg)!=null && count < 2 && m_keyEventCode!= KeyEvent.VK_CONTROL  ){
 				//System.out.println("Control key not pressed");
-				setGeoElementClicked(seg);
-				if(seg instanceof SegLine){
-					System.out.println("point set line");
-					setMousePointerLocation(pt);
-					setParameterWinBitSet(true);
-					if(m_highlightedElements.size()<1){
-						m_highlightedElements.add(seg);
-					}
-					lineWindow = new LineParameterWindow();
-					
-					//m_highlightedElements.clear();
-					//System.out.println("Show line properties");
-				}
-				else if(seg instanceof SegCircleCurve){
-					System.out.println("point set cir arc");
-					setMousePointerLocation(pt);
-					//m_highlightedElements.add(seg);
-					if(m_highlightedElements.size()<1){
-						m_highlightedElements.add(seg);
-					}
-					setParameterWinBitSet(true);
-					circArcWindow = new CircularArcParameterWindow();
-					System.out.println("Highlighted elements size + " + m_highlightedElements.size());
-					
-					//m_highlightedElements.clear();
-					//System.out.println("Show arc properties");
-				}
+				setGeoElementClicked (seg);
+				UpdateUI(2, null) ;
 			}
 		}
 	}
@@ -1701,11 +1687,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	{
 		boolean extraClick = false;
 		
-		System.out.println("mouse released ");
+		//System.out.println("mouse released ");
 	
 		
 		//added on 19-04-10 for showing GUI to set properties of an element
-		if(!isParameterWinBitSet()){
+		if(!isParameterWinBitSet()) //not already open
+		{
 			System.out.println("Enter show elements properties ");
 			showElementPropertiesWindow(x, y, buttonType);
 		}
@@ -1804,10 +1791,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 		
 		//Show all constraints in the system
-		if(extraClick)
-			GMethods.getRecognizedView().reset(m_drawData.getM_constraints());
+		if(extraClick) 
+		{
+			Vector c = m_drawData.getM_constraints();
+			UpdateUI(1, c) ;
+		}
 		
-			// do common housekeeping
+		// do common housekeeping
 		m_currStroke = null;
 		// mouse was in the Edit Mode, change it to draw mode
 		GVariables.setDRAWING_MODE(GConstants.DRAW_MODE);
@@ -1917,7 +1907,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	/**function to find is the given line horizontal
 	 * @author Sunil Kumar
 	 */
-	public boolean isLineHorizontal(double angle1){
+	public boolean isLineHorizontal(double angle1)
+	{
 		// checked it by a margin of .5 degrees on either sides
 		/*p: 0.5 degrees is the magic constant here*/
 		//System.out.println("horizontal");
@@ -2501,7 +2492,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// unhighlight the highlighted component in the drawing view, if
 		// required
 		if(!isParameterWinBitSet()){
-		System.out.println("mouse moved");
+	//	System.out.println("mouse moved");
 		if (m_highlightedElements.size() > 0){
 			//System.out.println("highlighted elements ");
 			// first check if the mouse is on the same object,
@@ -2645,7 +2636,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		updateStatusBar(x, y, "( Move )", label);
 		}
 		else{
-			System.out.println("mouse moved Parameter window bit set");
+		//	System.out.println("mouse moved Parameter window bit set");
 		}
 			
 	}
@@ -2714,7 +2705,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// 03-05-10
 		// condition is added to avoid array index out of bounds exception in case parents size is null
 		GeometryElement gEle = null;
-		if(ap.getAllParents().size()!=0){
+		if(ap.getAllParents().size()!=0) {
 		gEle = (GeometryElement) ap.getAllParents().elementAt(
 				ap.getAllParents().size() - 1);
 		}
@@ -3084,8 +3075,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 			m_selectedElements.clear();
 			repaint();
-			RecognizedView rv = MainWindow.getRecognizedView();
-			rv.reset(m_drawData.getM_constraints());
+			//RecognizedView rv = MainWindow.getRecognizedView();
+			//rv.reset(m_drawData.getM_constraints());
+			UpdateUI(1,m_drawData.getM_constraints());
 		}
 	}
 
@@ -3167,7 +3159,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 		*/
 		
-		MainWindow.getRecognizedView().reset(justAddedConstraints);
+		UpdateUI(1,justAddedConstraints);
 	}
 
 	private Vector recalculateConstraints(Vector affectedSegs)
@@ -3316,6 +3308,35 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
+	/**
+	 * Update the recognized view constraint list and the edit pane.
+	 * @param type
+	 * @param cons
+	 */
+	public void UpdateUI (int type, Vector cons) 
+	{
+		Stroke stroke = this.m_currStroke ;
+		EditView ev = MainWindow.getEv() ;
+		if(cons!=null) {
+			GMethods.getRecognizedView().reset(cons) ;
+		}
+		
+		if (type==2)
+		{
+			//setMousePointerLocation(pt);
+			//setParameterWinBitSet(true);
+			if(m_highlightedElements.size()<1){
+				m_highlightedElements.add(seg);
+			}
+			
+			//lineWindow = new LineParameterWindow();
+			if(seg!=null)
+				ev.displayOptions(seg) ;
+			//m_highlightedElements.clear();		
+		}
+	}
+	
+	
 	public boolean isM_trackFlag()
 	{
 		return m_trackFlag;
@@ -3326,14 +3347,16 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_trackFlag = flag;
 	}
 
+	
 	public void clearView()
 	{
 		if (null != m_drawData)
 		{
 			m_drawData = null;
 			init();
-			RecognizedView rv = MainWindow.getRecognizedView();
-			rv.reset(m_drawData.getM_constraints());
+			//RecognizedView rv = MainWindow.getRecognizedView();
+			//rv.reset(m_drawData.getM_constraints());
+			UpdateUI(1,m_drawData.getM_constraints()) ;
 		}
 		repaint();
 		this.revalidate();

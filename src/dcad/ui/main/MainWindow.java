@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 
 //import org.GNOME.Accessibility.Application;
 
@@ -29,10 +30,11 @@ import dcad.ui.drawing.VerticalScale;
 import dcad.ui.help.HelpDrawingView;
 import dcad.ui.help.HelpRecognizeView;
 import dcad.ui.help.HelpView;
+import dcad.ui.main.EditView; 
 import dcad.ui.main.TempClass;
 import dcad.ui.recognize.RecognizedView;
-import dcad.ui.recognize.OptionsPane;
 import dcad.util.GConstants;
+
 
 public class MainWindow extends ScrollPane implements ActionListener, AdjustmentListener
 {
@@ -43,7 +45,8 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 	private static MainWindow application = null;
 	private static HelpDrawingView  helpDrawingView= null;
 	private static HelpRecognizeView helpRecognizeView = null;
-
+	
+	private static EditView ev = null ;
 
 	private static HorizontalScale hs=null;
 	private static VerticalScale vs=null;
@@ -61,13 +64,12 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 	private static JComponent drawingTab;
 	private static JComponent helpTab;
 	private static JComponent recognizedTab;
-	private static JComponent optionsTab;
 	private static JComponent helpSubTab;
 	private static JComponent helpRecognizeTab;
 	private static JComponent horizontalScale;
 	private static JComponent verticalScale;
 	private static JComponent tempclass;
-	
+	private static JComponent EditTab ;
 	 
 	private static int winHeight = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private static int winWidth = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
@@ -94,6 +96,15 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		MainWindow.helpRecognizeView = helpRecognizeView;
 	}
 	
+	public static EditView getEv() 
+	{
+		return ev;
+	}
+	
+	public static void setEv(EditView e)
+	{
+		MainWindow.ev = e ;
+	}
 	
 	public static DrawingView getDv() {
 		return dv;
@@ -160,9 +171,13 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		//helpTab = new JScrollPane(new HelpView());
 			
 		//helpTab = new HelpView();
-		recognizedTab = new JScrollPane(new RecognizedView());
 		
-		optionsTab = new JScrollPane(new OptionsPane());
+		recognizedTab = new JScrollPane(new RecognizedView());
+		JTabbedPane tabbedPane = new JTabbedPane() ;
+		tabbedPane.add("CONSTRAINTS", recognizedTab) ;
+		
+
+		
 		// 25-09-09
 		helpDrawingView = new HelpDrawingView();
 		helpSubTab = helpDrawingView.DrawingWindow();
@@ -173,7 +188,9 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		dv = new DrawingView();
 		drawingTab = new JScrollPane(dv);
 		drawingTab.setFocusable(true);
-		
+		ev = new EditView();
+		EditTab = new JScrollPane (ev);
+		tabbedPane.add("EDIT",EditTab) ;
 		// add Scrollbar adjustment listener to Drawing Window - horizontal and vertical
 		
 		final JScrollBar drawHrBar = ((JScrollPane)drawingTab).getHorizontalScrollBar();
@@ -209,6 +226,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		horizontalScale = new JScrollPane(hs);
 		horizontalScale.setFocusable(true);
 		
+		
 		m_LeftSplitPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, tempclass ,verticalScale,TOP_HORIZONTAL_DIVIDER);
 	
 		m_hzScaleDrawView = createSplitPane(JSplitPane.VERTICAL_SPLIT, horizontalScale , drawingTab, TOP_HORIZONTAL_DIVIDER);
@@ -217,11 +235,12 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 					
 		//m_upperPane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_vtScaleDraw,helpSubTab, RIGHT_VERTICAL_DIVIDER);
 
-		//m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , recognizedTab, BOTTOM_DIVIDER);	
-		m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , optionsTab, BOTTOM_DIVIDER);	
-
+		m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , tabbedPane , BOTTOM_DIVIDER);	
 		m_splitpane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_LowerPane, helpSubTab,RIGHT_VERTICAL_DIVIDER);
 		//m_splitpane.setResizeWeight(0.7);
+		
+		//tabbedPane.add(m_LowerPane);
+		
 		
 		return m_splitpane;
 	}
@@ -300,6 +319,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		hs.repaint();
 		vs.repaint();
 	}
+	
 	public static JSplitPane createSplitPane(int splitOrientation, Component comp1, Component comp2, int divider){
 		JSplitPane js = new JSplitPane(splitOrientation, comp1 , comp2);
 		js.setOneTouchExpandable(true);

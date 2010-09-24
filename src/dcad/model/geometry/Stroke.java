@@ -693,6 +693,7 @@ public class Stroke extends GeometryElement
 				if(sp.getM_point().equals(m_ptList.elementAt(index))) return sp;
 			}
 		}
+
 		return null;
 	}
 	
@@ -730,13 +731,15 @@ public class Stroke extends GeometryElement
 		return length;
 	}
 
+	
 	public double getLength()
 	{
 		return getLength(0, m_ptList.size()-1);
 	}
 	
 	/**
-	 * what does this do?
+	 * Why not just return the previous element in the list instead of line intersections?
+	 * Note that the Point X,Y coordinates are integers, which is why the x+1,y+1 trick works.
 	 * @param x
 	 * @param y
 	 * @return
@@ -761,7 +764,7 @@ public class Stroke extends GeometryElement
 	}
 
 	/**
-	 * what does this do?
+	 * See findPrevPI
 	 * @param x
 	 * @param y
 	 * @return
@@ -785,6 +788,7 @@ public class Stroke extends GeometryElement
 		return null;
 	}
 
+	
 	public boolean containsPt(double x, double y)
 	{
 //		System.out.println("Stroke.containsPt()");
