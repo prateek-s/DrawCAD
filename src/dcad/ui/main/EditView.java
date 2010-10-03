@@ -228,8 +228,14 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		pt = new Point();
 //Determining the correct mouse pointer location is tricky. dv.getmouseptrlocation gives null values when it doesnt for the pop-up case. 
 		//Because when extra-clicked the mouse-moved listener is not called so the co-ordinates are "correct"! aah!
-		this.pt = pt ;
-		this.pt = dv.getMousePointerLocation() ;
+		/**
+		 * Basically pt location is crucial for writetext to work. Can we just choose a point on the current segment? 
+		 */
+		
+		//this.pt = pt ;
+		//this.pt = dv.getMousePointerLocation() ;
+		this.pt = (Point) seg.getRawPoints().elementAt(0) ; //first point of the stroke? 
+		
 		if(pt==null) {
 			System.out.println("POINT VALUE IS NULLLLLLLLLLLLLLLLLLL") ;
 		}
@@ -449,10 +455,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 				}
 				else 
 				{
-					cmd = this.seg_properties.field2.trim()+"a" ;
+					cmd = angle+"a" ;
 					dv.writeText((int)pt.getX(),(int) pt.getY(), cmd);
 				}
 			}
+			//CLEAR everything?
 		}
 
 		/*****CIRCLE*******/

@@ -1665,6 +1665,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			Point pt = new Point();
 			pt.setLocation(x, y);
 			
+			setMousePointerLocation(pt) ;
+			
 			Segment seg = null;
 			// check whether the point is on any segment
 			seg = isPtOnAnySegment((Point2D)pt); 
@@ -1688,8 +1690,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		boolean extraClick = false;
 		
 		//System.out.println("mouse released ");
-	
 		
+		Point pt1 = new Point(x,y) ;
+		setMousePointerLocation(pt1) ;
+
 		//added on 19-04-10 for showing GUI to set properties of an element
 		if(!isParameterWinBitSet()) //not already open
 		{
@@ -3329,27 +3333,37 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 */
 	public void UpdateUI (int type, Vector cons) 
 	{
-		Stroke stroke = this.m_currStroke ;
+		Stroke stroke = getCurrStroke();
 		EditView ev = MainWindow.getEv() ;
+		
 		if(cons!=null) {
 			GMethods.getRecognizedView().reset(cons) ;
 		}
 		Segment segm = null ;
-	//	if (type==2) 
-	//	{
-			//setMousePointerLocation(pt);
-			//setParameterWinBitSet(true);
-			if(m_highlightedElements.size() ==1 ){
-				m_highlightedElements.add(seg);
-			}
-		Vector segL = stroke.getM_segList();
+
+		if(m_highlightedElements.size() ==1 ){
+			m_highlightedElements.add(seg);
+		}
+		Vector segL; 
+		if(stroke == null) { //this arises in the case when property has been changed..
+			segL = null ;
+			
+		}
 		
-		if(segL.isEmpty()) {
-			 segm = null ;
+		if(stroke == null) { //possible..
+			return ;
+			
 		}
-		else {
-			 segm = (Segment)segL.elementAt(0) ;
+		segL = stroke.getM_segList();
+		
+
+		
+		if (segL.isEmpty()) {
+			segm= null ;
+			return ;
 		}
+		 segm = (Segment)segL.elementAt(0) ;
+		
 			//lineWindow = new LineParameterWindow();
 			if(segm!=null)
 			{
@@ -3360,7 +3374,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				Point pt4 = getLocation() ;
 				System.out.println("BEGIN POINT CO_ORDINATES......................") ;
 				
-				ev.displayOptions(segm,pt) ;
+				ev.displayOptions(segm,pt2) ;
 			}
 			//m_highlightedElements.clear();		
 	//	}
@@ -3524,9 +3538,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		return m_selectedElements;
 	}
 
-	public Stroke getCurrentStroke(){
-		return m_currStroke = new Stroke();
-	}
 	
 	public void setCurrentStroke(Stroke stroke){
 		m_currStroke = stroke;
