@@ -19,27 +19,30 @@ public class SegmentRecognizer
 	private int m_segType = Segment.NONE; 
 	private double m_segLen = 0.0;
 	private Segment m_recogSeg = null;
-	private LineRecognizer m_lineRecog = null;
+	public LineRecognizer m_lineRecog = null;
 	private SegmentRecognitionScheme m_pointRecog = null;
 	private EllipticalCurveRecognizer m_ellipCurveRecog = null;
-	private CircularCurveRecognizer m_circleCurveRecog = null;
+	public CircularCurveRecognizer m_circleCurveRecog = null;
 	
 	//02-06-10
 	private DrawingView dv = null; 
 	private final int CIRCULAR_ARC = 1;
 	private final int LINE = 0;
 	
+	
 	public SegmentRecognizer()
 	{
 		reset();
 	}
+	
 
+	
 	private void reset()
 	{
 		m_points = null;
 		m_recogSeg = null;
 		m_segLen = 0.0;
-		m_segType = Segment.NONE; 
+		//m_segType = Segment.NONE; 
 		m_confidance = -Double.MAX_VALUE;
 	}
 	
@@ -80,9 +83,8 @@ public class SegmentRecognizer
 	/**
 	 * finds the best match for this segment from all the possibilities.
 	 */
-	private SegmentRecognitionScheme getBestMatch(){		
-		
-		
+	private SegmentRecognitionScheme getBestMatch()
+	{			
 		
 		// fix some order of evaluation to find out the type of the segment
 		
@@ -200,7 +202,7 @@ public class SegmentRecognizer
 		return conf;
 	}
 		
-	private double isLine()
+	public double isLine()
 	{
 		m_lineRecog = new LineRecognizer(m_points);
 		double conf = m_lineRecog.approximate();
@@ -208,7 +210,7 @@ public class SegmentRecognizer
 		return conf;
 	}
 	
-	private double isCircle()
+	public double isCircle()
 	{
 		// get the total length of all the points
 		if(m_points.length<MIN_PTS_FOR_CIRCLE)
@@ -230,7 +232,7 @@ public class SegmentRecognizer
 		return conf;
 	}
 	
-	private double isEllipse()
+	public double isEllipse()
 	{
 		m_ellipCurveRecog = new EllipticalCurveRecognizer(m_points);
 		double conf = m_ellipCurveRecog.approximate();

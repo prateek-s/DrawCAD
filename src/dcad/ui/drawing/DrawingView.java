@@ -541,7 +541,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	/**
-	 * Called by mouse-released. 
+	 * Called by mouse-released. Detects Segment Points and does recognition and constraints
 	 * @param theStroke
 	 * @return Segments-Constraints Vector.
 	 */
@@ -1724,33 +1724,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				//added on 25-02-10
 				//if (m_currStroke != null
-				if (m_currStroke != null && m_currStroke.getM_ptList().size()!=0)
-				{
-				//1-6-2008
-				//m_currStroke.smoothen();
-					
-					Vector constraints = addStroke(m_currStroke);
-					
-				//add the constraints to the Constraint solver
-					if (m_currStroke.getM_type() == Stroke.TYPE_NORMAL)
-					{
-						if ((constraints != null) && (constraints.size() > 0))
-						{
-							if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
-								justAddedConstraints = constraints;
-						}
-						snapIPsAndRecalculateConstraints();
-						//GMethods.getHelpView().initialize(HelpView.afterDrawing);
-					}
-				//25-3-2008 Added this line.
-					else
-						addConstraintsForMarkers();
-				//show the last stroke
-					m_showLastStroke = true;
-					addToUndoVector();
-					repaint();
-					
-				}
+				Vector constraints = ProcessStroke(m_currStroke) ;
 			}
 		}
 		else
@@ -1814,6 +1788,45 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// drawing
 		resizePanel();
 	}
+	
+	
+	public Vector ProcessStroke(Stroke strk)
+	{
+		Vector constraints = null ;
+		if (strk != null )
+		{
+		//1-6-2008
+		//m_currStroke.smoothen();
+			
+			constraints = addStroke(strk); //Does all the work
+			
+		//add the constraints to the Constraint solver
+			if (strk.getM_type() == Stroke.TYPE_NORMAL)
+			{
+				if ((constraints != null) && (constraints.size() > 0))
+				{
+					if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
+						justAddedConstraints = constraints;
+				}
+				snapIPsAndRecalculateConstraints();
+				//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+			}
+		//25-3-2008 Added this line.
+			else {
+				addConstraintsForMarkers(); 
+			}
+		//show the last stroke
+			m_showLastStroke = true;
+			//TODO: Semantics of this..
+			addToUndoVector();
+			repaint();
+			
+			
+			
+		}
+		return constraints;
+	}
+	
 	
 	// added on 18-05-10
 	// to remove segment lines and their respective constraints
@@ -3310,7 +3323,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	/**
 	 * Update the recognized view constraint list and the edit pane.
-	 * @param type
+	 * @param type 1=only constraints 2=everything, including edit pane 
 	 * @param cons
 	 */
 	public void UpdateUI (int type, Vector cons) 
@@ -3320,20 +3333,31 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if(cons!=null) {
 			GMethods.getRecognizedView().reset(cons) ;
 		}
-		
-		if (type==2)
-		{
+		Segment segm = null ;
+	//	if (type==2) 
+	//	{
 			//setMousePointerLocation(pt);
 			//setParameterWinBitSet(true);
-			if(m_highlightedElements.size()<1){
+			if(m_highlightedElements.size() ==1 ){
 				m_highlightedElements.add(seg);
 			}
-			
-			//lineWindow = new LineParameterWindow();
-			if(seg!=null)
-				ev.displayOptions(seg) ;
-			//m_highlightedElements.clear();		
+		Vector segL = stroke.getM_segList();
+		
+		if(segL.isEmpty()) {
+			 segm = null ;
 		}
+		else {
+			 segm = (Segment)segL.elementAt(0) ;
+		}
+			//lineWindow = new LineParameterWindow();
+			if(segm!=null)
+			{
+				//Point pt = getMousePointerLocation() ;
+				Point pt = getM_mousePos() ;
+				ev.displayOptions(segm,pt) ;
+			}
+			//m_highlightedElements.clear();		
+	//	}
 	}
 	
 	

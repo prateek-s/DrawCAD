@@ -23,6 +23,7 @@ public abstract class SegmentRecognitionScheme
 	{
 		super();
 		init(points);
+		
 	}
 	
 	// abstract methods

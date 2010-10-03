@@ -14,6 +14,9 @@ public class LineRecognizer extends SegmentRecognitionScheme
 	{
 		super(points);
 		// TODO Auto-generated constructor stub
+		
+		/************ MODIFIED ACHTUNG */
+		
 	}
 
 	public double approximate()

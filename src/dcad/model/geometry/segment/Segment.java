@@ -148,6 +148,10 @@ public abstract class Segment extends GeometryElement
 		this.m_type = m_type;
 	}
 
+	public int getM_type () 
+	{	
+		return this.m_type ;
+	}
 	public GeometryElement getM_group()
 	{
 		return m_group;

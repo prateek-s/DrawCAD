@@ -25,6 +25,8 @@ import dcad.process.recognition.constraint.IndConstraintRecognizer;
 import dcad.process.recognition.constraint.RelConstraintRecognizer;
 import dcad.process.recognition.constraint.pointOnSegmentRecognizer;
 import dcad.process.recognition.constraint.tangencyRecognizer;
+import dcad.process.recognition.segment.CircularCurveRecognizer;
+import dcad.process.recognition.segment.LineRecognizer;
 import dcad.process.recognition.segment.SegmentRecognitionScheme;
 import dcad.process.recognition.segment.SegmentRecognizer;
 import dcad.ui.drawing.DrawingView;
@@ -177,15 +179,16 @@ public class Stroke extends GeometryElement
 		}
 	}
 	
-	
+	public int user_given = 0 ; //user says which segment this should be. 
 	
 	/*************************   Segment Functions   *****************************/
 
 	/**
 	 * Recognizes all the segments of this stroke. 
 	 */
-	public void recognizeSegments(SegmentRecognizer segRecog) throws Exception
-	{
+	
+		public void recognizeSegments(SegmentRecognizer segRecog) throws Exception
+		{
 
 		deleteSegments();
 		
@@ -227,6 +230,7 @@ public class Stroke extends GeometryElement
 				}
 			}
 		}
+
 	//	}
 	}
 
@@ -243,6 +247,52 @@ public class Stroke extends GeometryElement
 		
 		// get the pixels with the segment
 		double[][] seg = getWindowElemAs2DMatrix_Double(start, end);
+		
+		if(user_given > 0) 
+		{
+			Segment to_return = null ;
+			switch (user_given)
+			{
+			
+			case Segment.POINT:
+				//return ;
+
+			case Segment.LINE:
+			//basically, just call isLine() here.. 
+				LineRecognizer m_lineRecog = new LineRecognizer(seg);
+				m_lineRecog.approximate() ; //important side-effect. Sigh
+				to_return = m_lineRecog.getSegment() ;
+				to_return.setM_rawStartIdx(start);
+				to_return.setM_rawEndIdx(end);
+				to_return.setM_parentStk(this); 
+				
+				if(to_return instanceof SegCircleCurve)
+					((SegCircleCurve)to_return).updateDetails();
+				break ;
+			
+			case Segment.CIRCLE:
+				//call isCircle
+				segRecog.isCircle() ;
+				to_return = segRecog.m_circleCurveRecog.getSegment() ;
+			//	CircularCurveRecognizer m_circleCurveRecog = new CircularCurveRecognizer(seg);
+			//	to_return = m_circleCurveRecog.getSegment() ;
+				to_return.setM_rawStartIdx(start);
+				to_return.setM_rawEndIdx(end);
+				to_return.setM_parentStk(this); 
+				
+				if(to_return instanceof SegCircleCurve)
+					((SegCircleCurve)to_return).updateDetails();
+				break ;
+			case Segment.ELLIPSE:
+				//return m_ellipCurveRecog;
+				break ;
+			case Segment.GENERAL:
+			//	return null;
+				break ;
+			}
+			
+			return to_return ;
+		}
 		
 		if(seg != null)
 		{
