@@ -3333,7 +3333,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 */
 	public void UpdateUI (int type, Vector cons) 
 	{
-		Stroke stroke = getCurrStroke();
+		Stroke stroke = getCurrStroke(); 
+		Point pt2 = getMousePointerLocation() ; 
+		
 		EditView ev = MainWindow.getEv() ;
 		
 		if(cons!=null) {
@@ -3345,31 +3347,25 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			m_highlightedElements.add(seg);
 		}
 		Vector segL; 
-		if(stroke == null) { //this arises in the case when property has been changed..
-			segL = null ;
-			
-		}
 		
-		if(stroke == null) { //possible..
-			return ;
-			
-		}
-		segL = stroke.getM_segList();
+		//Need mouse-pointer location to get the segment, if the segment/stroke is null. Mouse-press creates new stroke, over writing previous one, so this 
+		// is needed. 
 		
+		if(stroke==null || stroke.getM_segList().isEmpty()) {
+			segm = isPtOnAnySegment((Point2D)pt2); 
 
-		
-		if (segL.isEmpty()) {
-			segm= null ;
-			return ;
 		}
-		 segm = (Segment)segL.elementAt(0) ;
-		
+		else {
+			segL = stroke.getM_segList();
+
+			segm = (Segment)segL.elementAt(0) ;
+		}
 			//lineWindow = new LineParameterWindow();
 			if(segm!=null)
 			{
 				//Point pt = getMousePointerLocation() ;
 				Point pt = getM_mousePos() ;
-				Point pt2 = getMousePointerLocation() ; 
+				
 				Point pt3 = getLocationOnScreen() ;
 				Point pt4 = getLocation() ;
 				System.out.println("BEGIN POINT CO_ORDINATES......................") ;
