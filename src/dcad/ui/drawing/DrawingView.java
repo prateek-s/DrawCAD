@@ -3322,7 +3322,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	/**
-	 * Update the recognized view constraint list and the edit pane.
+	 * Update the recognized view constraint list and the edit pane. 
+	 * TODO: Fix point null problem. 
 	 * @param type 1=only constraints 2=everything, including edit pane 
 	 * @param cons
 	 */
@@ -3354,6 +3355,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				//Point pt = getMousePointerLocation() ;
 				Point pt = getM_mousePos() ;
+				Point pt2 = getMousePointerLocation() ; 
+				Point pt3 = getLocationOnScreen() ;
+				Point pt4 = getLocation() ;
+				System.out.println("BEGIN POINT CO_ORDINATES......................") ;
+				
 				ev.displayOptions(segm,pt) ;
 			}
 			//m_highlightedElements.clear();		

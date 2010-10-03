@@ -202,7 +202,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	public void init() 
 	{
 		dv = MainWindow.getDv();
-		pt = new Point();
+		
 
 		//	pt = new Point();
 		//pt.setLocation(dv.getMousePointerLocation()); //moved over to displayOptions
@@ -223,8 +223,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 */
 	public void displayOptions(Segment seg, Point pt) 
 	{
+		
 		this.seg = seg ;
+		pt = new Point();
+//Determining the correct mouse pointer location is tricky. dv.getmouseptrlocation gives null values when it doesnt for the pop-up case. 
+		//Because when extra-clicked the mouse-moved listener is not called so the co-ordinates are "correct"! aah!
 		this.pt = pt ;
+		this.pt = dv.getMousePointerLocation() ;
 		if(pt==null) {
 			System.out.println("POINT VALUE IS NULLLLLLLLLLLLLLLLLLL") ;
 		}
@@ -408,6 +413,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	public void ChangeProperty(int seg_type,String property)
 	{
 		String cmd = "" ;
+		Point pt = this.pt ;
 		/*****LINE****/
 		if(seg_type==Segment.LINE) 
 		{
