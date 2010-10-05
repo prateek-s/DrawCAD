@@ -11,7 +11,7 @@ import dcad.ui.drawing.DrawingView;
 import dcad.ui.main.MainWindow;
 import dcad.util.GMethods;
 
-/** Class to convert from one recognition type to another 
+/** Class to convert from one recognition type to another. Defunct, doesnt work .
  * @author sunil
  */
 public class ConvertSegment {

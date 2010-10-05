@@ -16,11 +16,14 @@ import dcad.util.GVariables;
 
 /**
  * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily)
- * DrawingData object contains all the displayable objects in the current drawing
+ * DrawingData object contains all the displayable objects in the current drawing.
+ * Really, the only state kept by the this is the stroke-list. The rest is just list traversal. 
  */
 public class DrawingData
 {
-	
+	/**
+	 * Constraints
+	 */
 	private static Vector m_constraints;
 	/**
 	 * Stroke List. Accessed for..
@@ -35,6 +38,8 @@ public class DrawingData
 	 */
 	private CommandQueue m_inputFileCommands;
 
+	/**************************************************************************/
+	
 	public DrawingData()
 	{
 		m_stkList = new Vector();
@@ -196,6 +201,11 @@ public class DrawingData
 		this.m_constraints = m_constraints;
 	}
 
+	/**
+	 * Constraints associated with the segments. 
+	 * @param stroke
+	 * @return
+	 */
 	public Vector getConstraintsForStroke(Stroke stroke)
 	{
 		Vector constraints = new Vector();
@@ -244,6 +254,7 @@ public class DrawingData
 		}
 		return apList;
 	}
+	
 	
 	//While editing, we want to move all connected segments to move when highlighted segment(s) are moved.
 	public Vector getAllAnchorPointsWhileEditing(Vector highlightedElements)

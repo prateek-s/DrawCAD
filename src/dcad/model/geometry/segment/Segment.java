@@ -530,6 +530,11 @@ public abstract class Segment extends GeometryElement
 		}
 	}
 	
+	/**
+	 * 
+	 * @param segments
+	 * @return
+	 */
 	public Vector findConstraints(Vector segments)
 	{
 		Vector cons = new Vector();

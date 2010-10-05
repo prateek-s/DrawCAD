@@ -68,9 +68,21 @@ public class DrawCAD{
 		    f.renameTo(new File(absPath + "/src/DrawCAD.properties"));
 	}
 	
-	public static void main(String[] args){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
+	
+	/**
+	 * Initialize Swing UI. Also the program state and ActionInterface.
+	 * @param args
+	 */
+	public static void main(String[] args)
+	{
+	
+		
+		
+		/** initialize the swing UI .. */
+		javax.swing.SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
 				GMethods.init(System.getProperty("user.dir")+"/src/DrawCAD.properties");
 				
 		        frame = new JFrame();
@@ -94,11 +106,11 @@ public class DrawCAD{
 				    	}
 				        System.exit(0); 
 				    }
-				});
-			}
-		});
+				}); //close addWindowListener.
+			} //run
+		}); //invoke_later
 		
-	}
+	} //main
 	
 	
-}
+} //class
