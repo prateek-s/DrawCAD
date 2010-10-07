@@ -97,7 +97,8 @@ public class DrawingView extends JPanel implements MouseListener,
 		MouseMotionListener, KeyListener, KeyEventDispatcher, Serializable
 
 {
-
+	public ActionInterface A ;
+	
 	private ProcessManager m_processManager;
 	/**
 	 * Strokes, constraints, markets, anchors, text etc added by
@@ -337,6 +338,8 @@ public class DrawingView extends JPanel implements MouseListener,
 		setAutoscrolls(true);
 
 		m_processManager = ProcessManager.getInstance();
+		
+		A = new ActionInterface() ;
 
 		// reset the global id
 		GeometryElement.globalID = 0;
@@ -378,7 +381,8 @@ public class DrawingView extends JPanel implements MouseListener,
 	/**
 	 * box,length,prev point to null
 	 */
-	private void reset() {
+	private void reset() 
+	{
 		m_bBox = null;
 		m_prevPt = null;
 		m_length = 0.0;
@@ -440,7 +444,8 @@ public class DrawingView extends JPanel implements MouseListener,
 
 	// 10 - 05 -10
 	//
-	public void drawCollinearLine(Graphics g, Paint color) {
+	public void drawCollinearLine(Graphics g, Paint color) 
+	{
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setPaint(color);
 
@@ -449,7 +454,8 @@ public class DrawingView extends JPanel implements MouseListener,
 	}
 
 	/** draw all the strokes, segments and segment ponints */
-	private void drawStrokes(Graphics gc, Vector strokes) {
+	private void drawStrokes(Graphics gc, Vector strokes) 
+	{
 		Iterator iter = strokes.iterator();
 		while (iter.hasNext()) {
 			Stroke aStroke = (Stroke) iter.next();
@@ -458,7 +464,8 @@ public class DrawingView extends JPanel implements MouseListener,
 	}
 
 	/** draw all the markers */
-	public void drawMarkers(Graphics gc, Vector markers) {
+	public void drawMarkers(Graphics gc, Vector markers) 
+	{
 		// Graphics2D g2 = (Graphics2D)gc;
 		// g2.setPaint(color);
 		// if last drawn stroke is a marker, change the colour
@@ -471,7 +478,8 @@ public class DrawingView extends JPanel implements MouseListener,
 	}
 
 	/** draw all the text elments */
-	private void drawTextElements(Graphics gc, Vector textElements) {
+	private void drawTextElements(Graphics gc, Vector textElements) 
+	{
 		Iterator iter;
 		iter = textElements.iterator();
 		while (iter.hasNext()) {
@@ -512,9 +520,7 @@ public class DrawingView extends JPanel implements MouseListener,
 				if (y > m_bBox.height)
 					m_bBox.height = y;
 			}
-
 			gc.dispose();
-			
 		}
 
 		// Display the mouse position to the status bar
@@ -646,111 +652,11 @@ public class DrawingView extends JPanel implements MouseListener,
 		}
 	}
 
-	public void addGeoElement(GeometryElement gEle) {
-		if (gEle instanceof Stroke)
-			m_drawData.addStroke((Stroke) gEle);
-		else if (gEle instanceof Text)
-			m_drawData.addTextElement((Text) gEle);
-		else if (gEle instanceof Marker)
-			m_drawData.addMarker((Marker) gEle);
-	}
+	/** _MOVE **/
+	
 
-	public void removeGeoElement(GeometryElement gEle) {
-		if (gEle instanceof Stroke)
-			m_drawData.removeStroke((Stroke) gEle);
-		else if (gEle instanceof Text)
-			m_drawData.removeTextElement((Text) gEle);
-		else if (gEle instanceof Marker)
-			m_drawData.removeMarker((Marker) gEle);
-	}
 
 	public void mouseClicked(MouseEvent e) {
-	}
-
-	public Vector isPtOnAnyAnchorPoint(Point pt) {
-		Vector selectedAps = new Vector();
-		Vector apList = m_drawData.getAllAnchorPoints();
-		for (int i = 0; i < apList.size(); i++) {
-			AnchorPoint ap = (AnchorPoint) apList.get(i);
-			if (ap.containsPt(pt))
-				selectedAps.add(ap);
-		}
-		return selectedAps;
-	}
-
-	public Segment isPtOnAnySegment(Point2D pt) {
-		// find the closest segment
-		Vector segList = m_drawData.getAllSegments();
-		Iterator itr = segList.iterator();
-		while (itr.hasNext()) {
-			Segment seg = (Segment) itr.next();
-			if (seg.containsPt(pt))
-				return seg;
-		}
-
-		return null;
-	}
-
-	public GeometryElement isPtOnAnyText(Point2D pt) {
-		Iterator itr = m_drawData.getM_textElements().iterator();
-		while (itr.hasNext()) {
-			Text txt = (Text) itr.next();
-			if (txt.containsPt(pt))
-				return txt;
-		}
-		return null;
-	}
-
-	public Marker isPtOnAnyMarker(Point2D pt) {
-		Vector markerList = m_drawData.getM_markers();
-		Iterator itr = markerList.iterator();
-		while (itr.hasNext()) {
-			Marker marker = (Marker) itr.next();
-			if (marker.containsPt(pt))
-				return marker;
-		}
-		return null;
-	}
-
-	public Stroke isPtOnAnyStroke(Point2D pt) {
-		for (int i = m_drawData.getStrokeList().size() - 1; i >= 0; i--) {
-			Stroke stroke = (Stroke) m_drawData.getStrokeList().get(i);
-			if (stroke.containsPt(pt))
-				return stroke;
-		}
-		return null;
-	}
-
-	public Vector isPtOnGeometryElement(Point2D pt) {
-		Vector gEles = new Vector();
-		Vector aps = isPtOnAnyAnchorPoint(m_mousePos);
-		if ((aps != null) && (aps.size() > 0)) {
-			gEles.addAll(aps);
-			return gEles;
-		}
-
-		// check if the mouse is close to any other geometry element
-		GeometryElement gEle = isPtOnAnySegment(m_mousePos);
-		if ((gEle != null) && (gEle.isEnabled())) {
-			gEles.add(gEle);
-			return gEles;
-		}
-
-		// check if point is on any Text element
-		gEle = isPtOnAnyText(m_mousePos);
-		if ((gEle != null) && (gEle.isEnabled())) {
-			gEles.add(gEle);
-			return gEles;
-		}
-
-		// check if point is on any marker
-		gEle = isPtOnAnyMarker(m_mousePos);
-		if ((gEle != null) && (gEle.isEnabled())) {
-			gEles.add(gEle);
-			return gEles;
-		}
-
-		return gEles;
 	}
 
 	public void snapAllImpPoints(Vector SegmentList) {
@@ -1212,7 +1118,8 @@ public class DrawingView extends JPanel implements MouseListener,
 						l.delete();
 					}
 				}
-				snapIPsAndRecalculateConstraints();
+				snapIPsAndRecalculateConstraints() ;
+				UpdateUI(1, justAddedConstraints);
 			} else {
 
 				System.out.println("\n\n\n\n\nSeparating the points\n\n\n\n\n");
@@ -1498,7 +1405,8 @@ public class DrawingView extends JPanel implements MouseListener,
 		return intersect;
 	}
 
-	public void mouseButton1Pressed(int x, int y, long time) {
+	public void mouseButton1Pressed(int x, int y, long time)
+	{
 		justAddedConstraints = new Vector();
 		Point pt = new Point(x, y) ;
 		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
@@ -1549,6 +1457,7 @@ public class DrawingView extends JPanel implements MouseListener,
 
 	/**
 	 * some other element was clicked .. so clear all the selection
+	 * UI
 	 */
 	private void clearSelection()
 	{ 
@@ -2952,7 +2861,8 @@ public class DrawingView extends JPanel implements MouseListener,
 					getGraphics().drawString(blankStr, m_mousePos.x,
 							m_mousePos.y);
 
-					writeText(m_mousePos.x, m_mousePos.y, typedText);
+					writeText(m_mousePos.x, m_mousePos.y, typedText) ;
+					clearSelection() ;
 					repaint();
 				}
 				setEnterKeyClicked(false);
@@ -3024,116 +2934,20 @@ public class DrawingView extends JPanel implements MouseListener,
 			}
 		}
 	}
-
-	public void snapIPsAndRecalculateConstraints() {
-		snapIPs();
-
-		// After snapping the points, add more constraints that can be added
-		Vector newlyAddedConstraints = recalculateConstraints(m_drawData
-				.getAllSegments());
-
-		// These constraints could be solved
-		Vector solvedConstraints = ConstraintSolver
-				.solveConstraintsAfterSnapAndRecalculation(m_drawData
-						.getAllAnchorPoints());
-
-		// If the constraints could not be solved, remove the newly added
-		// constraints
-		if (solvedConstraints.size() == 0)
-			constraintsHelper.removeConstraints(newlyAddedConstraints);
-		else {
-			// First of all, update the solved constraints
-			updateConstraints(solvedConstraints, Constraint.HARD);
-
-			// It may happen that some newly identified soft constraints were
-			// removed while solving, delete them.
-			Vector tempVector = (Vector) newlyAddedConstraints.clone();
-
-			// Find out the constraints that could not get sovled
-			tempVector.removeAll(solvedConstraints);
-
-			// Remove the unsolved constraints from justAdded list
-			newlyAddedConstraints.removeAll(tempVector);
-
-			justAddedConstraints.addAll(newlyAddedConstraints);
-		}
-
-		updateConstraints(constraintsHelper.getListOfConstraints(m_drawData
-				.getAllAnchorPoints()), Constraint.HARD);
-		// commented on 15-10-09
-		// Because due to it, if user draws some small stroke it gets removed
-		// which th user does not want
-		/* 8-5-2008 */
-		// Don't forget to clone it
-		/*
-		 * Vector allSegments = (Vector) m_drawData.getAllSegments().clone();
-		 * Segment seg; for (int i = 0; i < allSegments.size(); i++) { seg =
-		 * (Segment) allSegments.get(i); if (seg instanceof SegLine &&
-		 * ((SegLine) seg).getM_length() < Constraint.MAX_ALLOWED_CONNECT_GAP)
-		 * {}//seg.delete(); else if (seg instanceof SegCircleCurve &&
-		 * ((SegCircleCurve) seg).getM_radius() <
-		 * Constraint.MAX_ALLOWED_CONNECT_GAP) {}//seg.delete(); }
-		 */
-
-		UpdateUI(1, justAddedConstraints);
-	}
+	
+	/**
+	 * Close attention to be given here. Called from all the important places.
+	 * 
+	 */
 
 	/**
-	 * Called by only SnapIPsandrecalcConstraints...
-	 * 
-	 * @param affectedSegs
-	 * @return
+	 * OK here.
+	 * @param X
+	 * @param Y
+	 * @param c
 	 */
-	private Vector recalculateConstraints(Vector affectedSegs) {
-		Vector v = new Vector();
-		Iterator iter;
-		iter = affectedSegs.iterator();
-		while (iter.hasNext()) {
-			GeometryElement element = (GeometryElement) iter.next();
-			v.addAll(recalculateConstraints(element));
-		}
-		return v;
-	}
-
-	/**
-	 * Clear constraints(SOFT) of the segment and find them again.
-	 * 
-	 * @param gElement
-	 * @return
-	 */
-	public Vector recalculateConstraints(GeometryElement gElement) {
-		Vector cons = new Vector();
-
-		if (gElement != null) {
-			Vector allMovedElements = new Vector();
-			if (gElement instanceof ImpPoint)
-				allMovedElements = ((ImpPoint) gElement).getAllParents();
-			else
-				allMovedElements.add(gElement);
-
-			GeometryElement movedElement;
-
-			for (int i = 0; i < allMovedElements.size(); i++) {
-				// there will be only one moved_element [unless IMPpoint]
-
-				movedElement = (GeometryElement) allMovedElements.elementAt(i);
-
-				if (movedElement instanceof Segment) {
-					Segment seg = (Segment) movedElement;
-					seg.clearConstraints(Constraint.SOFT);
-
-					cons = seg.findConstraints(m_drawData.getAllSegments());
-					if (cons != null) {
-						m_drawData.addConstraints(cons);
-						// justAddedConstraints.addAll(cons);
-					}
-				}
-			}
-		}
-		return cons;
-	}
-
-	public void writeText(int X, int Y, String c) {
+	public void writeText(int X, int Y, String c) 
+	{
 		Text t = new Text(c + "", X, Y);
 		if (t != null) {
 			addGeoElement(t);
@@ -3165,7 +2979,11 @@ public class DrawingView extends JPanel implements MouseListener,
 		}
 	}
 
-	private void resizePanel() {
+	/**
+	 * 
+	 */
+	private void resizePanel()
+	{
 		Vector v = m_drawData.getAllAnchorPoints();
 		// 27-09-09
 		Stroke stk = m_drawData.getLastStroke(true);
@@ -3217,12 +3035,13 @@ public class DrawingView extends JPanel implements MouseListener,
 	}
 
 	/**
-	 * Update the recognized view constraint list and the edit pane. TODO: Fix
-	 * point null problem.
+	 * Update the recognized view constraint list and the edit pane.
 	 * 
 	 * @param type
 	 *            1=only constraints 2=everything, including edit pane
 	 * @param cons
+	 * 
+	 * @author prateek
 	 */
 	public void UpdateUI(int type, Vector cons) {
 		Stroke stroke = getCurrStroke();
@@ -3277,7 +3096,8 @@ public class DrawingView extends JPanel implements MouseListener,
 		m_trackFlag = flag;
 	}
 
-	public void clearView() {
+	public void clearView() 
+	{
 		if (null != m_drawData) {
 			m_drawData = null;
 			init();
@@ -3356,21 +3176,6 @@ public class DrawingView extends JPanel implements MouseListener,
 		m_logBetweenKeyPress = betweenKEyPress;
 	}
 
-	/**
-	 * Updates the constraints related to the Segment based on the new values of
-	 * the segments
-	 */
-	protected void updateConstraints(Vector constraints, int catagory) {
-		if (constraints == null)
-			return;
-		Iterator iter = constraints.iterator();
-		while (iter.hasNext()) {
-			Constraint cons = (Constraint) iter.next();
-			if (cons.getM_category() == catagory) {
-				cons.update();
-			}
-		}
-	}
 
 	public boolean isM_keyPressedLogged() {
 		return m_keyPressedLogged;

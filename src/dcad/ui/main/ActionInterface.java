@@ -7,7 +7,9 @@ import java.util.Vector;
 import dcad.model.constraint.Constraint;
 import dcad.model.geometry.GeometryElement;
 import dcad.model.geometry.ImpPoint;
+import dcad.model.geometry.Text;
 import dcad.model.geometry.segment.Segment;
+import dcad.process.io.Command;
 import dcad.util.GMethods;
 
 
@@ -123,6 +125,35 @@ public class ActionInterface
 	public int A_add_text(String text, Point location) {
 		
 	}
+	
+	/**
+	 * To be moved out. 
+	 * @param X
+	 * @param Y
+	 * @param c
+	 */
+	public void writeText(int X, int Y, String c) 
+	{
+		Text t = new Text(c + "", X, Y);
+		if (t != null) {
+			addGeoElement(t);
+			logEvent("writeText({int}" + X + ", {int}" + Y + ", {"
+					+ String.class.getName() + "}" + c + ");");
+			logEvent(Command.PAUSE);
+			setM_logBetweenKeyPress(false);
+		}
+		repaint();
+
+		// Added on 6-5-2008
+		// This was added in mousemoved function where writeText is called
+		// But, because of that, this was not done while loading a file
+		// Now it's working.
+
+		addConstraintsForMarkers();
+
+		clearSelection();
+	}
+
 	
 	public int A_delete_text(Point location) {
 		
