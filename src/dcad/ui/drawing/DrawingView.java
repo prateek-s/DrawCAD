@@ -83,6 +83,8 @@ import dcad.util.GVariables;
 import dcad.util.Maths;
 import dcad.ui.main.ToolBar;
 import dcad.ui.drawing.*;
+import dcad.ui.main.ActionInterface ;
+
 
 /**
  * Top-Level class. Sets off the Stroke->Segment->Constraint->Draw chain on
@@ -373,6 +375,9 @@ public class DrawingView extends JPanel implements MouseListener,
 
 	}
 
+	/**
+	 * box,length,prev point to null
+	 */
 	private void reset() {
 		m_bBox = null;
 		m_prevPt = null;
@@ -477,13 +482,12 @@ public class DrawingView extends JPanel implements MouseListener,
 	}
 
 	/**
-	 * Called on mouse released and pressed(left) events.
-	 * Adds point to stroke vector and also draws the stroke on the screen 
+	 * Draws the stroke on the screen .Called on mouse released and pressed(left) events.
 	 * @param x
 	 * @param y
 	 * @param time
 	 */
-	public void track(int x, int y, long time)
+	public void paint_point(int x, int y, long time)
 	{
 		Graphics gc = this.getGraphics();
 		if (isM_trackFlag()) {
@@ -510,7 +514,7 @@ public class DrawingView extends JPanel implements MouseListener,
 			}
 
 			gc.dispose();
-			addPointToStroke(x, y, time);
+			
 		}
 
 		// Display the mouse position to the status bar
@@ -521,8 +525,9 @@ public class DrawingView extends JPanel implements MouseListener,
 		updateStatusBar(x, y, " ( Drag ) " + statusStr, "");
 	}
 
-	public void addPointToStroke(int x, int y, long time) 
+	public void addPointToStroke(Stroke strk , int x, int y, long time) 
 	{
+		m_currStroke = strk ;
 		// store current pixle position with timing information
 		m_currStroke.addPoint(x, y, time);
 		/*
@@ -1106,6 +1111,14 @@ public class DrawingView extends JPanel implements MouseListener,
 
 	}
 
+	/**
+	 * Call appropriate mouse-button<type> functions. Also drives the help system.
+	 * @param buttontype
+	 * @param clickcount
+	 * @param x
+	 * @param y
+	 * @param time
+	 */
 	public void mousePressed(int buttontype, int clickcount, int x, int y,
 			long time) {
 		repaint();
@@ -1487,22 +1500,35 @@ public class DrawingView extends JPanel implements MouseListener,
 
 	public void mouseButton1Pressed(int x, int y, long time) {
 		justAddedConstraints = new Vector();
-
+		Point pt = new Point(x, y) ;
 		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
 		logEvent("mouseButton1Pressed({int}" + x + ", {int}" + y + ", {long}"
 				+ time + ");");
 		setM_mousePressedLogged(true);
 
-		if (m_keyEventCode == -1) {
+		if (m_keyEventCode == -1) 
+		{
 			setM_trackFlag(true);
 			reset();
 			m_currStroke = new Stroke();
-			track(x, y, time);
+			paint_point(x, y, time) ;
+			addPointToStroke(m_currStroke, x, y, time) ;
+		//	track(x, y, time);
 			clearSelection();
-		} else {
-			if (m_keyEventCode == KeyEvent.VK_CONTROL) {
-				performSelection(x, y);
-			} else if ((m_keyEventCode == KeyEvent.VK_SHIFT)) {
+		} 
+		else 
+		{
+			if (m_keyEventCode == KeyEvent.VK_CONTROL) 
+			{
+				Vector selected = A_elements_selected(pt) ;
+				repaint();
+				updateStatusBar(x, y, "( Move )", label);
+				GMethods.getRecognizedView().updateSelection(m_selectedElements);
+				
+			//	performSelection(x, y);		//WASHERE
+			}
+			else if ((m_keyEventCode == KeyEvent.VK_SHIFT)) 
+			{
 				if (m_showLastStroke) {
 					Vector constraints = performSegRecycling(x, y);
 					if ((constraints != null) && (constraints.size() > 0)) {
@@ -1513,14 +1539,19 @@ public class DrawingView extends JPanel implements MouseListener,
 					snapIPsAndRecalculateConstraints();
 
 				}
-			} else {
+			}
+			else {
+				//clicking somewhere else unselects previously selected stuff.
 				clearSelection();
 			}
 		}
 	}
 
-	private void clearSelection() {
-		// some other element was clicked .. so clear all the selection
+	/**
+	 * some other element was clicked .. so clear all the selection
+	 */
+	private void clearSelection()
+	{ 
 		Iterator iter = m_selectedElements.iterator();
 		while (iter.hasNext()) {
 			GeometryElement element = (GeometryElement) iter.next();
@@ -1627,6 +1658,7 @@ public class DrawingView extends JPanel implements MouseListener,
 		}
 	}
 
+	
 	public void mouseReleased(int x, int y, int buttonType) 
 	{
 		boolean extraClick = false;
@@ -1663,14 +1695,22 @@ public class DrawingView extends JPanel implements MouseListener,
 
 		justAddedConstraints = new Vector();
 		// Moved this out of the block checked by the following condition.
-		if (m_keyEventCode == KeyEvent.VK_SHIFT) {
+		if (m_keyEventCode == KeyEvent.VK_SHIFT) 
+		{
 
-		} else if (GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE) {
+		}
+		else if (GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE) 
+		{
+			/** Stroke has been drawn */
 			setM_trackFlag(false);
 			if (!extraClick) {
 				// added on 25-02-10
 				// if (m_currStroke != null
-				Vector constraints = ProcessStroke(m_currStroke);
+				
+			//	Vector constraints = ProcessStroke(m_currStroke);
+				A_draw_Stroke(m_currStroke) ;
+				addToUndoVector();
+				repaint();
 			}
 		} else {
 			if (handleMouseDragEditMode(x, y)) {
@@ -2067,6 +2107,7 @@ public class DrawingView extends JPanel implements MouseListener,
 		mouseDragged(e.getX(), e.getY(), e.getWhen());
 	}
 
+	
 	private boolean handleMouseDragEditMode(int x, int y) {
 		boolean result = true;
 		// check for collinearity while dragging the line
@@ -2180,6 +2221,7 @@ public class DrawingView extends JPanel implements MouseListener,
 		return result;
 	}
 
+	
 	public void mouseDragged(int x, int y, long time)
 	{
 		if (GVariables.getDRAWING_MODE() == GConstants.EDIT_MODE) {
@@ -2190,7 +2232,8 @@ public class DrawingView extends JPanel implements MouseListener,
 			if (isM_trackFlag())
 				logEvent("mouseDragged({int}" + x + ", {int}" + y + ", {long}"
 						+ time + ");");
-			track(x, y, time);
+			paint_point(x, y, time) ;
+			addPointToStroke(m_currStroke, x, y, time);
 		}
 		m_mousePos.x = x;
 		m_mousePos.y = y;
@@ -2738,7 +2781,16 @@ public class DrawingView extends JPanel implements MouseListener,
 		}
 	}
 
-	private void performSelection(int x, int y) {
+	/**
+	 * returns the geometric elements under this point.
+	 * @param pt
+	 * @return
+	 */
+	public  Vector<GeometryElement> performSelection(Point pt) 
+	{
+		int x = pt.x ;
+		int y = pt.y ;
+		
 		// check if the mouse is close to any other geometry element
 		Vector gEles = isPtOnGeometryElement(new Point(x, y));
 		Iterator iter = gEles.iterator();

@@ -1,11 +1,14 @@
 package dcad.ui.main;
 
 import java.awt.Point;
+import java.util.Iterator;
 import java.util.Vector;
 
 import dcad.model.constraint.Constraint;
 import dcad.model.geometry.GeometryElement;
+import dcad.model.geometry.ImpPoint;
 import dcad.model.geometry.segment.Segment;
+import dcad.util.GMethods;
 
 
 /**
@@ -41,8 +44,43 @@ public class ActionInterface
 	 */
 
 
-	
-	public int A_draw_Stroke(Vector points) {
+	/**
+	 * Given a stroke, which is a vector of points, recognize it and paint.
+	 */
+	public int A_draw_Stroke(Vector<Point> strk) 
+	{
+
+		Vector constraints = null;
+		if (strk != null)
+		{
+			// 1-6-2008
+			// m_currStroke.smoothen();
+
+			constraints = addStroke(strk); // Does all the work
+
+			// add the constraints to the Constraint solver
+			if (strk.getM_type() == Stroke.TYPE_NORMAL) {
+				if ((constraints != null) && (constraints.size() > 0)) {
+					if (ConstraintSolver
+							.addConstraintsAfterDrawing(constraints) != null)
+						justAddedConstraints = constraints;
+				}
+				snapIPsAndRecalculateConstraints();
+				// GMethods.getHelpView().initialize(HelpView.afterDrawing);
+			}
+			// 25-3-2008 Added this line.
+			else {
+				addConstraintsForMarkers();
+			}
+			// show the last stroke
+			m_showLastStroke = true;
+			// TODO: Semantics of this..
+		//	addToUndoVector();	// in GUI layer now
+		//	repaint();  //in GUI layer now
+
+		}
+		return constraints;
+
 		return 0 ;
 	}
 
@@ -121,10 +159,66 @@ public class ActionInterface
 		
 	}
 	
-	public GeometryElement A_element_selected(Point pt) {
+	/**
+	 * returns the geomteric elements under this point. Can be several, so return a vector.
+	 * @param pt
+	 * @return
+	 */
+	public Vector<GeometryElement>  A_elements_selected(Point pt) 
+	{
+		
+			int x = pt.x ;
+			int y = pt.y ;
+			
+			// check if the mouse is close to any other geometry element
+			Vector gEles = isPtOnGeometryElement(new Point(x, y));
+			Iterator iter = gEles.iterator();
+			while (iter.hasNext()) {
+				GeometryElement ele = (GeometryElement) iter.next();
+				if (ele instanceof ImpPoint) {
+					ImpPoint ip = (ImpPoint) ele;
+					// check if any of the segments for the AP is already selected.
+					// In that case we do not need to add this ap
+					if ((ip.isSelected()) && (m_selectedElements.contains(ele))) {
+						ele.setSelected(false);
+						m_selectedElements.remove(ele);
+					} else if ((!ip.isSelected())
+							&& (!m_selectedElements.contains(ele))) {
+						ele.setSelected(true);
+						m_selectedElements.add(ele);
+					}
+				} else {
+					if ((ele.isSelected()) && (m_selectedElements.contains(ele))) {
+						ele.setSelected(false);
+						m_selectedElements.remove(ele);
+					} else if ((!ele.isSelected())
+							&& (!m_selectedElements.contains(ele))) {
+						ele.setSelected(true);
+						m_selectedElements.add(ele);
+					}
+				}
+			}
+
+			String label = "";
+			if (m_selectedElements != null) {
+				// 04-10-09 to show select rows in Help Table
+				highlightTableRowsSelectedElems();
+				iter = m_selectedElements.iterator();
+				while (iter.hasNext()) {
+					GeometryElement element = (GeometryElement) iter.next();
+					// select the element if its enabled
+					element.setSelected(element.isEnabled());
+					label += ", " + element.getM_label();
+				}
+				repaint();
+			}
+			updateStatusBar(x, y, "( Move )", label);
+			GMethods.getRecognizedView().updateSelection(m_selectedElements);
+		}		
+
 		
 		
-	}
+	
 	
 	/**********************************************************************************************************************/
 	
