@@ -158,11 +158,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	private int m_button_type;
 	
 	private Vector highlightedSegWhileDragging = null;
-	
-	
-	
-	
-	
+
 	
 	/**
 	 * Mouse is over this segment.
@@ -1279,7 +1275,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 * If yes then show appropriate parameter window
 	 * @author Sunil Kumar
 	 */
-	public void showElementPropertiesWindow(int x, int y,int buttonType){
+	public void showElementPropertiesWindow(int x, int y,int buttonType)
+	{
 		if((m_currStroke==null || 
 				(m_currStroke.getLength()==0 )) 
 				&&  buttonType == MouseEvent.BUTTON1 
@@ -1354,43 +1351,22 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				Vector constraints = ProcessStroke(m_currStroke) ;
 			}
 		}
-		else
-		{
+		else {
 			if(handleMouseDragEditMode(x, y))
 			{
 				if (isM_elementDragged() && (m_highlightedElements.size() > 0)){
-					snapIPsAndRecalculateConstraints(newConstraints);
-					
-					// 06-10-09
-				/*	if(winAct == null){
-						winAct = WindowActions.getInstance();
-					}
-					if(winAct.getUndoVector() != null){
-					if(winAct.getUndoIndex() < (winAct.getUndoVector().size()-1)){
-						winAct.removeUndoVectorElements();
-						}
-					}
-					winAct.addElementToUndoVector();*/
+					snapIPsAndRecalculateConstraints(newConstraints);		
 				}
-				
-		
 			}
-			else{}
-				//GMethods.getHelpView().initialize(HelpView.movementFailed);
-
 			//added on 11-05-10
 			// check to add whether dragged element was collinear
 			if(isM_AreLinesCollinear()){
 				System.out.println("mouse released unsetting bit ");
 				setM_AreLinesCollinear(false);
 				repaint();
-			}
-		
-			
+			}		
 			this.setCursor(Cursor.getDefaultCursor());
-
-		}
-		
+		}		
 		//Show all constraints in the system
 		if(extraClick) 
 		{
@@ -1407,6 +1383,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// so that the current element is selected
 		mouseMoved(x, y);
 		removeElementsWithStartEndPtMerged();
+		repaint(); 
 	
 		// if converted bit now set to false
 		setStrokeConverted(false);
@@ -1472,7 +1449,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				}
 			}
 		
-		repaint();
+	//	repaint();
 	}
 
 
@@ -1552,80 +1529,19 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 * one of them
 	 * @author Sunil Kumar
 	 */
-	public void checkForCollinearLines()
+	public boolean checkForCollinearLines()
 	{
+		boolean are_collinear = false ;
 		//System.out.println("Entered  collinear lines ");
 		
 		// to put highlighted element if it is a line in a segment 
-		if(m_highlightedElements.size() == 1 && m_button_type == MouseEvent.BUTTON3){
-			//System.out.println("Element Selected : " + m_highlightedElements.get(0).getClass());
-			String parsedCons[];
-			
-			parsedCons = m_highlightedElements.get(0).getClass().toString().split("[ ]+");
-			
-			if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0){
-				//System.out.println("Equal");
-				//Segment segm = (Segment)m_highlightedElements.get(0);
-				//System.out.println("Segment is a line");
-				//System.out.println("M_button_type :" + m_button_type + "   Mouse Event : " + MouseEvent.BUTTON3);
-				//System.out.println("size of highlighted elements : " + m_highlightedElements.size());
-		
-				Segment seg  = (Segment)m_highlightedElements.get(0);
-
-				Vector parallelLinesConstraintList = A.getParallelLinesConsList("lines", "parellel", seg);
-				if(parallelLinesConstraintList.size() != 0 ){
-					//System.out.println("Size of elements :" + parallelLinesConstraintList.size());
-					int consNumber = 0;
-					// for each parallel line to this find whether they are collinear and display that line
-					for(consNumber = 0; consNumber < parallelLinesConstraintList.size(); consNumber++){
-						Constraint c=(Constraint)parallelLinesConstraintList.get(consNumber);
-						if(c instanceof RelativeConstraint){
-							//System.out.println("Enter relative constraints");
-							RelativeConstraint rc=(RelativeConstraint)c;
-							SegLine seg1 = (SegLine)rc.getM_seg1();
-							SegLine seg2 = (SegLine)rc.getM_seg2();
-							
-							//System.out.println("X1 " + seg1.getM_start().getX()+ ", Y1 " +seg1.getM_start().getY());
-							//System.out.println("X2 " + seg1.getM_end().getX()+ ", Y2 " +seg1.getM_end().getY());
-							//System.out.println("X3 " + seg2.getM_start().getX()+ ", Y3 " +seg2.getM_start().getY());
-							//System.out.println("X4 " + seg2.getM_end().getX()+ ", Y4 " +seg2.getM_end().getY());
-							// check whether line formed by (x2,y2) and (x3,y3) is parallel to any
-							// other segment
-							double [][] segPoints = new double[4][2];
-							segPoints = findMiddlePtsWhileMoving(seg1, seg2);
-							
-				/*			int n= segPoints.length;
-							 System.out.println("Sorted Points");
-							    for(int i = 0; i < n; i++){
-							    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
-							    }
-					*/		    
-							if(constraintsHelper.areSlopesEqual(seg1.getM_start().getX(),seg1.getM_start().getY(),
-																seg1.getM_end().getX(),seg1.getM_end().getY(),
-																segPoints[1][0],segPoints[1][1],
-																segPoints[2][0],segPoints[2][1],false)){
-							//	drawDashedLineWhileMoving(seg1, seg2);
-								//System.out.println("Lines are collinear");
-								setM_AreLinesCollinear(true);
-								
-							}
-							else{
-								//System.out.println("not collinear");
-								setM_AreLinesCollinear(false);
-								
-							}
-							repaint();
-						}
-					}
-				}
-				else{
-					System.out.println("No parallel constraint");
-				}
-			
-				//System.out.println("Segment is a line");
+		if(m_highlightedElements.size() == 1 && m_button_type == MouseEvent.BUTTON3) 
+		{
+			are_collinear = A.Check_for_Collinearity((GeometryElement)m_highlightedElements.get(0)) ;
 		}
+		return are_collinear ;
 	}
-}
+	
 
 	public void mouseDragged(MouseEvent e)
 	{
@@ -1635,9 +1551,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	private boolean handleMouseDragEditMode(int x, int y)
 	{
-		boolean result = true;
+		boolean result = true ;
 		// check for collinearity while dragging the line
-		checkForCollinearLines();
+		boolean are_collinear = checkForCollinearLines() ;
+		setM_AreLinesCollinear(are_collinear) ;  
+		repaint() ;
 		
 		if (m_highlightedElements.size() > 0)
 		{
@@ -1761,13 +1679,15 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		return result;
 	}
 
+	
 	public void mouseDragged(int x, int y, long time)
 	{
 		if (GVariables.getDRAWING_MODE() == GConstants.EDIT_MODE)
 		{
 			logEvent("mouseDragged({int}" + x + ", {int}" + y + ", {long}" + time + ");");
 			handleMouseDragEditMode(x, y);
-		} else
+		} 
+		else
 		{
 			if (isM_trackFlag())
 				logEvent("mouseDragged({int}" + x + ", {int}" + y + ", {long}" + time + ");");
@@ -1780,6 +1700,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = y;
 	}
 
+	
+	/**
+	 * not needed.
+	 * @param elements
+	 */
 	private void copyMovedElements(Vector elements)
 	{
 		Iterator iterator = elements.iterator();
@@ -1830,8 +1755,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	public void mouseMoved(int x, int y)
 	{		
-		
-		if(m_highlightedElements.size() == 0 && m_selectedElements.size()==0){
+		if(m_highlightedElements.size() == 0 && m_selectedElements.size()==0)
+		{
 			if(m_drawData.isUnusedMarker() ){
 				Vector marker = m_drawData.getUnusedMarkers();
 				
@@ -1872,149 +1797,38 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = y;
 		
 		
-//###############################################################################
-		// 24-01-10
-		
-		//  vector to store segment points of all the strokes
-	/*	Vector segPoints  = new Vector();
-		segPoints = m_drawData.getAllAnchorPoints();
-		
-		//  Max distance within which the angle marker gets highlighted
-		double maxDistance = GConstants.cmScaleDrawingRatio/2;
-		AnchorPoint point = new AnchorPoint();
-		
-		//  To find the anchor point closest to the mouse pointer
-		Iterator iter = segPoints.iterator();
-		while(iter.hasNext()){
-			AnchorPoint ap = (AnchorPoint)iter.next();
-			if(ap.distance(m_mousePos) <= maxDistance){
-				point = ap;
-			//	System.out.println("close to point " + point.getX() + point.getY());
-				break;
-			}
-		}
-		
-		// Vectors containing segment list and line segments having this point 
-		Vector segList = new Vector();
-		Vector lineSegsContainAP = new Vector();
-		segList = m_drawData.getAllSegments();
-		
-		// get the list of segments containing this anchor point
-		iter = segList.iterator();
-		while(iter.hasNext()){
-			Segment seg = (Segment)iter.next();
-			if(seg instanceof SegLine){
-				if((seg.getSegStart() == point) || (seg.getSegEnd() == point) ){
-					lineSegsContainAP.add((SegLine)seg);
-				}
-			}
-		}
-		
-		//System.out.println("size is" + lineSegsContainAP.size());
-		// find the point is near to which lines
-		int vectorSize = lineSegsContainAP.size();
-		// if there are only two lines whether this point lies outside the
-		// triangle formed by these points
-		Vector pointsOfTriangle = new Vector(); 
-		if( vectorSize == 2){
-			iter = lineSegsContainAP.iterator();
-			while(iter.hasNext()){
-				Segment seg = (Segment)iter.next();
-				if(seg.getSegStart() != point){
-					pointsOfTriangle.add((AnchorPoint)seg.getSegStart());
-				}
-				else{
-					pointsOfTriangle.add((AnchorPoint)seg.getSegEnd());
-				}
-			}
-			AnchorPoint ptA = (AnchorPoint)pointsOfTriangle.get(0);
-			AnchorPoint ptB = (AnchorPoint)pointsOfTriangle.get(1);
-			AnchorPoint ptC = point;
-			Point ptP = m_mousePos;
-			
-			double areaABP = areaOfTriangle(ptA, ptB, ptP);
-			
-			double areaBCP = areaOfTriangle(ptB, ptC, ptP);
-
-			double areaACP = areaOfTriangle(ptA, ptC, ptP);
-
-			double areaABC = areaOfTriangle(ptA, ptB, ptC);
-			
-			double errorMargin = 0.000000000000001;
-			SegLine lineAB, lineAC;
-			if(areaABC == (areaABP + areaBCP + areaACP)){
-				
-				// angle of line AB with X-axis
-				lineAB = (SegLine)lineSegsContainAP.get(0);
-				double angleAB = findAngleWithXAxis(lineAB.getSegStart(),lineAB.getSegEnd());
-				
-				
-				//angle of line AC with X-axis
-				lineAC = (SegLine)lineSegsContainAP.get(1);
-				double angleAC = findAngleWithXAxis(lineAC.getSegStart(),lineAC.getSegEnd());
-				
-				
-			//	System.out.println("Point is inside the triangle with slope " + angleAB);
-			//	System.out.println("Point is inside the triangle with slope " + angleAC);
-				
-				// draw a circular arc between these two lines
-				 Marker m_marker = null; 
-				 m_marker = new MarkerAngle(null, lineAB, lineAC, null);
-				 int markerType = m_marker.getM_type();
-			}
-			else{
-			//	System.out.println("Point is outside the triangle");
-			}
-			
-						 
-			
-		}
-		
-		
-		
-		
-		
-		
-		lineSegsContainAP.clear();
-	/*	if ((ele.isSelected()) && (m_selectedElements.contains(ele)))
+		if(!isParameterWinBitSet())
 		{
-			ele.setSelected(false);
-			m_selectedElements.remove(ele);
-		}*/ 
-		//################################################################
-		
-		
-		// unhighlight the highlighted component in the drawing view, if
-		// required
-		if(!isParameterWinBitSet()){
 	//	System.out.println("mouse moved");
-		if (m_highlightedElements.size() > 0){
-			//System.out.println("highlighted elements ");
-			// first check if the mouse is on the same object,
-			boolean repaintReq = false;
-			Iterator iter = m_highlightedElements.iterator();
-			while (iter.hasNext())
+			if (m_highlightedElements.size() > 0)
 			{
-				GeometryElement ele = (GeometryElement) iter.next();
-				if (!ele.containsPt(m_mousePos))
+				//System.out.println("highlighted elements ");
+				// first check if the mouse is on the same object,
+				boolean repaintReq = false;
+				Iterator iter = m_highlightedElements.iterator();
+				while (iter.hasNext())
 				{
-					repaintReq = true;
-					ele.setHighlighted(false);
-					iter.remove();
+					GeometryElement ele = (GeometryElement) iter.next();
+					if (!ele.containsPt(m_mousePos))
+					{
+						repaintReq = true;
+						ele.setHighlighted(false);
+						iter.remove();
+					}
+				}
+				if (!repaintReq)
+					// mouse is still on the same object.. no need to do anything.
+					return;
+				else{
+					//addToUndoVector();
+					repaint();
 				}
 			}
-			if (!repaintReq)
-				// mouse is still on the same object.. no need to do anything.
-				return;
-			else{
-				//addToUndoVector();
-				repaint();
-			}
-		}
 		
 		
 		
-		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT)){
+		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT))
+		{
 			if (m_showLastStroke)
 			{
 				Stroke lastStroke = m_drawData.getLastStroke(true);
@@ -2073,6 +1887,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 		// create the label to be shown in the status bar.
 		// Also, set all the elements in the highlighted Vector to be true
+		
 		String label = "";
 		if (m_highlightedElements.size() > 0)
 		{

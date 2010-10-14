@@ -8,6 +8,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 
 import dcad.model.constraint.Constraint;
+import dcad.model.constraint.RelativeConstraint;
 import dcad.model.constraint.constraintsHelper;
 import dcad.model.constraint.circleArc.circularArcConstraint;
 import dcad.model.constraint.collinearity.CollinearLinesConstraint;
@@ -22,6 +23,7 @@ import dcad.model.geometry.ImpPoint;
 import dcad.model.geometry.PixelInfo;
 import dcad.model.geometry.SegmentPoint;
 import dcad.model.geometry.Stroke;
+import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
 import dcad.model.marker.Marker;
 import dcad.process.ProcessManager;
@@ -715,7 +717,45 @@ public class ActionHelper
 	}
 
 
-	
+	public boolean Check_for_Collinearity(GeometryElement e)
+	{
+		String parsedCons[];
+		
+		
+		
+		parsedCons = e.getClass().toString().split("[ ]+");
+		
+		if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
+		{
+
+			Segment seg  = (Segment)e;
+
+			Vector parallelLinesConstraintList = A.getParallelLinesConsList("lines", "parellel", seg);
+			if(parallelLinesConstraintList.size() != 0 ){
+				int consNumber = 0;
+				for(consNumber = 0 ; consNumber < parallelLinesConstraintList.size(); consNumber++){
+					Constraint c=(Constraint)parallelLinesConstraintList.get(consNumber);
+					if(c instanceof RelativeConstraint){
+						RelativeConstraint rc=(RelativeConstraint)c;
+						SegLine seg1 = (SegLine)rc.getM_seg1();
+						SegLine seg2 = (SegLine)rc.getM_seg2();
+							double [][] segPoints = new double[4][2];
+						segPoints = findMiddlePtsWhileMoving(seg1, seg2);
+						
+						if(constraintsHelper.areSlopesEqual(seg1.getM_start().getX(),seg1.getM_start().getY(),
+
+							return true ;
+						}
+						else{
+							return false; 
+						}
+					}
+				}
+			}
+		}
+		
+		return false ;
+	}
 	
 	
 	

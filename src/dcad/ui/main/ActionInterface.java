@@ -60,7 +60,8 @@ public class ActionInterface extends ActionHelper
 	 * Drawing State: Handled bydrawing data, and invariably, by the segments and strokes which the drawing is composed of. .
 	 */
 
-
+	
+public Vector<Constraint> new_constraints ;
 
 /**
  * Perform Segmentation, recognize segments, merges strokes,
@@ -68,15 +69,15 @@ public class ActionInterface extends ActionHelper
  */
 	public Vector A_draw_Stroke(Stroke strk) 
 	{
+		new_constraints = null ;
 		Vector segPts = Perform_Segmentation(strk) ;
 		Vector<Segment> Segments =  recognizeSegments(strk) ; 
 		adjustStroke(strk) ; //merges segments.
 		m_drawData.addStroke(strk) ;
 	
-		 Vector constraints = recognize_Constraints(strk);
+		 new_constraints = recognize_Constraints(strk);
 		 
-		 return constraints ;
-
+		 return null ;
 	}
 
 	/**
@@ -123,31 +124,38 @@ public class ActionInterface extends ActionHelper
 	}
 	
 	
-	public int A_delete_Segment(Segment seg) {
+	public int A_delete_Segment(Segment seg) 
+	{
 
 	}
 
-	public int A_move_Segment(Segment seg, Point to) {
+	public int A_move_Segment(Segment seg, Point to) 
+	{
 
 	}
 
-	public int A_change_seg_property(Segment seg, String property_type, String value) {
+	public int A_change_seg_property(Segment seg, String property_type, String value) 
+	{
 
 	}
 
-	public int A_undo(int count) {
+	public int A_undo(int count) 
+	{
 
 	}
 
-	public int A_redo(int count) {
+	public int A_redo(int count) 
+	{
 
 	}
 
-	public int A_change_to_marker(Stroke strk) {
+	public int A_change_to_marker(Stroke strk) 
+	{
 
 	}
 
-	public int A_change_marker_to_segment(Stroke strk) {
+	public int A_change_marker_to_segment(Stroke strk) 
+	{
 
 	}
 
@@ -313,7 +321,8 @@ public class ActionInterface extends ActionHelper
 
 	}
 
-	public int A_delete_anchor_point(Point pt) {
+	public int A_delete_anchor_point(Point pt) 
+	{
 
 	}
 
@@ -352,37 +361,45 @@ public class ActionInterface extends ActionHelper
 	}
 
 
-	public int A_delete_text(Point location) {
+	public int A_delete_text(Point location)
+	{
 
 	}
 
-	public int A_change_Segment_to(Segment seg, int seg_type) {
+	public int A_change_Segment_to(Segment seg, int seg_type) 
+	{
 
 	}
 
-	public int A_clear() {
+	public int A_clear() 
+	{
 
 	}
 
-	public int A_load() {
+	public int A_load()
+	{
 
 	}
 
-	public int A_save() {
+	public int A_save() 
+	{
 
 	}
 
-	public int A_add_constraint(Constraint constraint) {
+	public int A_add_constraint(Constraint constraint) 
+	{
 
 	}
 
-	public int A_delete_constraint(Constraint constraint) {
+	public int A_delete_constraint(Constraint constraint) 
+	{
 
 
 	}
 
 
-	public Segment A_seg_selected(Point pt) {
+	public Segment A_seg_selected(Point pt) 
+	{
 
 
 	}
