@@ -572,11 +572,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 */
 	public Vector addStroke(Stroke theStroke)
 	{
-		Vector constraints = A.A_draw_Stroke(theStroke) ;
-		
+		A.A_draw_Stroke(theStroke) ;
+		Vector constraints = A.new_constraints ;
 		repaint() ;	
 		UpdateUI(1,m_drawData.getM_constraints()); 
-
 		return constraints ;
 	}
 
@@ -1066,9 +1065,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					A.updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
 					//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
 				}
-				
-				
-				
+
 				resizePanel();
 				repaint();
 				this.setCursor(prevCursorType);

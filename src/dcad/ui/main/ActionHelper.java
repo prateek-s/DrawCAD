@@ -743,7 +743,10 @@ public class ActionHelper
 						segPoints = findMiddlePtsWhileMoving(seg1, seg2);
 						
 						if(constraintsHelper.areSlopesEqual(seg1.getM_start().getX(),seg1.getM_start().getY(),
-
+															seg1.getM_end().getX(),seg1.getM_end().getY(),
+															segPoints[1][0],segPoints[1][1],
+															segPoints[2][0],segPoints[2][1],false)){
+					
 							return true ;
 						}
 						else{
@@ -759,6 +762,74 @@ public class ActionHelper
 	
 	
 	
+	// added on 10-05-10
+	// find the end point and starting point of other line according to orientation
+	/**function to find the Middle points i.e, end point of first segment and 
+	 * starting point of other, between whom we have to draw a line 
+	 * @author Sunil Kumar
+	 */
+	public double[][] findMiddlePtsWhileMoving(Segment seg1, Segment seg2){
+		int sortByX = 0;
+		int sortByY = 1;
+		
+		// get seg points
+	    double x1 = seg1.getSegStart().getX();
+	    double y1 = seg1.getSegStart().getY();
+	    double x2 = seg1.getSegEnd().getX();
+	    double y2 = seg1.getSegEnd().getY();
+	    
+	    double x3 = seg2.getSegStart().getX();
+	    double y3 = seg2.getSegStart().getY();
+	    double x4 = seg2.getSegEnd().getX();
+	    double y4 = seg2.getSegEnd().getY();
+		
+	    
+		double [][] segPoints = new double[][] {{x1, y1},
+											{x2, y2},
+											{x3, y3},
+											{x4, y4}
+											};
+		
+		// get angle of these seg lines  with origin
+		double angle1 = Math.abs(Maths.AngleInDegrees(x1, y1, x2, y2));
+		double angle2 = Math.abs(Maths.AngleInDegrees(x3, y3, x4, y4));
+		// if lines are horizontal
+		if(A.isLineHorizontal(angle1) && A.isLineHorizontal(angle2)){
+			A.sortAnchorPoints(segPoints, sortByX);
+		}
+		// if lines are vertical
+		else if(A.isLineVertical(angle1) && A.isLineVertical(angle2)){
+				A.sortAnchorPoints(segPoints, sortByY);
+		}
+		else{
+			A.sortAnchorPoints(segPoints, sortByX);
+		}
+	int n= segPoints.length;
+			if(n > 0){
+	/*		 System.out.println("Sorted Points returned");
+			    for(int i = 0; i < n; i++){
+			    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+			    }
+		*/	    
+			
+			    if(pt1 == null){
+			    	pt1 = new Point();
+			    }
+			    
+			    if(pt2 == null){
+			    	pt2 = new Point();
+			    }
+			    pt1.x = (int)segPoints[1][0];
+			    pt1.y = (int)segPoints[1][1];
+			    pt2.x = (int)(segPoints[2][0]);
+			    pt2.y = (int)(segPoints[2][1]);
+			    
+			}
+		else{
+			//System.out.println("size of array is" + segPoints.length);
+		}
+			return segPoints;
+	}
 	
 	
 } // END CLASS

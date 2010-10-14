@@ -60,8 +60,14 @@ public class ActionInterface extends ActionHelper
 	 * Drawing State: Handled bydrawing data, and invariably, by the segments and strokes which the drawing is composed of. .
 	 */
 
-	
+/*************************** STATE VARIABLES.  
+ * ********************* BE CAREFUL WHAT GOES HERE.	
+ */
 public Vector<Constraint> new_constraints ;
+
+
+
+/********************************************************************/
 
 /**
  * Perform Segmentation, recognize segments, merges strokes,
