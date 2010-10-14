@@ -31,11 +31,13 @@ import dcad.process.recognition.marker.MarkerRecogManager;
 import dcad.process.recognition.marker.MarkerToConstraintConverter;
 import dcad.process.recognition.segment.SegmentRecognizer;
 import dcad.process.recognition.stroke.StrokeRecognizer;
+import dcad.ui.drawing.DrawingData;
 import dcad.util.GVariables;
 import dcad.util.Maths;
 
 public class ActionHelper 
 {
+	public DrawingData m_drawData = new DrawingData();
 
 	private Vector performSegRecycling(int x, int y)
 	{
@@ -147,13 +149,13 @@ public class ActionHelper
 	 * @param theStroke
 	 * @return
 	 */
-	public Vector recognizeSegmentsAndConstraints(Stroke theStroke)
+	public Vector recognize_Constraints(Stroke theStroke)
 	{
-		m_currStroke = theStroke;
+		Stroke m_currStroke = theStroke;
 		
-		recognizeSegments(theStroke);
-		A.adjustStroke(theStroke);
-		m_drawData.addStroke(theStroke);
+//		recognizeSegments(theStroke);
+//		adjustStroke(theStroke);
+//		m_drawData.addStroke(theStroke);
 		
 		theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
 
@@ -183,6 +185,7 @@ public class ActionHelper
 					c.remove();
 			}
 		}
+		
 		if (stkType == Stroke.TYPE_MARKER)
 		{
 			theStroke.setM_type(Stroke.TYPE_MARKER);
@@ -193,7 +196,7 @@ public class ActionHelper
 				addGeoElement(marker) ;
 			
 			
-			UpdateUI(1,m_drawData.getM_constraints());
+		//	UpdateUI(1,m_drawData.getM_constraints());
 			return null;
 		} else
 		{
@@ -205,19 +208,17 @@ public class ActionHelper
 			Vector constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
 			if (constraints != null)
 				m_drawData.addConstraints(constraints);
-			/*
-			 * RecognizedView rv = MainWindow.getRecognizedView();
-			 * rv.reset(m_drawData.getM_constraints());
-			 */
+
 			return constraints;
 		}
 	}
 	
 
-	public void recognizeSegments(Stroke theStroke)
+	public Vector<Segment> recognizeSegments(Stroke theStroke)
 	{
 		//m_currStroke = theStroke;
 		RecognitionManager recogMan = m_processManager.getRecogManager();
+		Vector<Segment> Segments = null ;
 		// identify segments
 		try
 		{
@@ -225,7 +226,7 @@ public class ActionHelper
 			// added on 23-02-10
 			// if this stroke is converted, then no need to call segment recognizer 
 			
-			theStroke.recognizeSegments(segmentRecog);
+			Segments = theStroke.recognizeSegments(segmentRecog);
 			// displaying of recognized segment can be done somewhere else as
 			// well.
 			if (!GVariables.undoing)
@@ -236,6 +237,9 @@ public class ActionHelper
 					+ e.getMessage());
 			e.printStackTrace();
 		}
+		
+		return Segments ;
+		
 	}
 	
 	
@@ -343,7 +347,7 @@ public class ActionHelper
 			justAddedConstraints.addAll(newlyAddedConstraints);
 		}
 
-		A.updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),
+		updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),
 				Constraint.HARD);
 		// commented on 15-10-09 
 		// Because due to it, if user draws some small stroke it gets removed which th user does not want 
@@ -680,6 +684,7 @@ public class ActionHelper
 		    
 		   // return segPoints;
 	}
+	
 	
 	
 

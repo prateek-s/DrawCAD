@@ -1,15 +1,29 @@
 package dcad.ui.main;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
 import dcad.model.constraint.Constraint;
+import dcad.model.constraint.constraintsHelper;
+import dcad.model.constraint.pointOnSegment.pointOnLineConstraint;
+import dcad.model.constraint.points.NoMergeConstraint;
+import dcad.model.geometry.AnchorPoint;
 import dcad.model.geometry.GeometryElement;
 import dcad.model.geometry.ImpPoint;
+import dcad.model.geometry.Stroke;
+import dcad.model.geometry.Stroke;
 import dcad.model.geometry.Text;
+import dcad.model.geometry.segment.SegCircleCurve;
+import dcad.model.geometry.segment.SegLine;
+import dcad.model.geometry.segment.SegPoint;
 import dcad.model.geometry.segment.Segment;
+import dcad.model.marker.Marker;
+import dcad.process.beautification.ConstraintSolver;
 import dcad.process.io.Command;
+import dcad.process.preprocess.PreProcessingManager;
+import dcad.process.preprocess.PreProcessor;
 import dcad.util.GMethods;
 
 
@@ -48,46 +62,67 @@ public class ActionInterface extends ActionHelper
 
 
 
-	/**
-	 * Given a stroke, which is a vector of points, recognize it and paint.
-	 */
-	public int A_draw_Stroke(Vector<Point> strk) 
+/**
+ * Perform Segmentation, recognize segments, merges strokes,
+ * recognizes constraints, 
+ */
+	public Vector A_draw_Stroke(Stroke strk) 
 	{
+		Vector segPts = Perform_Segmentation(strk) ;
+		Vector<Segment> Segments =  recognizeSegments(strk) ; 
+		adjustStroke(strk) ; //merges segments.
+		m_drawData.addStroke(strk) ;
+	
+		 Vector constraints = recognize_Constraints(strk);
+		 
+		 return constraints ;
 
-		Vector constraints = null;
-		if (strk != null)
-		{
-			// 1-6-2008
-			// m_currStroke.smoothen();
-
-			constraints = addStroke(strk); // Does all the work
-
-			// add the constraints to the Constraint solver
-			if (strk.getM_type() == Stroke.TYPE_NORMAL) {
-				if ((constraints != null) && (constraints.size() > 0)) {
-					if (ConstraintSolver
-							.addConstraintsAfterDrawing(constraints) != null)
-						justAddedConstraints = constraints;
-				}
-				snapIPsAndRecalculateConstraints();
-				// GMethods.getHelpView().initialize(HelpView.afterDrawing);
-			}
-			// 25-3-2008 Added this line.
-			else {
-				addConstraintsForMarkers();
-			}
-			// show the last stroke
-			m_showLastStroke = true;
-			// TODO: Semantics of this..
-			//	addToUndoVector();	// in GUI layer now
-			//	repaint();  //in GUI layer now
-
-		}
-		return constraints;
-
-		return 0 ;
 	}
 
+	/**
+	 * Segmentation using the appropriate segmentation scheme which is set by other means.
+	 * @param strk
+	 * @return
+	 */
+	public Vector Perform_Segmentation(Stroke strk)
+	{
+		PreProcessingManager preProcessMan = m_processManager.getPreProManager();
+		PreProcessor preProcessor = preProcessMan.getPreProcessor();
+		Vector segPts = preProcessor.preProcess(strk);
+		strk.setM_segPtList(segPts); 
+		
+		return segPts ;
+		
+	}
+	
+	
+	/**
+	 * Refresh drawing after drawing a new stroke.
+	 * @param strk
+	 * @param constraints
+	 * @return
+	 */
+	public Vector Refresh_Drawing (Stroke strk, Vector constraints)
+	{
+		Vector new_constraints = null ;
+		if (strk.getM_type() == Stroke.TYPE_NORMAL)
+		{
+			if ((constraints != null) && (constraints.size() > 0))
+			{
+				if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
+					 ;
+			}
+			new_constraints = A_snapIPsAndRecalculateConstraints(constraints);
+			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+		}
+	//25-3-2008 Added this line.
+		else {
+			addConstraintsForMarkers(); 
+		}
+		return new_constraints ;
+	}
+	
+	
 	public int A_delete_Segment(Segment seg) {
 
 	}
@@ -116,7 +151,165 @@ public class ActionInterface extends ActionHelper
 
 	}
 
-	public int A_add_anchor_point(Point pt) {
+	/**
+	 * partition line segment earlier.
+	 * @param pt
+	 * @return
+	 */
+	public int A_add_anchor_point(GeometryElement e, Point pt) 
+	{
+		int x = pt.x ;
+		int y = pt.y ;
+		if (e instanceof AnchorPoint)
+		{
+			System.out.println("Anchor point clicked");
+			System.out.println(" \n\n\n Shift key clicked \n\n\n ");
+			AnchorPoint ap = (AnchorPoint) e;
+			Vector v = constraintsHelper.getPointSegmentConstraintsOfPoints(ap);
+			if (v.size() > 0)
+			{
+				pointOnLineConstraint c;
+				for (int i = 0; i < v.size(); i++)
+				{
+					if (v.get(i) instanceof pointOnLineConstraint)
+					{
+						// This has one problem.
+						// If I add one point by shift + right click and then if
+						// I resegment the same segment, I'll loose that point.
+						c = (pointOnLineConstraint) v.get(i);
+						SegLine l = (SegLine) c.getM_seg();
+						Stroke parentStroke = l.getM_parentStk();
+						Point2D p = new Point2D.Double(x, y);
+
+						int index1 = l.getM_rawStartIdx(), index2 = l.getM_rawEndIdx();
+						double d1 = l.getM_start().distance(p);
+						double d = l.getM_length();
+						int index3 = index1 + (int) (d1 * (index2 - index1) / d);
+
+						// parentStroke.addSegment(new
+						// SegLine(l.getM_start(),ap,parentStroke,-1,-1));
+						// parentStroke.addSegment(new
+						// SegLine(l.getM_end(),ap,parentStroke,-1,-1));
+
+						Vector v1 = new Vector();
+						v1.add(l.getM_start().getM_point());
+						v1.add(p);
+						SegLine l1 = new SegLine(v1);
+						l1.setM_rawStartIdx(index1);
+						l1.setM_rawEndIdx(index3);
+						l1.setM_parentStk(parentStroke);
+						parentStroke.addSegment(l1);
+
+						Vector v2 = new Vector();
+						v2.add(l.getM_end().getM_point());
+						v2.add(p);
+						SegLine l2 = new SegLine(v2);
+						l2.setM_rawStartIdx(index3);
+						l2.setM_rawEndIdx(index2);
+						l2.setM_parentStk(parentStroke);
+						parentStroke.addSegment(l2);
+
+						l.delete();
+					}
+				}
+				snapIPsAndRecalculateConstraints(newConstraints);
+			} else
+			{
+
+				System.out.println("\n\n\n\n\nSeparating the points\n\n\n\n\n");
+				Vector oldParentsVector = ap.getAllParents();
+				if (oldParentsVector.size() > 1)
+				{
+					int siz = oldParentsVector.size();
+					for(int i=0;i<siz;i++)
+					{
+						Segment seg1 = (Segment)oldParentsVector.get(i);
+						for(int j=i+1;j<siz;j++)
+						{
+							Segment seg2 = (Segment)oldParentsVector.get(j);
+							Vector tempVector = constraintsHelper.getRelativeConstraintsBetween2Segments(seg1,seg2);
+							constraintsHelper.removeConstraints(tempVector);
+						}
+					}
+					
+					Vector newAPs = new Vector();
+					while (oldParentsVector.size() != 0)
+					{
+						Segment seg = (Segment) oldParentsVector.get(0);
+						if (seg instanceof SegPoint)
+						{
+							oldParentsVector.remove(0);
+							continue;
+						}
+						Vector newParentsVector = new Vector();
+						newParentsVector.add(seg);
+						AnchorPoint newAP = new AnchorPoint( new Point2D.Double(ap.getX(), ap.getY()), newParentsVector );
+						newAPs.add(newAP);
+
+						Vector resultingConstraints = new Vector();
+						Vector otherConstraints = new Vector();
+
+						if (seg instanceof SegLine)
+						{
+							SegLine l = (SegLine) seg;
+							otherConstraints = (Vector) l.getM_start().getConstraints().clone();
+							if (l.getM_start() == ap)
+								otherConstraints = (Vector) l.getM_end().getConstraints().clone();
+							resultingConstraints = constraintsHelper.minusInverse(ap
+									.getConstraints(), otherConstraints);
+						} else if (seg instanceof SegCircleCurve)
+						{
+							SegCircleCurve c = (SegCircleCurve) seg;
+							AnchorPoint ap1 = c.getM_start(), ap2 = c.getM_end();
+							if (ap == c.getM_start())
+							{
+								ap1 = c.getM_end();
+								ap2 = c.getM_center();
+							} else if (ap == c.getM_end())
+							{
+								ap1 = c.getM_start();
+								ap2 = c.getM_center();
+							}
+							otherConstraints = constraintsHelper.minusInverse(ap1.getConstraints(),
+									ap2.getConstraints());
+							resultingConstraints = constraintsHelper.minusInverse(ap
+									.getConstraints(), otherConstraints);
+						} else
+							System.out.println("Segment is an instance of unknown shape !!!");
+
+						int size = resultingConstraints.size();
+						for (int i = 0; i < size; i++)
+						{
+							Constraint c = (Constraint) resultingConstraints.get(i);
+							c.changePoint(ap, newAP);
+							((AnchorPoint) newAP).addConstraint(c);
+						}
+						ap.getConstraints().removeAll(resultingConstraints);
+						seg.changeAnchorPoint(ap, newAP);
+						seg.changePoint4Segment(ap, newAP);
+						oldParentsVector.remove(0);
+					}
+					ap.deleteConstraints();
+					newConstraints = new Vector();
+					siz = newAPs.size();
+					for(int i=0;i<siz;i++)
+					{
+						AnchorPoint ap1 = (AnchorPoint)newAPs.get(i);
+						Constraint c;
+						for(int j=i+1;j<siz;j++)
+						{
+							AnchorPoint ap2 = (AnchorPoint)newAPs.get(j);
+							c = new NoMergeConstraint(ap1,ap2,Constraint.HARD,false);
+							m_drawData.addConstraint(c);
+							newConstraints.add(c);
+						}
+					}
+					snapIPsAndRecalculateConstraints(newConstraints);
+					UpdateUI(1,newConstraints);
+				}
+
+			}
+		}
 
 	}
 
@@ -199,19 +392,21 @@ public class ActionInterface extends ActionHelper
 	 * @param pt
 	 * @return
 	 */
-	public Vector<GeometryElement>  A_elements_selected(Point pt) 
+	public Vector<GeometryElement>  A_elements_selected(Point pt,Vector m_selectedElements1) 
 	{
 
 		int x = pt.x ;
 		int y = pt.y ;
-		Vector<GeometryElement> m_selectedElements ;
+		Vector<GeometryElement> m_selectedElements = m_selectedElements1;
 		
 		// check if the mouse is close to any other geometry element
-		Vector gEles = isPtOnGeometryElement(new Point(x, y));
+		Vector gEles = isPtOnGeometryElement(pt);
 		Iterator iter = gEles.iterator();
-		while (iter.hasNext()) {
+		while (iter.hasNext()) 
+		{
 			GeometryElement ele = (GeometryElement) iter.next();
-			if (ele instanceof ImpPoint) {
+			if (ele instanceof ImpPoint) 
+			{
 				ImpPoint ip = (ImpPoint) ele;
 				// check if any of the segments for the AP is already selected.
 				// In that case we do not need to add this ap
@@ -234,9 +429,43 @@ public class ActionInterface extends ActionHelper
 				}
 			}
 		}
+		
+		iter = m_selectedElements.iterator(); 
+		while (iter.hasNext())
+		{
+			GeometryElement element = (GeometryElement) iter.next();
+			// select the element if its enabled
+			element.setSelected(element.isEnabled());
+			
+		}
+		
 		return m_selectedElements ;
 	}		
 
+
+	/*********************************************************************/
+	
+
+	public void addGeoElement(GeometryElement gEle)
+	{
+		if (gEle instanceof Stroke)
+			m_drawData.addStroke((Stroke) gEle);
+		else if (gEle instanceof Text)
+			m_drawData.addTextElement((Text) gEle);
+		else if (gEle instanceof Marker)
+			m_drawData.addMarker((Marker) gEle);
+	}
+
+	
+	public void removeGeoElement(GeometryElement gEle)
+	{
+		if (gEle instanceof Stroke)
+			m_drawData.removeStroke((Stroke) gEle);
+		else if (gEle instanceof Text)
+			m_drawData.removeTextElement((Text) gEle);
+		else if (gEle instanceof Marker)
+			m_drawData.removeMarker((Marker) gEle);
+	}
 
 
 

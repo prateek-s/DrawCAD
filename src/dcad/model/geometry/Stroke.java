@@ -187,7 +187,7 @@ public class Stroke extends GeometryElement
 	 * Recognizes all the segments of this stroke. 
 	 */
 	
-		public void recognizeSegments(SegmentRecognizer segRecog) throws Exception
+		public Vector<Segment> recognizeSegments(SegmentRecognizer segRecog) throws Exception
 		{
 
 		deleteSegments();
@@ -232,6 +232,9 @@ public class Stroke extends GeometryElement
 		}
 
 	//	}
+ 		
+ 		return m_segList ;
+ 		
 	}
 
 	
