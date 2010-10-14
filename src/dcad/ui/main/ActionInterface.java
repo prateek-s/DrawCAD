@@ -24,6 +24,7 @@ import dcad.process.beautification.ConstraintSolver;
 import dcad.process.io.Command;
 import dcad.process.preprocess.PreProcessingManager;
 import dcad.process.preprocess.PreProcessor;
+import dcad.ui.drawing.DrawingData;
 import dcad.util.GMethods;
 
 
@@ -64,6 +65,12 @@ public class ActionInterface extends ActionHelper
  * ********************* BE CAREFUL WHAT GOES HERE.	
  */
 public Vector<Constraint> new_constraints ;
+
+public DrawingData mDrawingData ;
+
+public Vector<GeometryElement> m_highlighedElements ;
+
+public Vector<GeometryElement> m_selectedElements ;
 
 
 

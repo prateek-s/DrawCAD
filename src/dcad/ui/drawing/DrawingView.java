@@ -393,6 +393,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_length = 0.0;
 	}
 
+	/***************************************************************************/
 	/**
 	 * This draws the component on-screen. AND repaints the entire screen - the grid,segments,text,markers etc. 
 	 * Is there any other way??
@@ -407,24 +408,30 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		 // if lines are collinear draw a line 
 		// 10 - 05 -10
 		
-		if(isM_AreLinesCollinear()){
-			System.out.println("collinear bit set");
+		/* handle collinear line cue 'dashed-line' here */
+		if(isM_AreLinesCollinear())
+		{
 			drawCollinearLine(gc, GVariables.SELECTED_FIXED_COLOR);
 		}
-		else if(pt1 !=null && pt2!=null){
+		/*When does this happen? get rid? */
+		else if(pt1 !=null && pt2!=null)
+		{
 			drawCollinearLine(gc, GVariables.BACKGROUND_COLOR);
 		}
 			
 		// to draw grid
 		// is the grid repainted on every stroke?
-		 if(drGrid == null){
-		 drGrid = new DrawGrid();
+		 if(drGrid == null)
+		 {
+			 drGrid = new DrawGrid();
 		 }
 		
-		 if(isM_gridActive() == true){  
-				drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.GRID_COLOR);
-			}
-		 else{
+		 if(isM_gridActive() == true)
+		 {  
+			 drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.GRID_COLOR);
+		 }
+		 else
+		 {
 			 drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.BACKGROUND_COLOR);
 		 }
 		 	 
@@ -433,22 +440,22 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if ((lastStroke != null) && (m_showLastStroke))
 			lastStroke.drawRaw(gc);
 		
+		
 		drawStrokes(gc, m_drawData.getStrokeList());
 		/*Nooo! Is everything redrawn all the time!? */
-	/*	if(winAct.getUndoBit() == 1){
-			drawMarkers(gc, m_drawData.getM_markers(),GVariables.BACKGROUND_COLOR);
-			winAct.setUndoBit(0);
-		}
-		else{*/
+
 		drawMarkers(gc, m_drawData.getM_markers());
-		
-		//}
+
 		drawTextElements(gc, m_drawData.getM_textElements());
 		
 	}
 
-	// 10 - 05 -10
-	//
+	/***************************************************************************/
+
+	/**
+	 * Draws a collinear line between point pt1 and pt2, which are global, and set 
+	 * somewhere else
+	 */
 	public void drawCollinearLine(Graphics g, Paint color)
 	{
 		Graphics2D g2 = (Graphics2D)g;
