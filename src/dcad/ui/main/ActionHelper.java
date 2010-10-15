@@ -2,6 +2,7 @@ package dcad.ui.main;
 
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -23,6 +24,7 @@ import dcad.model.geometry.ImpPoint;
 import dcad.model.geometry.PixelInfo;
 import dcad.model.geometry.SegmentPoint;
 import dcad.model.geometry.Stroke;
+import dcad.model.geometry.segment.SegCircleCurve;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
 import dcad.model.marker.Marker;
@@ -34,12 +36,15 @@ import dcad.process.recognition.marker.MarkerToConstraintConverter;
 import dcad.process.recognition.segment.SegmentRecognizer;
 import dcad.process.recognition.stroke.StrokeRecognizer;
 import dcad.ui.drawing.DrawingData;
+import dcad.util.GConstants;
 import dcad.util.GVariables;
 import dcad.util.Maths;
 
 public class ActionHelper 
 {
 	public DrawingData m_drawData = new DrawingData();
+	public Vector m_highlightedElements ;
+	public Vector m_selectedElements ;
 
 	private Vector performSegRecycling(int x, int y)
 	{
@@ -97,6 +102,32 @@ public class ActionHelper
 		}
 	}
 	
+	
+	
+	public void mergePoints(ImpPoint ip1, ImpPoint ip2)
+	{	
+		A_merge_points(ip1, ip2) ;
+		
+		int tempIndex;
+		if (m_highlightedElements.contains(ip1))
+		{
+			tempIndex = m_highlightedElements.indexOf(ip1);
+			m_highlightedElements.remove(ip1);
+			addHighLightedElement(ip2);
+			// m_highlightedElements.add(tempIndex,ip2);
+		}
+		if (m_selectedElements.contains(ip1))
+		{
+			tempIndex = m_selectedElements.indexOf(ip1);
+			m_selectedElements.remove(ip1);
+			m_selectedElements.add(tempIndex, ip2);
+		}
+		postMergeOperations(ip2);
+	}
+
+	
+	
+	
 	public int A_merge_points(ImpPoint ip1, ImpPoint ip2)
 	{	
 		if(constraintsHelper.getNoMergeConstraintBetweenPoints((AnchorPoint)ip1,(AnchorPoint)ip2) != null)
@@ -147,7 +178,8 @@ public class ActionHelper
 	}
 	
 	/**
-	 * Calls a lot of methods in other parts of the program. This is the key method where everything is set in motion.
+	 * Try recognizing all constraints of the stroke. Called after segmentation, snapping has been 
+	 * performed already.
 	 * @param theStroke
 	 * @return
 	 */
@@ -159,16 +191,35 @@ public class ActionHelper
 //		adjustStroke(theStroke);
 //		m_drawData.addStroke(theStroke);
 		
-		theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
+		Vector connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
 
 		RecognitionManager recogMan = m_processManager.getRecogManager();
 		StrokeRecognizer strokeRecog = recogMan.getM_strokeRecogManager().getStrokeRecognizer();
-		// to set stroke's properties in case convert option is clicked
-		theStroke.setStrokeConverted(isStrokeConverted);
-		theStroke.setStrokeConvertedTo(strokeConvertedTo);
 		
-		int stkType = strokeRecog.findType(theStroke);
-
+		
+		//
+		// to set stroke's properties in case convert option is clicked
+		//move out next two lines
+		//theStroke.setStrokeConverted(isStrokeConverted);
+		//theStroke.setStrokeConvertedTo(strokeConvertedTo);
+		//
+		
+		int stkType = strokeRecog.findType(theStroke);	//marker or stroke?
+		if (stkType == Stroke.TYPE_MARKER)
+		{
+			theStroke.setM_type(Stroke.TYPE_MARKER);
+			// as this is a marker.. for each of its segments clear the points
+			// Vector for each of their constraints
+			Marker marker = strokeRecog.getMarker();
+			if (marker != null)
+				addGeoElement(marker) ;
+					
+		//	UpdateUI(1,m_drawData.getM_constraints());
+			return null;
+		}
+		
+		/** *** 	CAN MARKERS HAVE SEGMENTS?? :-OOOOOOOO *******/
+		
 		// We have found whether the stroke is marker or not. Now remove the
 		// intersection constraints
 		// At this point, the circular arc will have circularArcConstraint.
@@ -187,32 +238,18 @@ public class ActionHelper
 					c.remove();
 			}
 		}
-		
-		if (stkType == Stroke.TYPE_MARKER)
-		{
-			theStroke.setM_type(Stroke.TYPE_MARKER);
-			// as this is a marker.. for each of its segments clear the points
-			// Vector for each of their constraints
-			Marker marker = strokeRecog.getMarker();
-			if (marker != null)
-				addGeoElement(marker) ;
-			
-			
-		//	UpdateUI(1,m_drawData.getM_constraints());
-			return null;
-		} else
-		{
-			// 08-02-10
-			//snapIPs(m_drawData.getAllAnchorPoints());
-			snapIPs();
-			// find the constraints between the segments of this stroke and
-			// the segments of ALL the previous strokes.
-			Vector constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
-			if (constraints != null)
-				m_drawData.addConstraints(constraints);
 
-			return constraints;
-		}
+		//snapIPs();	//this should be removed
+
+		// find the constraints between the segments of this stroke and
+		// the segments of ALL the previous strokes.
+		Vector constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
+
+		if (constraints != null)
+			m_drawData.addConstraints(constraints);
+
+		return constraints;
+		
 	}
 	
 
@@ -258,6 +295,7 @@ public class ActionHelper
 		return v;
 	}
 
+	
 	public Vector recalculateConstraints(GeometryElement gElement)
 	{
 		Vector cons = new Vector();
@@ -318,8 +356,6 @@ public class ActionHelper
 
 	public Vector A_snapIPsAndRecalculateConstraints(Vector justAddedConstraints)
 	{
-
-
 		// After snapping the points, add more constraints that can be added
 		Vector newlyAddedConstraints =recalculateConstraints(m_drawData.getAllSegments());
 
@@ -351,24 +387,6 @@ public class ActionHelper
 
 		updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),
 				Constraint.HARD);
-		// commented on 15-10-09 
-		// Because due to it, if user draws some small stroke it gets removed which th user does not want 
-		/* 8-5-2008 */
-		// Don't forget to clone it
-		/*
-		Vector allSegments = (Vector) m_drawData.getAllSegments().clone();
-		Segment seg;
-		for (int i = 0; i < allSegments.size(); i++)
-		{
-			seg = (Segment) allSegments.get(i);
-			if (seg instanceof SegLine
-					&& ((SegLine) seg).getM_length() < Constraint.MAX_ALLOWED_CONNECT_GAP)
-				{}//seg.delete();
-			else if (seg instanceof SegCircleCurve
-					&& ((SegCircleCurve) seg).getM_radius() < Constraint.MAX_ALLOWED_CONNECT_GAP)
-				{}//seg.delete();
-		}
-		*/
 		
 		return justAddedConstraints ;
 	}
@@ -830,6 +848,234 @@ public class ActionHelper
 		}
 			return segPoints;
 	}
+	
+	/**************************** SNAPPING **********/
+	
+	
+	
+	public void snapAllImpPoints(Vector SegmentList)
+	{
+		Iterator iter = SegmentList.iterator();
+		while (iter.hasNext())
+		{
+			Segment seg = (Segment) iter.next();
+			snapSegment(seg);
+		}
+	}
+
+	public void snapSegment(Segment seg)
+	{
+		// snap AnchorPoints
+		boolean changed = false;
+		Vector v = seg.getM_impPoints();
+		for (int w = 0 ; w < v.size() ; w++)
+		{
+			ImpPoint ip = (ImpPoint) v.elementAt(w);
+			changed = snapIP(ip) || changed;
+		}
+
+		Vector closePt = seg.findClosestSeg(m_drawData.getAllSegments());
+		if ((closePt != null) && (closePt.size() == 2))
+		{
+			Point2D fromPt = (Point2D) closePt.get(0);
+			Point2D toPt = (Point2D) closePt.get(1);
+			if (!fromPt.equals(toPt))
+				seg.move(fromPt, toPt);
+		}
+	}
+	
+	
+	public boolean snapIP(ImpPoint ip)
+	{
+		// It may happen that this point was replaced by some point in the outer
+		// call of this function.
+		// In that case, it is no longer required to check for a close point for
+		// this point.
+		if (ip.getM_point() == null)
+			return false;
+
+		// find all the imp points close to this ip
+		ImpPoint closestIP = ip.findClosestIP(m_drawData.getAllAnchorPoints());
+		Point2D closestPt;
+		if (closestIP != null)
+			closestPt = closestIP.getM_point();
+		else
+			closestPt = null;
+
+		// snap ip to the closest PT;
+		if (closestPt != null)
+		{
+			// added on 09-02-10
+			// if this important point belongs to Circular arc and is center point
+			// don't merge
+			// ip.move(closestPt.getX(), closestPt.getY());
+			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE)
+			{
+				if(!iterateParentVector(ip)){
+					if(!iterateParentVector(closestIP)){
+						mergePoints(closestIP, ip);
+						return true;
+					}
+				}
+			}
+			else{
+				mergePoints(closestIP, ip);
+				return true;
+			}
+		} 
+		else {
+			closestPt = ip.findClosestSeg(m_drawData.getAllSegments());
+			if (closestPt != null)
+			{
+				ip.move(closestPt.getX(), closestPt.getY());
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**Function to check if this Imp point is the center of Circular arc 
+	 * @author Sunil Kumar
+	 */
+	public boolean iterateParentVector(ImpPoint ip)
+	{
+		Vector parents = ip.getAllParents();
+		Iterator iter = parents.iterator();
+		while (iter.hasNext())
+		{
+			Segment seg = (Segment) iter.next();
+		// if this important point belongs to Circular arc and is center point
+		// don't merge	
+			if(seg instanceof SegCircleCurve){
+			   SegCircleCurve segCC = (SegCircleCurve)seg;
+			   if((segCC.getM_center().getM_point()).equals(ip.getM_point())){
+				   return true;
+			   }   
+			}
+			else if(seg instanceof SegLine){
+				SegLine sLine = (SegLine)seg;
+				if((sLine.getM_middle().getM_point()).equals(ip.getM_point())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Snap IPs of newly drawn stroke.
+	 */
+	public void Snap_IPs_new(Stroke m_currStroke) 
+	{
+		Vector segPts = new Vector();
+		segPts = null;
+		if(m_currStroke != null)
+		{
+			segPts = m_currStroke.getM_segPtList();
+			if(segPts.size()!=0)
+			{
+				Iterator iter1 = segPts.iterator();
+				while (iter1.hasNext())
+				{
+					SegmentPoint point = (SegmentPoint)iter1.next();
+					Point2D segPoint = point.getM_point();	
+					
+					Vector anchorPoints = m_drawData.getAllAnchorPoints();
+					Iterator iter2 = anchorPoints.iterator();
+					while (iter2.hasNext())
+					{
+						ImpPoint ip = (ImpPoint) iter2.next();
+						if(ip.getM_point()!=null){
+							if((ip.getM_point()).equals(segPoint) 
+									|| (ip.getM_point().distance(segPoint) < (((GConstants.cmScaleDrawingRatio)/10)*2)))
+							{
+								snapIP(ip);					// distance < 2 mm
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+	public void Snap_IP_drag(Vector<GeometryElement> m_highlightedElements) 
+	{
+		Iterator iter = m_highlightedElements.iterator();
+		while (iter.hasNext()){
+			GeometryElement seg = (GeometryElement)iter.next();
+			if(seg instanceof SegCircleCurve){
+				SegCircleCurve segCC = (SegCircleCurve)seg;
+				Vector segCirCurvePts = segCC.getM_impPoints();
+				iter = segCirCurvePts.iterator();
+				while (iter.hasNext()){
+					snapIP((ImpPoint)iter.next());
+				}	
+				//snapIP((ImpPoint)iter.next());
+			}
+			else if(seg instanceof SegLine){
+				System.out.println("Seg Line");
+				SegLine segL = (SegLine) seg; 
+				Vector segLinePts = segL.getM_impPoints();
+				iter = segLinePts.iterator();
+				while (iter.hasNext()){
+					snapIP((ImpPoint)iter.next());
+				}	
+			}
+			else if(seg instanceof ImpPoint){
+				System.out.println("ImpPoint");
+				snapIP((ImpPoint)seg);
+			}
+			else{
+				System.out.println("this is else part");
+			}
+		}
+		
+	}
+	
+	
+	
+	/********************************************************/
+	
+	public boolean smartMergeSelectedEleToHighLightedEle()
+	{
+		boolean intersect = false;
+
+		// check if any of the highlighted element is a selected element as
+		// well.
+		Iterator iter = m_selectedElements.iterator();
+		while (iter.hasNext())
+		{
+			GeometryElement ele = (GeometryElement) iter.next();
+			if (m_highlightedElements.contains(ele))
+			{
+				intersect = true;
+				break;
+			}
+		}
+		if (intersect)
+		{
+			// some highlighted element were in present in the selected list, so
+			// add all selected elements to the highlighted list.
+			// first remove all selected elemnts for highlighted list (this is
+			// to avoid duplicates objects in the list)
+			m_highlightedElements.removeAll(m_selectedElements);
+
+			// set the highlight flag for all the selected objects
+			iter = m_selectedElements.iterator();
+			while (iter.hasNext())
+			{
+				GeometryElement element = (GeometryElement) iter.next();
+				element.setHighlighted(true);
+			}
+
+			// add all selected elements to the highlighted list.
+			addHighLightedElements(m_selectedElements);
+			// m_highlightedElements.addAll(m_selectedElements);
+		}
+		return intersect;
+	}
+	
 	
 	
 } // END CLASS

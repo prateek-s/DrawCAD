@@ -172,6 +172,11 @@ public Vector<GeometryElement> m_selectedElements ;
 
 	}
 
+	public int A_add_marker( )
+	{
+		
+	}
+	
 	/**
 	 * partition line segment earlier.
 	 * @param pt
@@ -278,7 +283,8 @@ public Vector<GeometryElement> m_selectedElements ;
 								otherConstraints = (Vector) l.getM_end().getConstraints().clone();
 							resultingConstraints = constraintsHelper.minusInverse(ap
 									.getConstraints(), otherConstraints);
-						} else if (seg instanceof SegCircleCurve)
+						}
+						else if (seg instanceof SegCircleCurve)
 						{
 							SegCircleCurve c = (SegCircleCurve) seg;
 							AnchorPoint ap1 = c.getM_start(), ap2 = c.getM_end();
@@ -295,7 +301,8 @@ public Vector<GeometryElement> m_selectedElements ;
 									ap2.getConstraints());
 							resultingConstraints = constraintsHelper.minusInverse(ap
 									.getConstraints(), otherConstraints);
-						} else
+						}
+						else
 							System.out.println("Segment is an instance of unknown shape !!!");
 
 						int size = resultingConstraints.size();
@@ -498,6 +505,33 @@ public Vector<GeometryElement> m_selectedElements ;
 	}
 
 
+	public int A_fix_elements() 
+	{
+		// don't TOGGLE the fixed flag of all the elements, at least on
+		// element is not fixed, first fix it
+		// else if all elements were fixed then unfix all.
+		boolean setFixed = false;
+		Iterator iter = m_highlightedElements.iterator();
+		while (iter.hasNext())
+		{
+			GeometryElement element = (GeometryElement) iter.next();
+			if (!element.isFixed())
+			{
+				setFixed = true;
+				break;
+			}
+		}
+
+		// set the fixed flag of all the elements, depending on the setFixed
+		// Flag
+		iter = m_highlightedElements.iterator();
+		while (iter.hasNext())
+		{
+			GeometryElement element = (GeometryElement) iter.next();
+			element.setFixed(setFixed);
+		}
+		return 1;
+	}
 
 
 	/**********************************************************************************************************************/

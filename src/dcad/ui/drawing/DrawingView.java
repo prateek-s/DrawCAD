@@ -392,8 +392,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_prevPt = null;
 		m_length = 0.0;
 	}
-
-	/***************************************************************************/
+	
+	/*******************************************************************************/
+	
 	/**
 	 * This draws the component on-screen. AND repaints the entire screen - the grid,segments,text,markers etc. 
 	 * Is there any other way??
@@ -450,7 +451,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		
 	}
 
-	/***************************************************************************/
 
 	/**
 	 * Draws a collinear line between point pt1 and pt2, which are global, and set 
@@ -504,11 +504,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
-	
+	/********************************************************************************/
+	/************************ STROKE ADD ******************************************/
 	/**
 	 * REPLACES public void track(int x, int y, long time)
 	 * Called on mouse released and pressed(left) events. 
-	 * 
 	 * @param pt
 	 * @return
 	 */
@@ -557,7 +557,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	/**
-	 * Adds point to given stroke
+	 * Adds point to given stroke. Usually preceeded by paintpoint
 	 * @param pt
 	 * @param time
 	 */
@@ -566,10 +566,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		int x = pt.x ; int y = pt.y ;
 		// store current pixle position with timing information
 		m_currStroke.addPoint(x, y, time);
-/*		if (x > m_canvasUsed.width)
-			m_canvasUsed.width = x;
-		if (y > m_canvasUsed.height)
-			m_canvasUsed.height = y;*/
 	}
 
 	/**
@@ -581,65 +577,42 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	{
 		A.A_draw_Stroke(theStroke) ;
 		Vector constraints = A.new_constraints ;
+		
 		repaint() ;	
-		UpdateUI(1,m_drawData.getM_constraints()); 
+		UpdateUI(1,m_drawData.getM_constraints());
+		
 		return constraints ;
 	}
 
-
-	
-	public void mouseClicked(MouseEvent e)
-	{
-	}
-
-
-	public void snapAllImpPoints(Vector SegmentList)
-	{
-		Iterator iter = SegmentList.iterator();
-		while (iter.hasNext())
-		{
-			Segment seg = (Segment) iter.next();
-			snapSegment(seg);
-		}
-	}
-
-	public void snapSegment(Segment seg)
-	{
-		// snap AnchorPoints
-		boolean changed = false;
-		Vector v = seg.getM_impPoints();
-		for (int w = 0; w < v.size(); w++)
-		{
-			ImpPoint ip = (ImpPoint) v.elementAt(w);
-			changed = snapIP(ip) || changed;
-		}
-
-		Vector closePt = seg.findClosestSeg(m_drawData.getAllSegments());
-		if ((closePt != null) && (closePt.size() == 2))
-		{
-			Point2D fromPt = (Point2D) closePt.get(0);
-			Point2D toPt = (Point2D) closePt.get(1);
-			if (!fromPt.equals(toPt))
-				seg.move(fromPt, toPt);
-		}
-	}
-
 	/**
-	 * Snap all the IPs of the Vector
-	 * 
-	 * @param ips
+	 *  The UI part of the code when adding a stroke to a draing. 
+	 * @param strk
+	 * @return
 	 */
-/*	public void snapIPs(Vector ips)
+	public Vector ProcessStroke(Stroke strk)
 	{
-		
-		Iterator iter = ips.iterator();
-		while (iter.hasNext())
-		{
-			ImpPoint ip = (ImpPoint) iter.next();
-			snapIP(ip);
+		Vector constraints = null ;
+		if (strk != null )
+		{			
+			constraints = addStroke(strk); //Does all the work
+
+			constraints = A.Refresh_Drawing(strk,constraints) ;
+			
+			//show the last stroke
+			m_showLastStroke = true;
+			//TODO: Semantics of this..
+			addToUndoVector();
+			repaint();	
 		}
-	}*/
-// 08-02-10
+		return constraints ;
+	}
+	
+	/********************************************************************************/
+
+	/***************************** SNAPPING **************************************/
+	
+	
+
 /**function snap the ips
  * if a new stroke is drawn, check for if end points of this 
  * stroke needs to be snapped.	
@@ -652,171 +625,22 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	{
 		// found on 22-02-10 when we type a text then also the tool is in Drawing mode.
 		// so checked here whether the Enter key is clicked do not do this
-		if(!isEnterKeyClicked()){
-			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE && m_drawData.getStrokeList().size()>=1){
-				Vector segPts = new Vector();
-				segPts = null;
-				if(m_currStroke != null){
-					if(m_currStroke.getM_segPtList().size()!=0){
-                  		segPts = m_currStroke.getM_segPtList();
-            
-                  			Iterator iter1 = segPts.iterator();
-                  			while (iter1.hasNext()){
-                  				SegmentPoint point = (SegmentPoint)iter1.next();
-                  				Point2D segPoint = point.getM_point();	
-			
-                  				Vector anchorPoints = m_drawData.getAllAnchorPoints();
-                  				Iterator iter2 = anchorPoints.iterator();
-		
-                  				while (iter2.hasNext()){
-                  					ImpPoint ip = (ImpPoint) iter2.next();
-                  					if(ip.getM_point()!=null){
-                  						if((ip.getM_point()).equals(segPoint) 
-                  								|| (ip.getM_point().distance(segPoint) < (((GConstants.cmScaleDrawingRatio)/10)*2))){
-                  							snapIP(ip);					// distance < 2 mm
-                  						}
-                  					}
-                  				}
-                  			}
-					}
-				}
-			}
-			else{
-				if (isM_elementDragged() && (m_highlightedElements.size() > 0)){
-					System.out.println("highlighted elements count : " + m_highlightedElements.size());
-					Iterator iter = m_highlightedElements.iterator();
-					while (iter.hasNext()){
-						GeometryElement seg = (GeometryElement)iter.next();
-						if(seg instanceof SegCircleCurve){
-							SegCircleCurve segCC = (SegCircleCurve)seg;
-							Vector segCirCurvePts = segCC.getM_impPoints();
-							iter = segCirCurvePts.iterator();
-							while (iter.hasNext()){
-								snapIP((ImpPoint)iter.next());
-							}	
-						 //snapIP((ImpPoint)iter.next());
-						}
-						else if(seg instanceof SegLine){
-							System.out.println("Seg Line");
-							SegLine segL = (SegLine) seg; 
-							Vector segLinePts = segL.getM_impPoints();
-							iter = segLinePts.iterator();
-							while (iter.hasNext()){
-								snapIP((ImpPoint)iter.next());
-							}	
-						}
-						else if(seg instanceof ImpPoint){
-							System.out.println("ImpPoint");
-							snapIP((ImpPoint)seg);
-						}
-						else{
-							System.out.println("this is else part");
-						}
-					}
-				}
-			}
-		}
-	}
-	/**Function to check if this Imp point is the center of Circular arc 
-	 * @author Sunil Kumar
-	 */
-	public boolean iterateParentVector(ImpPoint ip){
-		Vector parents = ip.getAllParents();
-		Iterator iter = parents.iterator();
-		while (iter.hasNext())
+		if(!isEnterKeyClicked())
 		{
-			Segment seg = (Segment) iter.next();
-		// if this important point belongs to Circular arc and is center point
-		// don't merge	
-			if(seg instanceof SegCircleCurve){
-			   SegCircleCurve segCC = (SegCircleCurve)seg;
-			   if((segCC.getM_center().getM_point()).equals(ip.getM_point())){
-				   return true;
-			   }   
-			}
-			else if(seg instanceof SegLine){
-				SegLine sLine = (SegLine)seg;
-				if((sLine.getM_middle().getM_point()).equals(ip.getM_point())){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	public boolean snapIP(ImpPoint ip)
-	{
-		// It may happen that this point was replaced by some point in the outer
-		// call of this function.
-		// In that case, it is no longer required to check for a close point for
-		// this point.
-		if (ip.getM_point() == null)
-			return false;
-
-		// find all the imp points close to this ip
-		ImpPoint closestIP = ip.findClosestIP(m_drawData.getAllAnchorPoints());
-		Point2D closestPt;
-		if (closestIP != null)
-			closestPt = closestIP.getM_point();
-		else
-			closestPt = null;
-
-		// snap ip to the closest PT;
-		if (closestPt != null)
-		{
-			// added on 09-02-10
-			// if this important point belongs to Circular arc and is center point
-			// don't merge
-			// ip.move(closestPt.getX(), closestPt.getY());
-			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE){
-				if(!iterateParentVector(ip)){
-					if(!iterateParentVector(closestIP)){
-						mergePoints(closestIP, ip);
-						return true;
-					}
-				}
-			}
-			else{
-				mergePoints(closestIP, ip);
-				return true;
-			}
-		} 
-		else{
-			closestPt = ip.findClosestSeg(m_drawData.getAllSegments());
-			if (closestPt != null)
+			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE && m_drawData.getStrokeList().size()>=1)
 			{
-				ip.move(closestPt.getX(), closestPt.getY());
-				return true;
+				A.Snap_IPs_new(m_currStroke) ;
+			}
+			//else, not draw mode, or no strokes.
+			else	
+			{
+				if (isM_elementDragged() && (m_highlightedElements.size() > 0))
+				{
+					A.Snap_IP_drag (m_highlightedElements) ; 
+				}
 			}
 		}
-		return false;
 	}
-
-	
-	public void mergePoints(ImpPoint ip1, ImpPoint ip2)
-	{	
-		A.A_merge_points(ip1, ip2) ;
-		
-		int tempIndex;
-		if (m_highlightedElements.contains(ip1))
-		{
-			tempIndex = m_highlightedElements.indexOf(ip1);
-			m_highlightedElements.remove(ip1);
-			addHighLightedElement(ip2);
-			// m_highlightedElements.add(tempIndex,ip2);
-		}
-		if (m_selectedElements.contains(ip1))
-		{
-			tempIndex = m_selectedElements.indexOf(ip1);
-			m_selectedElements.remove(ip1);
-			m_selectedElements.add(tempIndex, ip2);
-		}
-		A.postMergeOperations(ip2);
-	}
-
-	
-
-
 
 	public void mouseEntered(MouseEvent e)
 	{
@@ -827,12 +651,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 		m_mousePos.x = e.getX();
 		m_mousePos.y = e.getY();
-		//if(index == 0)
-		//helpDrawView.selectRows(GConstants.LEFT_CLICK);
-		//index++;
+
 		highlightTableRowsSelectedElems();
-	
 	}
+	
+	
+	
 	/**Function to highlight table rows in Help table
 	 * @author Sunil Kumar
 	 */
@@ -970,6 +794,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = y;
 	}
 
+	
 	public void mouseButton3Pressed(int x, int y)
 	{
 		Point pt = new Point(x,y) ;
@@ -987,34 +812,32 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			
 			// added on 08-05-10
 			// to put highlighted element if it is a line in a segment 
-			if(m_highlightedElements.size() == 1){
-				System.out.println("Element Selected : " + m_highlightedElements.get(0).getClass());
-				String parsedCons[];
-				
-				parsedCons = m_highlightedElements.get(0).getClass().toString().split("[ ]+");
-				
-					if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0){
-							System.out.println("Equal");
-							Segment segm = (Segment)m_highlightedElements.get(0);
-							
-							if(segm instanceof SegLine)
-								highlightedSegWhileDragging.add(segm);
-							System.out.println("Added highlighted element : " + (Segment)highlightedSegWhileDragging.get(0));
-							System.out.println("size : "+ highlightedSegWhileDragging.size());
-					}
-			}
+//			if(m_highlightedElements.size() == 1)
+//			{
+//				System.out.println("Element Selected : " + m_highlightedElements.get(0).getClass());
+//				String parsedCons[];
+//				
+//				parsedCons = m_highlightedElements.get(0).getClass().toString().split("[ ]+");
+//				
+//				if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
+//				{
+//					System.out.println("Equal");
+//					Segment segm = (Segment)m_highlightedElements.get(0);
+//				}
+//			}
 			
 			//***************************************************
 			if ((m_keyEventCode == KeyEvent.VK_SHIFT))
 			{
 				GeometryElement e = (GeometryElement) m_highlightedElements.get(0) ;
-				A.A_add_anchor_point(e,pt) ;
+				A.A_add_anchor_point(e , pt) ;
 			
 				//partitionLineSegments(e, x, y);
-			} else
+			}
+			else
 			{
 				GVariables.setDRAWING_MODE(GConstants.EDIT_MODE);
-				if (!smartMergeSelectedEleToHighLightedEle())
+				if (!A.smartMergeSelectedEleToHighLightedEle())
 				{
 					clearSelection();
 				}
@@ -1022,6 +845,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		} 
 	}
 
+	/***********************************************************************/
 	
 	
 	private void addConstraintsForMarkers()
@@ -1084,10 +908,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	}
 
+	
 	private void fixElements(int x, int y)
 	{
 		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
-		if (!smartMergeSelectedEleToHighLightedEle())
+		if (!A.smartMergeSelectedEleToHighLightedEle())
 		{
 			clearSelection();
 		}
@@ -1095,29 +920,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
 		setM_mousePressedLogged(true);
 
-		// don't TOGGLE the fixed flag of all the elements, at least on
-		// element is not fixed, first fix it
-		// else if all elements were fixed then unfix all.
-		boolean setFixed = false;
-		Iterator iter = m_highlightedElements.iterator();
-		while (iter.hasNext())
-		{
-			GeometryElement element = (GeometryElement) iter.next();
-			if (!element.isFixed())
-			{
-				setFixed = true;
-				break;
-			}
-		}
-
-		// set the fixed flag of all the elements, depending on the setFixed
-		// Flag
-		iter = m_highlightedElements.iterator();
-		while (iter.hasNext())
-		{
-			GeometryElement element = (GeometryElement) iter.next();
-			element.setFixed(setFixed);
-		}
+		A.A_fix_elements() ;
 	}
 
 	public void mouseButton2Pressed(int x, int y)
@@ -1136,45 +939,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
-	private boolean smartMergeSelectedEleToHighLightedEle()
-	{
-		boolean intersect = false;
-
-		// check if any of the highlighted element is a selected element as
-		// well.
-		Iterator iter = m_selectedElements.iterator();
-		while (iter.hasNext())
-		{
-			GeometryElement ele = (GeometryElement) iter.next();
-			if (m_highlightedElements.contains(ele))
-			{
-				intersect = true;
-				break;
-			}
-		}
-		if (intersect)
-		{
-			// some highlighted element were in present in the selected list, so
-			// add all selected elements to the highlighted list.
-			// first remove all selected elemnts for highlighted list (this is
-			// to avoid duplicates objects in the list)
-			m_highlightedElements.removeAll(m_selectedElements);
-
-			// set the highlight flag for all the selected objects
-			iter = m_selectedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement element = (GeometryElement) iter.next();
-				element.setHighlighted(true);
-			}
-
-			// add all selected elements to the highlighted list.
-			addHighLightedElements(m_selectedElements);
-			// m_highlightedElements.addAll(m_selectedElements);
-		}
-		return intersect;
-	}
-
+	
 	public void mouseButton1Pressed(int x, int y, long time)
 	{
 		newConstraints = new Vector();
@@ -1242,7 +1007,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	public void mouseReleased(MouseEvent e)
 	{
-		
 		mouseReleased(e.getX(), e.getY(),e.getButton());
 	}
 
@@ -1254,7 +1018,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 //***************************************************************
 	//19-04-10
 	//functions to get mouse click's point location
-	public void setMousePointerLocation(Point pt1){
+	public void setMousePointerLocation(Point pt1)
+	{
 		if(pt == null){
 			pt = new Point(); 
 		}
@@ -1396,30 +1161,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// drawing
 		resizePanel();
 	}
-	
-	
-	public Vector ProcessStroke(Stroke strk)
-	{
-		Vector constraints = null ;
-		if (strk != null )
-		{
-		//1-6-2008
-		//m_currStroke.smoothen();
-			
-			constraints = addStroke(strk); //Does all the work
-			
-		
-			constraints = A.Refresh_Drawing(strk,constraints) ;
-			
-		//show the last stroke
-			m_showLastStroke = true;
-			//TODO: Semantics of this..
-			addToUndoVector();
-			repaint();
-			
-		}
-		return constraints ;
-	}
+
 	
 	
 	
@@ -2514,5 +2256,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	public int getM_button_type() {
 		return m_button_type;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
