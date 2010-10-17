@@ -123,7 +123,8 @@ public class ActionInterface extends ActionHelper
 	
 	
     /**
-     * Refresh drawing after drawing a new stroke.
+     * Calculate new constraints which occur as a result of adding a stroke,
+     * snapips, add markers if any.
      * @param strk
      * @param constraints
      * @return
@@ -185,7 +186,7 @@ public class ActionInterface extends ActionHelper
 	    {
 		boolean remMarkers = false;
 		// this is done only once
-		Iterator iter = elementsToMove.iterator();
+		 iter = elementsToMove.iterator();
 		while (iter.hasNext())
 		    {
 			GeometryElement element = (GeometryElement) iter.next();
@@ -204,10 +205,10 @@ public class ActionInterface extends ActionHelper
 		    }
 		//NExt 2 statement dance not really needed. 
 		// clear the list of moved elements
-		m_movedElementsOldPos.clear();
+	//	m_movedElementsOldPos.clear();
 		// add all the highlighted elements to the movedElements
 		// Vector
-		copyMovedElements(elementsToMove);
+	//	copyMovedElements(elementsToMove);
 		//
 		
 		if (remMarkers)
@@ -244,7 +245,7 @@ public class ActionInterface extends ActionHelper
 		// " + ap.getY());
 	    }
 				
-	Iterator iter = elementsToMove.iterator();
+	 iter = elementsToMove.iterator();
 	while (iter.hasNext())
 	    {
 		GeometryElement element = (GeometryElement) iter.next();
@@ -254,11 +255,10 @@ public class ActionInterface extends ActionHelper
 	//iter = elementsToMove.iterator();
 	if (movedPts.size() > 0)
 	    {
-		Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,
-										     movedPointsPositions);
+		Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,movedPointsPositions);
 		if (affectedCons == null)
 		    {
-			result = false;
+			boolean result = false;
 			// undo this move
 			// 29-1-2008 WindowActions.getInstance().undo();
 			// WindowActions.getInstance().undo();
@@ -268,32 +268,30 @@ public class ActionInterface extends ActionHelper
 		    }
 	    }
     }
-	}
 }
 
-public int A_change_seg_property(Segment seg, String property_type, String value) 
-{
 
-}
+
+
 
 public int A_undo(int count) 
 {
-
+return 1;
 }
 
 public int A_redo(int count) 
 {
-
+return 1;
 }
 
 public int A_change_to_marker(Stroke strk) 
 {
-
+return 1;
 }
 
 public int A_change_marker_to_segment(Stroke strk) 
 {
-
+return 1;
 }
 
 
@@ -319,7 +317,7 @@ public int A_add_all_markers()
 		
 		A_add_markers(new_markers) ;
 	}
-
+return 1;
 }
 
 
@@ -434,16 +432,33 @@ public int A_add_text(String text, Point pt)
 	return 1;
 }
 
-
+/**
+ * Clears all the selected elements. 
+ * @return
+ */
+public int A_clear_selection() 
+{
+	int selected = m_selectedElements.size() ;
+	// some other element was clicked .. so clear all the selection
+	Iterator iter = m_selectedElements.iterator();
+	while (iter.hasNext())
+	{
+		GeometryElement element = (GeometryElement) iter.next();
+		element.setSelected(false);
+	}
+	m_selectedElements.clear();
+	return (selected-m_selectedElements.size()) ;
+	
+}
 
 public int A_delete_text(Point location)
 {
-
+return 1;
 }
 
 public int A_change_Segment_to(Segment seg, int seg_type) 
 {
-
+return 1;
 }
 
 public int A_change_Seg_property(Segment seg,String type, String val)
@@ -475,17 +490,17 @@ return 1;
 
 public int A_clear() 
 {
-
+return 1;
 }
 
 public int A_load()
 {
-
+return 1;
 }
 
 public int A_save() 
 {
-
+return 1;
 }
 
 /**
@@ -500,13 +515,14 @@ public int A_save()
 public int A_add_constraints(Vector constraints) 
 {
 	ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) ;
+	return 1;
 	
 }
 
 
 public int A_delete_constraint(Constraint constraint) 
 {
-
+return 1;
 }
 
 /**
@@ -516,11 +532,10 @@ public int A_delete_constraint(Constraint constraint)
  */
 public Segment A_seg_selected(Point pt) 
 {
-
-
+return null ;
 }
 
-/**************************************************************************************/
+/***************************** ELEMENT SELECTION **********************/
 /**
  * returns the geometric elements under this point. Can be several, so return a vector. Already selected elements are passed, so duplicates are removed
  * @param pt
@@ -578,9 +593,10 @@ public Vector<GeometryElement>  A_elements_selected (Point pt,Vector m_selectedE
 
 /****************************************************************************************/
 
-public Vector isPtOnGeometryElement(Point2D pt)
+public Vector isPtOnGeometryElement(Point pt)
 {
 	Vector gEles = new Vector();
+
 	Vector aps = isPtOnAnyAnchorPoint(pt);
 	if ((aps != null) && (aps.size() > 0))
 	{

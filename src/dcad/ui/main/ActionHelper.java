@@ -8,6 +8,8 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
+import sun.awt.windows.ThemeReader;
+
 import dcad.model.constraint.Constraint;
 import dcad.model.constraint.RelativeConstraint;
 import dcad.model.constraint.constraintsHelper;
@@ -45,7 +47,25 @@ public class ActionHelper
 	public DrawingData m_drawData = new DrawingData();
 	public Vector m_highlightedElements ;
 	public Vector m_selectedElements ;
-
+	public ProcessManager m_processManager ; 
+	
+/****************************************************************************/
+	
+	public void addHighLightedElement(GeometryElement g)
+	{
+		if (!m_highlightedElements.contains(g))
+			m_highlightedElements.add(g);
+	}
+	public void addHighlightedElements(Vector v) 
+	{
+		Iterator i = v.iterator() ;
+		while(i.hasNext())
+			addHighLightedElement((GeometryElement) i.next()) ;
+	}
+	
+	/**
+	 * Add or remove anchor point.
+	 */
 	private Vector performSegRecycling(int x, int y)
 	{
 		Vector modConstraints = new Vector();
@@ -77,6 +97,8 @@ public class ActionHelper
 		return modConstraints;
 	}
 	
+	
+/************************** MERGE OPERATIONS ******************************/
 	/**
 	 * Merges the segments of the stroke by ensuring end-points coincide. 
 	 * @param theStroke
@@ -102,8 +124,11 @@ public class ActionHelper
 		}
 	}
 	
-	
-	
+	/**
+	 * 
+	 * @param ip1
+	 * @param ip2
+	 */
 	public void mergePoints(ImpPoint ip1, ImpPoint ip2)
 	{	
 		A_merge_points(ip1, ip2) ;
@@ -125,9 +150,13 @@ public class ActionHelper
 		postMergeOperations(ip2);
 	}
 
-	
-	
-	
+
+	/**
+	 * constraints handled. Delete the merged point too.
+	 * @param ip1
+	 * @param ip2
+	 * @return
+	 */
 	public int A_merge_points(ImpPoint ip1, ImpPoint ip2)
 	{	
 		if(constraintsHelper.getNoMergeConstraintBetweenPoints((AnchorPoint)ip1,(AnchorPoint)ip2) != null)
@@ -150,6 +179,7 @@ public class ActionHelper
 		return 1 ;
 	}
 	
+	
 	public void postMergeOperations(ImpPoint ip)
 	{
 		AnchorPoint ap = (AnchorPoint) ip;
@@ -163,7 +193,9 @@ public class ActionHelper
 		removeConstraintsOfType(ap, CollinearLinesConstraint.class);
 	}
 	
-	private void removeConstraintsOfType(AnchorPoint ap, Class className)
+	
+	
+	public void removeConstraintsOfType(AnchorPoint ap, Class className)
 	{
 		Vector constraints = ap.getConstraintsByType(className);
 		for (int i = 0; i < constraints.size(); i++)
@@ -172,10 +204,12 @@ public class ActionHelper
 			if (!constraintsHelper.arePointsUnique(c))
 			{
 				c.remove();
-				justAddedConstraints.remove(c);
+				//justAddedConstraints.remove(c); //FIXME
 			}
 		}
 	}
+	
+/**************************************************************************/
 	
 	/**
 	 * Try recognizing all constraints of the stroke. Called after segmentation, snapping has been 
@@ -253,6 +287,12 @@ public class ActionHelper
 	}
 	
 
+/************************************************************************/
+	
+	/**
+	 * Recognize segments of the stroke.. Assumes segmentation has already 
+	 * been performed.  
+	 */
 	public Vector<Segment> recognizeSegments(Stroke theStroke)
 	{
 		//m_currStroke = theStroke;
@@ -262,14 +302,9 @@ public class ActionHelper
 		try
 		{
 			SegmentRecognizer segmentRecog = recogMan.getSegmentRecogMan().getSegmentRecognizer();
-			// added on 23-02-10
-			// if this stroke is converted, then no need to call segment recognizer 
 			
 			Segments = theStroke.recognizeSegments(segmentRecog);
-			// displaying of recognized segment can be done somewhere else as
-			// well.
-			if (!GVariables.undoing)
-				theStroke.drawSegments(getGraphics());
+
 		} catch (Exception e)
 		{
 			JOptionPane.showMessageDialog(null, "Error Occured in recognize segments : "
@@ -280,6 +315,10 @@ public class ActionHelper
 		return Segments ;
 		
 	}
+
+/**************************************************************************/
+	
+/************************ CONSTRAINTS *********************************/
 	
 	
 	public Vector recalculateConstraints(Vector affectedSegs)
@@ -416,7 +455,7 @@ public class ActionHelper
 		}
 	}
 	
-
+/************************* END CONSTRAINTS ********************/
 
 	/**
 	 * This methods removes the segment point (breakpoint) indicated by this
@@ -466,7 +505,9 @@ public class ActionHelper
 					// remove all segments of this stroke.
 					theStroke.deleteSegments();
 
-					return recognizeSegmentsAndConstraints(theStroke);
+					recognizeSegments(theStroke) ;
+					return recognize_Constraints(theStroke) ;
+					//return recognizeSegmentsAndConstraints(theStroke);
 
 				}
 			}
@@ -475,6 +516,7 @@ public class ActionHelper
 		return null;
 	}
 
+/************************/
 	
 	public Vector performReSegmentation(Stroke theStroke, Point pt)
 	{
@@ -542,8 +584,9 @@ public class ActionHelper
 				// insert a new segment point at the start
 				segPtList.add(0, sp);
 			}
-
-			return recognizeSegmentsAndConstraints(theStroke);
+			recognizeSegments(theStroke) ;
+			return recognize_Constraints(theStroke) ;
+			//return recognizeSegmentsAndConstraints(theStroke);
 		} else
 		{
 			JOptionPane.showMessageDialog(null, "No Close Pixel found ", "Resegmentation Error",
@@ -551,40 +594,8 @@ public class ActionHelper
 			return null;
 		}
 	}
-	
-	
-	public Vector performSegRecycling(Vector m_highlightedElements, int x, int y)
-	{
-		Vector modConstraints = new Vector();
-		Point pt = new Point(x, y);
-		Iterator iter = m_highlightedElements.iterator();
-		while (iter.hasNext())
-		{
-			GeometryElement element = (GeometryElement) iter.next();
-			if (element instanceof Stroke)
-			{
-				Stroke stroke = (Stroke) element;
-				if (stroke.containsPt(pt))
-				{
-					Vector vec = performReSegmentation(stroke, pt);
-					if (vec != null)
-						modConstraints.addAll(vec);
-				}
-				break;
-			}
-			if (element instanceof AnchorPoint)
-			{
-				AnchorPoint ap = (AnchorPoint) element;
-				Vector vec = A.performSegFusion(ap);
-				if (vec != null)
-					modConstraints.addAll(vec);
-				break;
-			}
-		}
-		return modConstraints;
-	}
-	
-	
+
+/*********************************************************************/
 	// 25-01-10
 	public double areaOfTriangle(AnchorPoint ptA, AnchorPoint ptB, Point ptP){
 		return(Math.abs(ptA.getX()*ptB.getY() + ptB.getX()*ptP.getY()
@@ -609,6 +620,9 @@ public class ActionHelper
 	}
 	
 
+	
+	
+	
 	// 08 - 05- 10
 	// gives all the parallel lines constraints to the given segment
 	/**function to give all the parallel lines constraints to the given segment
@@ -706,8 +720,11 @@ public class ActionHelper
 	}
 	
 	
-	
+/************************************************************************/	
 
+	/**
+	 * Get all anchor points present in the given list of elements
+	 */
 	public Vector findAnchorPoints(Vector elements)
 	{
 		Vector anchorPts = new Vector();
@@ -734,7 +751,11 @@ public class ActionHelper
 		return anchorPts;
 	}
 
-
+/**
+ *UI separated
+ * @param e
+ * @return
+ */
 	public boolean Check_for_Collinearity(GeometryElement e)
 	{
 		String parsedCons[];
@@ -748,7 +769,7 @@ public class ActionHelper
 
 			Segment seg  = (Segment)e;
 
-			Vector parallelLinesConstraintList = A.getParallelLinesConsList("lines", "parellel", seg);
+			Vector parallelLinesConstraintList = getParallelLinesConsList("lines", "parellel", seg);
 			if(parallelLinesConstraintList.size() != 0 ){
 				int consNumber = 0;
 				for(consNumber = 0 ; consNumber < parallelLinesConstraintList.size(); consNumber++){
@@ -779,7 +800,7 @@ public class ActionHelper
 	}
 	
 	
-	
+	Point pt1,pt2 ;
 	// added on 10-05-10
 	// find the end point and starting point of other line according to orientation
 	/**function to find the Middle points i.e, end point of first segment and 
@@ -812,15 +833,15 @@ public class ActionHelper
 		double angle1 = Math.abs(Maths.AngleInDegrees(x1, y1, x2, y2));
 		double angle2 = Math.abs(Maths.AngleInDegrees(x3, y3, x4, y4));
 		// if lines are horizontal
-		if(A.isLineHorizontal(angle1) && A.isLineHorizontal(angle2)){
-			A.sortAnchorPoints(segPoints, sortByX);
+		if(isLineHorizontal(angle1) && isLineHorizontal(angle2)){
+			sortAnchorPoints(segPoints, sortByX);
 		}
 		// if lines are vertical
-		else if(A.isLineVertical(angle1) && A.isLineVertical(angle2)){
-				A.sortAnchorPoints(segPoints, sortByY);
+		else if(isLineVertical(angle1) && isLineVertical(angle2)){
+				sortAnchorPoints(segPoints, sortByY);
 		}
 		else{
-			A.sortAnchorPoints(segPoints, sortByX);
+			sortAnchorPoints(segPoints, sortByX);
 		}
 	int n= segPoints.length;
 			if(n > 0){
@@ -849,7 +870,7 @@ public class ActionHelper
 			return segPoints;
 	}
 	
-	/**************************** SNAPPING **********/
+	/**************************** SNAPPING *****************************/
 	
 	
 	
@@ -1035,7 +1056,7 @@ public class ActionHelper
 	
 	
 	
-	/********************************************************/
+/***************************************************************************/
 	
 	public boolean smartMergeSelectedEleToHighLightedEle()
 	{
@@ -1070,7 +1091,7 @@ public class ActionHelper
 			}
 
 			// add all selected elements to the highlighted list.
-			addHighLightedElements(m_selectedElements);
+			addHighlightedElements(m_selectedElements);
 			// m_highlightedElements.addAll(m_selectedElements);
 		}
 		return intersect;

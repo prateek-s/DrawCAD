@@ -578,6 +578,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		A.A_draw_Stroke(theStroke) ;
 		Vector constraints = A.new_constraints ;
 		
+		if (!GVariables.undoing)
+			theStroke.drawSegments(getGraphics());
+		
 		repaint() ;	
 		UpdateUI(1,m_drawData.getM_constraints());
 		
@@ -989,14 +992,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 */
 	private void clearSelection()
 	{
-		// some other element was clicked .. so clear all the selection
-		Iterator iter = m_selectedElements.iterator();
-		while (iter.hasNext())
-		{
-			GeometryElement element = (GeometryElement) iter.next();
-			element.setSelected(false);
-		}
-		m_selectedElements.clear();
+		A.A_clear_selection() ;
 		GMethods.getRecognizedView().updateSelection(m_selectedElements);
 	}
 	
@@ -1850,7 +1846,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		Text t = new Text(c + "", X, Y);
 		if (t != null)
 		{
-			addGeoElement(t);
 			logEvent("writeText({int}" + X + ", {int}" + Y + ", {" + String.class.getName() + "}"
 					+ c + ");");
 			logEvent(Command.PAUSE);
@@ -1863,7 +1858,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// But, because of that, this was not done while loading a file
 		// Now it's working.
 		A.A_add_text(c,new Point (X,Y)) ;
-		addConstraintsForMarkers();
+		
 		clearSelection();
 	}
 
