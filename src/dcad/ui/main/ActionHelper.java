@@ -566,7 +566,7 @@ public class ActionHelper
 				Stroke stroke = (Stroke) element;
 				if (stroke.containsPt(pt))
 				{
-					Vector vec = A.performReSegmentation(stroke, pt);
+					Vector vec = performReSegmentation(stroke, pt);
 					if (vec != null)
 						modConstraints.addAll(vec);
 				}

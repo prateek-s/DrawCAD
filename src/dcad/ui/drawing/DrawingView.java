@@ -976,7 +976,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 							newConstraints.addAll(constraints);
 					}
 					snapIPsAndRecalculateConstraints(newConstraints);
-
 				}
 			} 
 			else{
@@ -1120,7 +1119,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				Vector constraints = ProcessStroke(m_currStroke) ;
 			}
 		}
-		else {
+		else //edit mode
+		{
 			if(handleMouseDragEditMode(x, y))
 			{
 				if (isM_elementDragged() && (m_highlightedElements.size() > 0)){
@@ -1323,105 +1323,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			// In case there are element to move, go in
 			if (elementsToMove.size() > 0)
 			{
-				if (!isM_elementDragged())
-				{
-					boolean remMarkers = false;
-					// this is done only once
-					iter = elementsToMove.iterator();
-					while (iter.hasNext())
-					{
-						GeometryElement element = (GeometryElement) iter.next();
-						if (!element.isFixed())
-						{
-							if (element instanceof Text){
-								// do nothing
-							} 
-							else{
-								// clear the soft constraints for the selected
-								// element
-								A.removeConstraints(element);
-								remMarkers = true;
-							}
-						}
-					}
+			A.A_move_Elements(elementsToMove,m_mousePos,new Point(x,y),0) ;
 
-					// clear the list of moved elements
-					m_movedElementsOldPos.clear();
-
-					// add all the highlighted elements to the movedElements
-					// Vector
-					copyMovedElements(elementsToMove);
-
-					if (remMarkers)
-					{
-						// remove all the unused markers or Text elements
-						Iterator itr = m_drawData.getUnusedMarkers().iterator();
-						while (itr.hasNext())
-						{
-							Marker marker = (Marker) itr.next();
-							marker.delete();
-						}
-				
-						// remove all the unused text Elements
-						itr = m_drawData.getUnusedText().iterator();
-						while (itr.hasNext())
-						{
-							Text text = (Text) itr.next();
-							text.delete();
-						}
-					}
-
-					setM_elementDragged(true);
-				}
-
-				Vector movedPts = A.findAnchorPoints(elementsToMove);
-				double movedPointsPositions[] = new double[movedPts.size() * 2];
-				// System.out.println("!!!!!!!!! Initial Positions : ");
-				for (int temp = 0; temp < movedPts.size(); temp++)
-				{
-					AnchorPoint ap = (AnchorPoint) movedPts.get(temp);
-					movedPointsPositions[temp * 2] = ap.getX();
-					movedPointsPositions[temp * 2 + 1] = ap.getY();
-					// System.out.println(ap.getM_label() + " " + ap.getX() + "
-					// " + ap.getY());
-				}
-				
-				iter = elementsToMove.iterator();
-				while (iter.hasNext())
-				{
-					GeometryElement element = (GeometryElement) iter.next();
-					element.move(m_mousePos.x, m_mousePos.y, x, y);
-				}
-				
-				//iter = elementsToMove.iterator();
-				if (movedPts.size() > 0)
-				{
-					Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,
-							movedPointsPositions);
-					if (affectedCons == null)
-					{
-						result = false;
-						// undo this move
-						// 29-1-2008 WindowActions.getInstance().undo();
-						// WindowActions.getInstance().undo();
-					} else
-					{
-						A.updateConstraints(affectedCons, Constraint.HARD);
-					}
-				}
-			}
-			
-		/*	if(getMovedPointSegment() != null){
-				Segment movedSeg  = getMovedPointSegment();
-				
-				movedSeg.clearConstraints(Constraint.SOFT);
-				movedSeg.clearConstraints(Constraint.HARD);
-				//movedSeg.delete();
-				//setMovedPointSegment(null);
-			}*/
-			
 			repaint();
-		}
+			}
 		return result;
 	}
 
@@ -1913,16 +1818,16 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{
 			logEvent("deleteKeyPressed()");
 			logEvent(Command.PAUSE);
+
 			Iterator iter = m_selectedElements.iterator();
 			while (iter.hasNext())
 			{
-				GeometryElement gEle = (GeometryElement) iter.next();
-				gEle.delete();
+			    A.A_delete_Element(iter.next())
+
 			}
 			m_selectedElements.clear();
 			repaint();
-			//RecognizedView rv = MainWindow.getRecognizedView();
-			//rv.reset(m_drawData.getM_constraints());
+
 			UpdateUI(1,m_drawData.getM_constraints());
 		}
 	}
