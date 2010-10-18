@@ -173,6 +173,18 @@ public class ActionInterface extends ActionHelper
 	return 1 ;
     }
 
+    boolean m_elementDragged ;
+    
+	public boolean isM_elementDragged()
+	{
+		return m_elementDragged;
+	}
+
+	public void setM_elementDragged(boolean dragged)
+	{
+		m_elementDragged = dragged;
+	}
+    
     /**
      *Move the elements to new location 'to'
      */
@@ -282,6 +294,8 @@ public class ActionInterface extends ActionHelper
 		    }
 	    }
     }
+		
+		return 1;
 }
 
 
@@ -800,7 +814,7 @@ public ActionInterface() {
 public DrawingData m_drawData = new DrawingData();
 public Vector m_highlightedElements ;
 public Vector m_selectedElements ;
-public ProcessManager m_processManager ; 
+public ProcessManager m_processManager = ProcessManager.getInstance(); ; 
 
 /****************************************************************************/
 

@@ -219,7 +219,7 @@ public class Text extends GeometryElement
 		
 		// remove this Text element from the Drawing data.
 		DrawingView dv = GMethods.getCurrentView();
-		dv.removeGeoElement(this);
+		dv.A.removeGeoElement(this);
 		
 //		// remove the Text Element
 //		removeFromMarker();

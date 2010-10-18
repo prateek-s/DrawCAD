@@ -95,7 +95,7 @@ public abstract class Marker extends GeometryElement
 	{
 		// remove this Text element from the Drawing data.
 		DrawingView dv = GMethods.getCurrentView();
-		dv.removeGeoElement(this);
+		dv.A.removeGeoElement(this);
 		// this is just a part of the stroke.. so remove the stroke
 		if(m_stroke != null) m_stroke.delete();
 		super.delete();

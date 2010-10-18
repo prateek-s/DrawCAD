@@ -129,7 +129,7 @@ public class SegLine extends Segment
 			Marker marker = null;
 			Vector segList = m_parentStk.getM_segList();
 			Iterator iter = segList.iterator();
-			if ((marker = dv.isPtOnAnyMarker(pt)) != null){
+			if ((marker = dv.A.isPtOnAnyMarker(pt)) != null){
 				while(iter.hasNext()){
 				SegLine seg = (SegLine)iter.next();	
 				if(seg.isSelected()){
