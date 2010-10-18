@@ -97,7 +97,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		KeyEventDispatcher, Serializable
 		
 	{
-	public ActionHelper A ;
+	public ActionInterface A ;
 	
 	private ProcessManager m_processManager;
 	/**
@@ -828,12 +828,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 //					Segment segm = (Segment)m_highlightedElements.get(0);
 //				}
 //			}
-			
+			//commented out because it seems there is no use for it
 			//***************************************************
 			if ((m_keyEventCode == KeyEvent.VK_SHIFT))
 			{
 				GeometryElement e = (GeometryElement) m_highlightedElements.get(0) ;
-				A.A_add_anchor_point(e , pt) ;
+				Vector es = (Vector) m_highlightedElements.subList(0, 1) ;
+				A.A_add_anchor_point(es , pt) ;
 			
 				//partitionLineSegments(e, x, y);
 			}
@@ -973,7 +974,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				if (m_showLastStroke)
 				{
-					Vector constraints = A.performSegRecycling(m_highlightedElements ,x, y);
+					Vector constraints = A.performSegRecycling(x, y);
 					if ((constraints != null) && (constraints.size() > 0)){
 						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
 							newConstraints.addAll(constraints);
@@ -1053,9 +1054,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			
 			Segment seg = null;
 			// check whether the point is on any segment
-			seg = isPtOnAnySegment((Point2D)pt); 
+			seg = A.isPtOnAnySegment((Point2D)pt); 
 			this.segUnderCursor = seg ;
-			int count = ptOnSegments(pt);
+			int count = A.ptOnSegments(pt);
 			//System.out.println("Count =" +count);
 			// count <2 
 			// count = 0 means that the point is not an anchor point
@@ -1319,11 +1320,14 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			// In case there are element to move, go in
 			if (elementsToMove.size() > 0)
 			{
-			A.A_move_Elements(elementsToMove,m_mousePos,new Point(x,y),0) ;
+			A.A_move_Elements( elementsToMove,m_mousePos,new Point(x,y),0) ;
 
 			repaint();
 			}
-		return result;
+		}
+			
+		 //return result;
+			return true ;
 	}
 
 	
@@ -1483,13 +1487,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					addHighLightedElement(lastStroke);
 				else
 				{
-					Vector aps = isPtOnAnyAnchorPoint(m_mousePos);
+					Vector aps = A.isPtOnAnyAnchorPoint(m_mousePos);
 					
 					if ((aps != null) && (aps.size() > 0))
 						addHighLightedElements(aps);
 					else
 					{
-						Vector gEles = isPtOnGeometryElement(m_mousePos);
+						Vector gEles = A.isPtOnGeometryElement(m_mousePos);
 						if (gEles != null)
 							addHighLightedElements(gEles);
 					}
@@ -1498,7 +1502,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		} 
 		else{
 			// check if the mouse is close to any other geometry element
-			Vector gEles = isPtOnGeometryElement(m_mousePos);
+			Vector gEles = A.isPtOnGeometryElement(m_mousePos);
 			
 			if (m_keyEventCode == KeyEvent.VK_CONTROL)
 			{
@@ -1818,7 +1822,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			Iterator iter = m_selectedElements.iterator();
 			while (iter.hasNext())
 			{
-			    A.A_delete_Element(iter.next())
+			    A.A_delete_Element((GeometryElement )iter.next()) ;
 
 			}
 			m_selectedElements.clear();
@@ -1966,7 +1970,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// is needed. 
 		
 		if(stroke==null || stroke.getM_segList().isEmpty()) {
-			segm = isPtOnAnySegment((Point2D)pt2); 
+			segm = A.isPtOnAnySegment((Point2D)pt2); 
 
 		}
 		else {
