@@ -66,7 +66,7 @@ public class ActionHelper
 	/**
 	 * Add or remove anchor point.
 	 */
-	private Vector performSegRecycling(int x, int y)
+	public Vector performSegRecycling(int x, int y)
 	{
 		Vector modConstraints = new Vector();
 		Point pt = new Point(x, y);

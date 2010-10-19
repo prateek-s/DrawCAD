@@ -91,7 +91,11 @@ public class ActionInterface extends ActionHelper
      */
     public Vector<Constraint> new_constraints ;
 
-    public DrawingData mDrawingData ;
+    public DrawingData m_drawData = new DrawingData();
+
+    public Vector m_selectedElements = new Vector() ;
+    
+    public ProcessManager m_processManager = ProcessManager.getInstance(); 
 
     public Vector m_highlightedElements = new Vector()  ;
 
@@ -811,11 +815,6 @@ public ActionInterface() {
 
 
 
-public DrawingData m_drawData = new DrawingData();
-
-public Vector m_selectedElements ;
-public ProcessManager m_processManager = ProcessManager.getInstance(); ; 
-
 /****************************************************************************/
 
 public void addHighLightedElement(GeometryElement g)
@@ -1272,7 +1271,11 @@ public Vector performSegFusion(AnchorPoint ap)
 				// remove all segments of this stroke.
 				theStroke.deleteSegments();
 
-				recognizeSegments(theStroke) ;
+				
+				recognizeSegments(theStroke);
+				adjustStroke(theStroke);
+				m_drawData.addStroke(theStroke);
+
 				return recognize_Constraints(theStroke) ;
 				//return recognizeSegmentsAndConstraints(theStroke);
 
@@ -1351,7 +1354,10 @@ public Vector performReSegmentation(Stroke theStroke, Point pt)
 			// insert a new segment point at the start
 			segPtList.add(0, sp);
 		}
-		recognizeSegments(theStroke) ;
+		
+		recognizeSegments(theStroke);
+		adjustStroke(theStroke);
+		m_drawData.addStroke(theStroke);
 		return recognize_Constraints(theStroke) ;
 		//return recognizeSegmentsAndConstraints(theStroke);
 	} else

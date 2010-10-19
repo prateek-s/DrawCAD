@@ -345,7 +345,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// reset the global id
 		GeometryElement.globalID = 0;
 		
-		m_drawData = new DrawingData();
+		m_drawData = A.m_drawData ;
 		
 		m_mousePos = new Point(-1, -1);
 		m_trackFlag = false;
@@ -729,6 +729,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 		}
 	}
+	
+	
 	public void mouseExited(MouseEvent e)
 	{
 		m_mouseOverPanel = false;
@@ -819,7 +821,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// Note that selected elements may or may not be connected.
 		if (A.m_highlightedElements.size() > 0)
 		{
-			
 			// added on 08-05-10
 			// to put highlighted element if it is a line in a segment 
 //			if(A.m_highlightedElements.size() == 1)
@@ -839,6 +840,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			//***************************************************
 			if ((m_keyEventCode == KeyEvent.VK_SHIFT))
 			{
+				/**
+				 * 
+				 */
 				GeometryElement e = (GeometryElement) A.m_highlightedElements.get(0) ;
 				Vector es = (Vector) A.m_highlightedElements.subList(0, 1) ;
 				A.A_add_anchor_point(es , pt) ;
@@ -847,6 +851,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 			else
 			{
+				/**
+				 * 
+				 */
 				GVariables.setDRAWING_MODE(GConstants.EDIT_MODE);
 				if (!A.smartMergeSelectedEleToHighLightedEle())
 				{
@@ -941,11 +948,17 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// Note that selected elements may or may not be connected.
 		if (A.m_highlightedElements.size() > 0)
 		{
+			/**
+			 * Fix the position of the element to it's current position.
+			 */
 			fixElements(x, y);
 		} else
 		{
 			logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
 			logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
+			/**
+			 * Look for markers and apply the constraints that they can enforce.
+			 */
 			addConstraintsForMarkers();
 		}
 	}
@@ -962,6 +975,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if (m_keyEventCode == -1)
 		{
 			UI_log(getMethod()+"NEW STROKE BEGIN") ;
+			/**
+			 * Beginning of a stroke being drawn.
+			 * DrawingState: Segmentation and constraints added/modified
+			 * Stroke Points painted on screen 
+			 */
 			setM_trackFlag(true);
 			reset();
 			m_currStroke = new Stroke();
@@ -976,6 +994,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{
 			if (m_keyEventCode == KeyEvent.VK_CONTROL)
 			{
+				/**
+				 * Element under cursor selected. 
+				 * Operations can be performed on these selected elements. 
+				 */
 				performSelection(x, y);
 			} 
 			else if ((m_keyEventCode == KeyEvent.VK_SHIFT))
@@ -983,13 +1005,20 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				if (m_showLastStroke)
 				{
 					UI_log("Perform Seg Recycling" + "SHIFT" ) ;
+					/**
+					 * Adds or removes anchor-points. Anchor-points are start/end points
+					 * of a segment. Hence this changes the segmentation of the stroke. 
+					 * DrawingState: Stroke is resegmented. Constraints adjusted. Other segments
+					 * also can be affected.
+					 */
 					Vector constraints = A.performSegRecycling(x, y);
-					
+					repaint() ;
 					if ((constraints != null) && (constraints.size() > 0)){
 						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
 							newConstraints.addAll(constraints);
 					}
 					snapIPsAndRecalculateConstraints(newConstraints);
+					repaint() ;
 				}
 			} 
 			else{
@@ -999,7 +1028,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	/**
-	 * Clear the selected elements.
+	 * Resets the selected elements.
+	 * DrawingState: element selected flag unset
+	 * RecognizedView : cleared
 	 */
 	private void clearSelection()
 	{
@@ -1128,6 +1159,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 		else //edit mode
 		{
+			/**
+			 * Move an element
+			 * DRAG is a transient operation.
+			 * 
+			 */
 			boolean dragged = handleMouseDragEditMode(x, y); 
 			if (dragged)
 			{
@@ -1440,7 +1476,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					else if(seg instanceof SegLine){
 						helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_LINE);
 					}
-					
 				}
 				else if(mark instanceof MarkerPerpendicular){
 					helpDrawView.selectRows(GConstants.MARKER_PERP);
@@ -1455,18 +1490,16 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			else{
 			helpDrawView.selectRows(GConstants.LEFT_CLICK);
 			}
-		}
+		} //end outer-if
+		
 		m_mousePos.x = x;
 		m_mousePos.y = y;
 		
-		
 		if(!isParameterWinBitSet())
 		{
-	//	System.out.println("mouse moved");
 			if (A.m_highlightedElements.size() > 0)
 			{System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
-				//System.out.println("highlighted elements ");
-				// first check if the mouse is on the same object,
+
 				boolean repaintReq = false;
 				Iterator iter = A.m_highlightedElements.iterator();
 				while (iter.hasNext())
@@ -1493,9 +1526,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					repaint();
 				}
 			}
-		
-		
-		
+			
 		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT))
 		{
 			if (m_showLastStroke)
@@ -1503,6 +1534,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				Stroke lastStroke = m_drawData.getLastStroke(true);
 				if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
 					A.addHighLightedElement(lastStroke);
+				
 				else
 				{
 					Vector aps = A.isPtOnAnyAnchorPoint(m_mousePos);
@@ -1549,13 +1581,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 			if (gEles != null){
 				A.addHighlightedElements(gEles);
-			//	System.out.println("point on anchor point");
 			}
-			// A.m_highlightedElements.addAll(gEles);
 		}
 
-		// create the label to be shown in the status bar.
-		// Also, set all the elements in the highlighted Vector to be true
 		
 		String label = "";
 		if (A.m_highlightedElements.size() > 0)
@@ -1853,7 +1881,13 @@ public void UI_log(String s)
 		UpdateUI(1,newConstraints);
 	}
 
-
+/**
+ * Write some text-string on the drawing. This can be inferred as a marker or just 
+ * simply plain text. 
+ * @param X
+ * @param Y
+ * @param c
+ */
 	public void writeText(int X, int Y, String c)
 	{
 		Text t = new Text(c + "", X, Y);
@@ -1874,7 +1908,14 @@ public void UI_log(String s)
 		
 		clearSelection();
 	}
-
+	
+/**
+ * 
+ * @param x
+ * @param y
+ * @param statusStr
+ * @param label
+ */
 	private void updateStatusBar(int x, int y, String statusStr, String label)
 	{
 		StatusBar sb = MainWindow.getM_statusBar();
@@ -1891,27 +1932,10 @@ public void UI_log(String s)
 	private void resizePanel()
 	{
 		Vector v = m_drawData.getAllAnchorPoints();
-		// 27-09-09
 		Stroke stk = m_drawData.getLastStroke(true);
-	/*	if (stk==null)
-			 return;
-		Vector vec = stk.getM_ptList();
-		for(int i=0;i<vec.size();i++)
-		{
-			Point p = ((PixelInfo) vec.get((Integer)i));
-			//AnchorPoint p = (AnchorPoint)v.get(i);
-			if(p.getX() > m_canvasUsed.width)
-				m_canvasUsed.width = (int)p.getX() + 100;
-			if(p.getY() > m_canvasUsed.height)
-				m_canvasUsed.height = (int)p.getY() + 100;
-		}
-		*/
-		
-		// added on 18-05-10
 		// change canvas's width and height in case of draw and drag mode
 		for(int i=0;i<v.size();i++)
-		{
-		
+		{		
 			AnchorPoint p = (AnchorPoint) v.get(i);
 			//AnchorPoint p = (AnchorPoint)v.get(i);
 			if(p.getX() > m_canvasUsed.width)
@@ -1919,22 +1943,17 @@ public void UI_log(String s)
 			if(p.getY() > m_canvasUsed.height)
 				m_canvasUsed.height = (int)p.getY() + ((int)GConstants.cmScaleDrawingRatio*3);
 		}
-		
-		
 		boolean changed = false;
 		Dimension drawArea = new Dimension();
 		changed = true;
 		if (m_canvasUsed.width > getSize().width)
 		{
-			drawArea.width = m_canvasUsed.width;
-			
-			
+			drawArea.width = m_canvasUsed.width;	
 			changed = true;
 		}
 		else
 			drawArea.width = getSize().width;
 		
-
 		if (m_canvasUsed.height > getSize().height)
 		{
 			drawArea.height = m_canvasUsed.height;
@@ -1948,7 +1967,6 @@ public void UI_log(String s)
 			// adjust the area to the new dimensions.
 			this.setPreferredSize(drawArea);
 			this.revalidate();
-
 		}
 	}
 
@@ -2031,7 +2049,7 @@ public void UI_log(String s)
 
 	public DrawingData getM_drawData()
 	{
-		return m_drawData;
+		return A.m_drawData;
 	}
 
 	public void setM_drawData(DrawingData data)
