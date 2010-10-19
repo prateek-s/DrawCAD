@@ -93,7 +93,7 @@ public class ActionInterface extends ActionHelper
 
     public DrawingData mDrawingData ;
 
-    public Vector<GeometryElement> m_highlighedElements ;
+    public Vector m_highlightedElements = new Vector()  ;
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
@@ -812,7 +812,7 @@ public ActionInterface() {
 
 
 public DrawingData m_drawData = new DrawingData();
-public Vector m_highlightedElements ;
+
 public Vector m_selectedElements ;
 public ProcessManager m_processManager = ProcessManager.getInstance(); ; 
 

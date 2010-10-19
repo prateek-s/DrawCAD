@@ -596,6 +596,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 */
 	public Vector ProcessStroke(Stroke strk)
 	{
+		UI_log(getMethod()) ;
 		Vector constraints = null ;
 		if (strk != null )
 		{			
@@ -758,22 +759,26 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		repaint();
 		setM_button_type(buttontype);
 		if (buttontype == MouseEvent.BUTTON1)
+		{			
+		helpDrawView.selectRows(GConstants.LEFT_CLICK);
+			
+		if (clickcount == 1)
+		{
+			mouseButton1Pressed(x, y, time);
+		}
+		} 
+		else if (buttontype == MouseEvent.BUTTON2) 
 		{
 			// 04-10-09 to highlight rows in HELP table
-			
-			helpDrawView.selectRows(GConstants.LEFT_CLICK);
-			if (clickcount == 1){
-				mouseButton1Pressed(x, y, time);
-			}
-		} 
-		else if (buttontype == MouseEvent.BUTTON2) {
-			// 04-10-09 to highlight rows in HELP table
-			if(A.m_highlightedElements.size() != 0 ) {
+		if(A.m_highlightedElements.size() != 0 ) {
 			helpDrawView.selectRows(GConstants.MIDDLE_CLICK);
 			}
+		
 			mouseButton2Pressed(x, y);
 		}
-		else if (buttontype == MouseEvent.BUTTON3) {
+		
+		else if (buttontype == MouseEvent.BUTTON3) 
+		{
 			// 04-10-09 to highlight rows in HELP table
 			if(A.m_highlightedElements.size() != 0 ) {
 				if(m_keyEventCode == KeyEvent.VK_SHIFT) {
@@ -956,6 +961,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 		if (m_keyEventCode == -1)
 		{
+			UI_log(getMethod()+"NEW STROKE BEGIN") ;
 			setM_trackFlag(true);
 			reset();
 			m_currStroke = new Stroke();
@@ -976,7 +982,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				if (m_showLastStroke)
 				{
+					UI_log("Perform Seg Recycling" + "SHIFT" ) ;
 					Vector constraints = A.performSegRecycling(x, y);
+					
 					if ((constraints != null) && (constraints.size() > 0)){
 						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
 							newConstraints.addAll(constraints);
@@ -1120,7 +1128,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 		else //edit mode
 		{
-			if(handleMouseDragEditMode(x, y))
+			boolean dragged = handleMouseDragEditMode(x, y); 
+			if (dragged)
 			{
 				if (isM_elementDragged() && (A.m_highlightedElements.size() > 0)){
 					snapIPsAndRecalculateConstraints(newConstraints);		
@@ -1296,6 +1305,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	private boolean handleMouseDragEditMode(int x, int y)
 	{
+		UI_log(getMethod()) ;
 		boolean result = true ;
 		// check for collinearity while dragging the line
 		boolean are_collinear = checkForCollinearLines() ;
@@ -1454,7 +1464,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{
 	//	System.out.println("mouse moved");
 			if (A.m_highlightedElements.size() > 0)
-			{
+			{System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
 				//System.out.println("highlighted elements ");
 				// first check if the mouse is on the same object,
 				boolean repaintReq = false;
@@ -1462,8 +1472,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				while (iter.hasNext())
 				{
 					GeometryElement ele = (GeometryElement) iter.next();
+					if(ele==null) {
+						System.out.println("********ACHTUNG");
+						break ;
+					}
 					System.out.println("MOUSE POS"+m_mousePos.toString()) ;
-					System.out.println("ele POS"+ele.toString()) ;
+
 					if (!ele.containsPt(m_mousePos))
 					{
 						repaintReq = true;
@@ -1488,18 +1502,18 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				Stroke lastStroke = m_drawData.getLastStroke(true);
 				if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
-					addHighLightedElement(lastStroke);
+					A.addHighLightedElement(lastStroke);
 				else
 				{
 					Vector aps = A.isPtOnAnyAnchorPoint(m_mousePos);
 					
 					if ((aps != null) && (aps.size() > 0))
-						addHighLightedElements(aps);
+						A.addHighlightedElements(aps);
 					else
 					{
 						Vector gEles = A.isPtOnGeometryElement(m_mousePos);
 						if (gEles != null)
-							addHighLightedElements(gEles);
+							A.addHighlightedElements(gEles);
 					}
 				}
 			}
@@ -1522,10 +1536,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 							EqualRelLengthConstraint eq = (EqualRelLengthConstraint) equalRelativeLengthConstraints
 									.get(j);
 							if (eq.getM_seg1() == seg)
-								addHighLightedElement(eq.getM_seg2());
+								A.addHighLightedElement(eq.getM_seg2());
 							// A.m_highlightedElements.add(eq.getM_seg2());
 							else
-								addHighLightedElement(eq.getM_seg1());
+								A.addHighLightedElement(eq.getM_seg1());
 							// A.m_highlightedElements.add(eq.getM_seg1());
 
 						}
@@ -1534,7 +1548,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 
 			if (gEles != null){
-				addHighLightedElements(gEles);
+				A.addHighlightedElements(gEles);
 			//	System.out.println("point on anchor point");
 			}
 			// A.m_highlightedElements.addAll(gEles);
@@ -1606,20 +1620,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			
 	}
 
-	
-	private void addHighLightedElement(GeometryElement g)
-	{
-		if (!A.m_highlightedElements.contains(g))
-			A.m_highlightedElements.add(g);
-	}
-
-	private void addHighLightedElements(Vector v)
-	{
-		for (int i = 0; i < v.size(); i++)
-			addHighLightedElement((GeometryElement) v.get(i));
-	}
-
-
+public void UI_log(String s) 
+{
+	System.out.println(s) ;
+}
 
 
 	/**
@@ -1627,8 +1631,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 * @param x
 	 * @param y
 	 */
-	private void performSelection(int x, int y)
+	public void performSelection(int x, int y)
 	{
+		UI_log(getMethod()+ "CTRL " + " SELECT") ;
 		Point pt = new Point (x,y) ;
 		A.m_selectedElements = A.A_elements_selected(pt,A.m_selectedElements) ;
 		
@@ -2171,4 +2176,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public String getMethod() {
+	     StackTraceElement stackTraceElements[] =
+	             (new Throwable()).getStackTrace();
+	     return stackTraceElements[1].toString();
+	}
+	
 }
