@@ -421,7 +421,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{
 			drawCollinearLine(gc, GVariables.BACKGROUND_COLOR);
 		}
-			
+		
 		// to draw grid
 		// is the grid repainted on every stroke?
 		 if(drGrid == null)
@@ -445,12 +445,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		
 		
 		drawStrokes(gc, m_drawData.getStrokeList());
-		/*Nooo! Is everything redrawn all the time!? */
 
 		drawMarkers(gc, m_drawData.getM_markers());
 
-		drawTextElements(gc, m_drawData.getM_textElements());
-		
+		drawTextElements(gc, m_drawData.getM_textElements());		
 	}
 
 
@@ -578,11 +576,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	public Vector addStroke(Stroke theStroke)
 	{
 		A.A_draw_Stroke(theStroke) ;
+		
 		Vector constraints = A.new_constraints ;
 		
 		if (!GVariables.undoing)
 			theStroke.drawSegments(getGraphics());
-		
+	
 		repaint() ;	
 		UpdateUI(1,m_drawData.getM_constraints());
 		
