@@ -97,9 +97,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		KeyEventDispatcher, Serializable
 		
 	{
+	
 	public ActionInterface A ;
 	
-	private ProcessManager m_processManager;
+	public ProcessManager m_processManager;
 	/**
 	 * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily)
 	 */
@@ -379,11 +380,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		this.setBackground(GVariables.BACKGROUND_COLOR);
 		repaint();
 		
-
 		// add commdand to initialize the drawing view.
 		logEvent("init();");
 		logEvent(Command.PAUSE);
-		
 		
 	}
 
@@ -395,8 +394,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_length = 0.0;
 	}
 	
-	/*******************************************************************************/
-	
+	/********************************************************************/
+	/********************* DRAWING ON SCREEN ***************************/
+
 	/**
 	 * This draws the component on-screen. AND repaints the entire screen - the grid,segments,text,markers etc. 
 	 * Is there any other way??
@@ -542,11 +542,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				if (y > m_bBox.height)
 					m_bBox.height = y;
 			}
-
 			gc.dispose();		
 		}
 		
-				// Display the mouse position to the status bar
+		// Display the mouse position to the status bar
 		String statusStr = "";
 		if (m_mouseOverPanel)
 			statusStr = x + ", " + y;
@@ -563,7 +562,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 */
 	public void addPointToStroke(Stroke m_currStroke, Point pt, long time)
 	{
-		int x = pt.x ; int y = pt.y ;
+		int x = pt.x ;
+		int y = pt.y ;
 		// store current pixle position with timing information
 		m_currStroke.addPoint(x, y, time);
 	}
@@ -589,7 +589,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	/**
-	 *  The UI part of the code when adding a stroke to a draing. 
+	 *  The UI part of the code when adding a stroke to a drawing. 
 	 * @param strk
 	 * @return
 	 */
@@ -605,7 +605,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			
 			//show the last stroke
 			m_showLastStroke = true;
-			//TODO: Semantics of this..
+			//TODO: Semantics of undo
 			addToUndoVector();
 			repaint();	
 		}
@@ -621,10 +621,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 /**function snap the ips
  * if a new stroke is drawn, check for if end points of this 
  * stroke needs to be snapped.	
-  * In drawing mode, if a circular arc is drawn, then do not merge 
-	 * center of circle with any other point.
-	 * Merge it only in Edit mode(when an element is being dragged)
- * @author Sunil Kumar
+ * In drawing mode, if a circular arc is drawn, then do not merge 
+ * center of circle with any other point.
+ * Merge it only in Edit mode(when an element is being dragged)
  */
 	public void snapIPs()
 	{
@@ -641,26 +640,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				if (isM_elementDragged() && (A.m_highlightedElements.size() > 0))
 				{
-					A.Snap_IP_drag (A.m_highlightedElements) ; 
+					A.Snap_IP_drag(A.m_highlightedElements) ; 
 				}
 			}
 		}
 	}
 
-	public void mouseEntered(MouseEvent e)
-	{
-		requestFocusInWindow();
-		m_mouseOverPanel = true;
-		removeKeyListener(this);
-		addKeyListener(this);
-		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
-		m_mousePos.x = e.getX();
-		m_mousePos.y = e.getY();
 
-		highlightTableRowsSelectedElems();
-	}
-	
-	
 	
 	/**Function to highlight table rows in Help table
 	 * @author Sunil Kumar
@@ -730,6 +716,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 	
 	
+	
+	/***************************************************************************/
+	/************************ MOUSE EVENTS *************************************/
+	
+	/**
+	 * Disable all event listening when mouse exits area. Unselect all help rows
+	 */
 	public void mouseExited(MouseEvent e)
 	{
 		m_mouseOverPanel = false;
@@ -741,9 +734,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = e.getY();
 	}
 
-	/**
-	 * todo
-	 */
+
+	
 	public void mousePressed(MouseEvent e)
 	{
 	//	if(!isParameterWinBitSet()){
@@ -755,6 +747,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			
 	}
 
+	
 	public void mousePressed(int buttontype, int clickcount, int x, int y, long time)
 	{
 		repaint();
@@ -763,11 +756,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{			
 		helpDrawView.selectRows(GConstants.LEFT_CLICK);
 			
-		if (clickcount == 1)
-		{
-			mouseButton1Pressed(x, y, time);
+			if (clickcount == 1)
+			{
+				mouseButton1Pressed(x, y, time);
+			}
 		}
-		} 
+		
 		else if (buttontype == MouseEvent.BUTTON2) 
 		{
 			// 04-10-09 to highlight rows in HELP table
@@ -782,7 +776,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{
 			// 04-10-09 to highlight rows in HELP table
 			if(A.m_highlightedElements.size() != 0 ) {
-				if(m_keyEventCode == KeyEvent.VK_SHIFT) {
+				if(m_keyEventCode == KeyEvent.VK_SHIFT)
+				{
+				// SHIFT+RIGHT-CLICK => Separate anchor points.
 					if(A.m_highlightedElements.size() == 1) 
 					{
 						GeometryElement ge = (GeometryElement) A.m_highlightedElements.get(0);
@@ -799,13 +795,117 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					helpDrawView.selectRows(GConstants.RIGHT_CLICK);
 				}
 			}
+			
 			mouseButton3Pressed(x, y);
 		}
 		m_mousePos.x = x;
 		m_mousePos.y = y;
 	}
 
+
+	/**
+	 * Middle click
+	 * @param x
+	 * @param y
+	 */
+	public void mouseButton2Pressed(int x, int y)
+	{
+		// check if any of the highlighted elemets are selected, in which case
+		// the operation will be performed on al the selected elements.
+		// Note that selected elements may or may not be connected.
+		if (A.m_highlightedElements.size() > 0)
+		{
+			/**
+			 * Fix the position of the element to it's current position.
+			 */
+			fixElements(x, y);
+		} else
+		{
+			logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
+			logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
+			/**
+			 * Look for markers and apply the constraints that they can enforce.
+			 */
+			addConstraintsForMarkers();
+		}
+	}
+
+	/**
+	 * Left-click
+	 * @param x
+	 * @param y
+	 * @param time
+	 */
+	public void mouseButton1Pressed(int x, int y, long time)
+	{
+		newConstraints = new Vector();
+
+		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
+		logEvent("mouseButton1Pressed({int}" + x + ", {int}" + y + ", {long}" + time + ");");
+		setM_mousePressedLogged(true);
+
+		if (m_keyEventCode == -1)
+		{
+			UI_log(getMethod()+"NEW STROKE BEGIN") ;
+			/**
+			 * @UI: Left-button press
+			 * @Action: Beginning of a stroke. Paint stroke on screen-++-
+			 * DrawingState: Segmentation and constraints added/modified
+			 */
+			setM_trackFlag(true);
+			reset();
+			m_currStroke = new Stroke();
+			Point pt = new Point(x,y) ;
+			
+			paint_point(pt) ;
+			addPointToStroke(m_currStroke,pt, time) ;
+			
+		//	track(x, y, time) ;
+			clearSelection() ;
+		} else 
+		{
+			if (m_keyEventCode == KeyEvent.VK_CONTROL)
+			{
+				/**
+				 * Element under cursor selected. 
+				 * Operations can be performed on these selected elements. 
+				 */
+				performSelection(x, y);
+			} 
+			else if ((m_keyEventCode == KeyEvent.VK_SHIFT))
+			{
+				if (m_showLastStroke)
+				{
+					UI_log("Perform Seg Recycling" + "SHIFT" ) ;
+					/**
+					 * Adds or removes anchor-points. Anchor-points are start/end points
+					 * of a segment. Hence this changes the segmentation of the stroke. 
+					 * DrawingState: Stroke is resegmented. Constraints adjusted. Other segments
+					 * also can be affected.
+					 */
+					Vector constraints = A.performSegRecycling(x, y);
+					repaint() ;
+					if ((constraints != null) && (constraints.size() > 0)){
+						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
+							newConstraints.addAll(constraints);
+					}
+					snapIPsAndRecalculateConstraints(newConstraints);
+					repaint() ;
+				}
+			} 
+			else{
+				clearSelection();
+			}
+		}
+	}
+
 	
+	
+	/**
+	 * Right-click
+	 * @param x
+	 * @param y
+	 */
 	public void mouseButton3Pressed(int x, int y)
 	{
 		Point pt = new Point(x,y) ;
@@ -840,19 +940,21 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			if ((m_keyEventCode == KeyEvent.VK_SHIFT))
 			{
 				/**
-				 * 
+				 * @UI : Shift+Right-click.
+				 * @Action: Separate Anchor Points.
+				 * @Description: Anchor point is added on  the position of the click.
+				 * @Side-effect: 
+				 * @Internal: Calls A_add_anchor_point
 				 */
 				GeometryElement e = (GeometryElement) A.m_highlightedElements.get(0) ;
 				Vector es = (Vector) A.m_highlightedElements.subList(0, 1) ;
 				A.A_add_anchor_point(es , pt) ;
 			
 				//partitionLineSegments(e, x, y);
+				//WAS HERE
 			}
 			else
 			{
-				/**
-				 * 
-				 */
 				GVariables.setDRAWING_MODE(GConstants.EDIT_MODE);
 				if (!A.smartMergeSelectedEleToHighLightedEle())
 				{
@@ -861,6 +963,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 		} 
 	}
+	
+	
+	
 
 	/***********************************************************************/
 	
@@ -940,91 +1045,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		A.A_fix_elements() ;
 	}
 
-	public void mouseButton2Pressed(int x, int y)
-	{
-		// check if any of the highlighted elemets are selected, in which case
-		// the operation will be performed on al the selected elements.
-		// Note that selected elements may or may not be connected.
-		if (A.m_highlightedElements.size() > 0)
-		{
-			/**
-			 * Fix the position of the element to it's current position.
-			 */
-			fixElements(x, y);
-		} else
-		{
-			logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
-			logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
-			/**
-			 * Look for markers and apply the constraints that they can enforce.
-			 */
-			addConstraintsForMarkers();
-		}
-	}
-
-	
-	public void mouseButton1Pressed(int x, int y, long time)
-	{
-		newConstraints = new Vector();
-
-		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
-		logEvent("mouseButton1Pressed({int}" + x + ", {int}" + y + ", {long}" + time + ");");
-		setM_mousePressedLogged(true);
-
-		if (m_keyEventCode == -1)
-		{
-			UI_log(getMethod()+"NEW STROKE BEGIN") ;
-			/**
-			 * Beginning of a stroke being drawn.
-			 * DrawingState: Segmentation and constraints added/modified
-			 * Stroke Points painted on screen 
-			 */
-			setM_trackFlag(true);
-			reset();
-			m_currStroke = new Stroke();
-			Point pt = new Point(x,y) ;
-			
-			paint_point(pt) ;
-			addPointToStroke(m_currStroke,pt, time) ;
-			
-		//	track(x, y, time) ;
-			clearSelection() ;
-		} else 
-		{
-			if (m_keyEventCode == KeyEvent.VK_CONTROL)
-			{
-				/**
-				 * Element under cursor selected. 
-				 * Operations can be performed on these selected elements. 
-				 */
-				performSelection(x, y);
-			} 
-			else if ((m_keyEventCode == KeyEvent.VK_SHIFT))
-			{
-				if (m_showLastStroke)
-				{
-					UI_log("Perform Seg Recycling" + "SHIFT" ) ;
-					/**
-					 * Adds or removes anchor-points. Anchor-points are start/end points
-					 * of a segment. Hence this changes the segmentation of the stroke. 
-					 * DrawingState: Stroke is resegmented. Constraints adjusted. Other segments
-					 * also can be affected.
-					 */
-					Vector constraints = A.performSegRecycling(x, y);
-					repaint() ;
-					if ((constraints != null) && (constraints.size() > 0)){
-						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
-							newConstraints.addAll(constraints);
-					}
-					snapIPsAndRecalculateConstraints(newConstraints);
-					repaint() ;
-				}
-			} 
-			else{
-				clearSelection();
-			}
-		}
-	}
 
 	/**
 	 * Resets the selected elements.
@@ -1449,6 +1469,23 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 	
 
+	
+	
+	public void mouseEntered(MouseEvent e)
+	{
+		requestFocusInWindow();
+		m_mouseOverPanel = true;
+		removeKeyListener(this);
+		addKeyListener(this);
+		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+		m_mousePos.x = e.getX();
+		m_mousePos.y = e.getY();
+
+		highlightTableRowsSelectedElems();
+	}
+	
+	
+	
 	
 	
 	public void mouseMoved(int x, int y)

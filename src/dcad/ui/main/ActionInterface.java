@@ -1872,7 +1872,5 @@ public boolean smartMergeSelectedEleToHighLightedEle()
 
 
 
-
-
 /********************* END OF CLASS ***********************************/
 }
