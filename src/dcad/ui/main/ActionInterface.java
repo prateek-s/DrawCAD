@@ -1600,16 +1600,11 @@ public Vector findAnchorPoints(Vector elements)
 public boolean Check_for_Collinearity(GeometryElement e)
 {
 	String parsedCons[];
-	
-	
-	
 	parsedCons = e.getClass().toString().split("[ ]+");
 	
 	if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
 	{
-
 		Segment seg  = (Segment)e;
-
 		Vector parallelLinesConstraintList = getParallelLinesConsList("lines", "parellel", seg);
 		if(parallelLinesConstraintList.size() != 0 ){
 			int consNumber = 0;
