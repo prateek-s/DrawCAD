@@ -87,7 +87,7 @@ class Filter implements FileFilter
    public boolean accept(File file)  
    {  
       if(file.getName().endsWith("~") || file.getName().endsWith(".exe")){
-   	return false;   
+    	  return false;   
       }
       else{
    	return true;   
