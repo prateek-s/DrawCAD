@@ -1463,7 +1463,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 /***********************************************************************/
 	
-	
+	/**
+	 * 
+	 */
 	public void addConstraintsForMarkers()
 	{
 		if ((m_drawData.isUnusedMarker()) || (m_drawData.isUnusedText()))
@@ -1482,7 +1484,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		
 	}
 
-	
+	/**
+	 * Fix the position of an element, so that it is not affected by
+	 * any other process (beutification etc)
+	 * @param x
+	 * @param y
+	 */
 	private void fixElements(int x, int y)
 	{
 		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
@@ -1510,11 +1517,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 	
 	
-	// added on 19-04-10
-	// checks whether the point is an child of how many elements 
-
-
-
 	
 	// This contains all constraints added after drawing or movement.
 	// They will be shown in the recognized view. And user can remove some of
@@ -1545,29 +1547,28 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	 * or the distance between two points is negligible
 	 * @author Sunil Kumar
 	 */
-	
-	void removeElementsWithStartEndPtMerged()
+
+	public void removeElementsWithStartEndPtMerged()
 	{
-		
-			Vector segList = m_drawData.getAllSegments();
-			if(segList != null ){
-				Iterator segIter = segList.iterator();
-				while(segIter.hasNext()){
-					Segment segment  = (Segment)segIter.next();
-					if(segment instanceof SegLine){
-						
-						if(segment.getSegStart().distance(segment.getSegEnd()) < THRESHOLD){
-							System.out.println("segment removed");
-							segment.clearConstraints(Constraint.SOFT);
-							segment.clearConstraints(Constraint.HARD);
-							segment.delete();
-						}
+		Vector<Segment> segList = m_drawData.getAllSegments();
+		if(segList != null )
+		{
+			for (Segment segment : segList) 
+			{
+				if(segment instanceof SegLine)
+				{
+					if(segment.getSegStart().distance(segment.getSegEnd()) < THRESHOLD){
+						System.out.println("segment removed");
+						segment.clearConstraints(Constraint.SOFT);
+						segment.clearConstraints(Constraint.HARD);
+						segment.delete();
 					}
 				}
-			}
-		
-	//	repaint();
+			} //for
+		}
 	}
+
+
 
 
 	
@@ -1639,6 +1640,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 			return segPoints;
 	}
+	
 	
 	// added on 08-05-10
 	// to show line while two line become collinear while dragging the element
