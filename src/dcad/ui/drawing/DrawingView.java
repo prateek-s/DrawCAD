@@ -1411,6 +1411,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				logEvent("mouseDragged({int}" + x + ", {int}" + y + ", {long}" + time + ");");
 			Point pt = new Point(x,y) ;
 			paint_point(pt) ;
+			if(m_currStroke==null) {
+				return ;
+			}
 			addPointToStroke(m_currStroke, pt, time) ;
 			//track(x, y, time); WAS HERE
 		}
