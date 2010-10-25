@@ -94,7 +94,7 @@ public class Util
 
 			x = (c2 - c1) / (m1 - m2);
 			y = m1 * x + c1;
-			// //System.out.println("\n X and y value obtained in the Util : (
+			// /////System.out.println("\n X and y value obtained in the Util : (
 			// "+x+" , "+y+" )");
 		}
 		return new AnchorPoint(x, y);
@@ -237,19 +237,19 @@ public class Util
 		long y4i = Math.round(y4);
 
 		/*
-		 * System.out.println("\n x1 - x - x2 : "+x1i + " " +xi + " " +x2i);
-		 * System.out.println("\n x3 - x - x4 : "+x3i + " " +xi + " " +x4i);
-		 * System.out.println("\n y1 - y - y2 : "+y1i + " " +yi + " " +y2i);
-		 * System.out.println("\n y3 - y - y4 : "+y3i + " " +yi + " " +y4i);
+		 * ///System.out.println("\n x1 - x - x2 : "+x1i + " " +xi + " " +x2i);
+		 * ///System.out.println("\n x3 - x - x4 : "+x3i + " " +xi + " " +x4i);
+		 * ///System.out.println("\n y1 - y - y2 : "+y1i + " " +yi + " " +y2i);
+		 * ///System.out.println("\n y3 - y - y4 : "+y3i + " " +yi + " " +y4i);
 		 */
-		// //System.out.println("\nin cross ( "+x1+","+y1+") ("+x2+" , "+y2+")
+		// /////System.out.println("\nin cross ( "+x1+","+y1+") ("+x2+" , "+y2+")
 		// ("+x+" , "+y +")");
 		if (((xi <= x1i && xi >= x2i) || (xi >= x1i && xi <= x2i)) && ((yi <= y1i && yi >= y2i) || (yi >= y1i && yi <= y2i)) && (((xi <= x3i && xi >= x4i) || (xi >= x3i && xi <= x4i)) && ((yi <= y3i && yi >= y4i) || (yi >= y3i && yi <= y4i)))) // on
 			// second
 			// line
 			return true;
 
-		System.out.println("\nCross failed :((");
+		///System.out.println("\nCross failed :((");
 		return (false);
 	}
 
@@ -306,7 +306,7 @@ public class Util
 	 * y1*x2; if(((x1 < x2 && x1 < pX && x2 > pX) || (x1 > x2 && x2 < pX && x1 >
 	 * pX)) && ((y1 < y2 && y1 < pY && y2 > pY) || (y1 > y2 && y2 < pY && y1 >
 	 * pY)) ) { dist = Math.abs((A*pX + B*pY + C)/(Math.sqrt(A*A + B*B)));
-	 * //System.out.println("DIstance : "+dist); } return dist; }
+	 * /////System.out.println("DIstance : "+dist); } return dist; }
 	 */
 	public static int sign(double no)
 	{
@@ -344,24 +344,24 @@ public class Util
 
 		dist = Math.abs((A * pX + B * pY + C) / (Math.sqrt(A * A + B * B)));
 
-		// //System.out.println("\n distanceFromLine( "+x1+","+y1+") ("+x2+" ,
+		// /////System.out.println("\n distanceFromLine( "+x1+","+y1+") ("+x2+" ,
 		// "+y2+") ("+pX+" , "+pY +")");
 		if (x1 == x2 && Math.abs(pX - x1) <= 3.0 && ((pY <= y1 && pY >= y2) || (pY <= y2 && pY >= y1)))
 		{
-			// //System.out.println("DIstance : "+dist);
+			// /////System.out.println("DIstance : "+dist);
 
 			return dist;
 		}
 		else if (y1 == y2 && Math.abs(pY - y1) <= 3.0 && ((pX <= x1 && pX >= x2) || (pX <= x2 && pX >= x1)))
 		{
-			// //System.out.println("DIstance : "+dist);
+			// /////System.out.println("DIstance : "+dist);
 			return dist;
 
 		}
 		else if (((x1 <= x2 && x1 <= pX && x2 >= pX) || (x1 >= x2 && x2 <= pX && x1 >= pX)) && ((y1 <= y2 && y1 <= pY && y2 >= pY) || (y1 >= y2 && y2 <= pY && y1 >= pY)))
 
 		{
-			// //System.out.println("DIstance : "+dist);
+			// /////System.out.println("DIstance : "+dist);
 			return dist;
 
 		}
@@ -386,24 +386,24 @@ public class Util
 
 		dist = Math.abs((A * pX + B * pY + C) / (Math.sqrt(A * A + B * B)));
 
-		// //System.out.println("\n distanceFromLine( "+x1+","+y1+") ("+x2+" ,
+		// /////System.out.println("\n distanceFromLine( "+x1+","+y1+") ("+x2+" ,
 		// "+y2+") ("+pX+" , "+pY +")");
 		if (x1 == x2 && Math.abs(pX - x1) <= 3.0 && ((pY <= y1 && pY >= y2) || (pY <= y2 && pY >= y1)))
 		{
-			// //System.out.println("DIstance : "+dist);
+			// /////System.out.println("DIstance : "+dist);
 
 			return dist;
 		}
 		else if (y1 == y2 && Math.abs(pY - y1) <= 3.0 && ((pX <= x1 && pX >= x2) || (pX <= x2 && pX >= x1)))
 		{
-			// //System.out.println("DIstance : "+dist);
+			// /////System.out.println("DIstance : "+dist);
 			return dist;
 
 		}
 		else if (((x1 <= x2 && x1 <= pX && x2 >= pX) || (x1 >= x2 && x2 <= pX && x1 >= pX)) && ((y1 <= y2 && y1 <= pY && y2 >= pY) || (y1 >= y2 && y2 <= pY && y1 >= pY)))
 
 		{
-			// //System.out.println("DIstance : "+dist);
+			// /////System.out.println("DIstance : "+dist);
 			return dist;
 
 		}
@@ -429,7 +429,7 @@ public class Util
 
 		dist = Math.abs((A * pX + B * pY + C) / (Math.sqrt(A * A + B * B)));
 
-		// //System.out.println("\n distanceFromLine( "+x1+","+y1+") ("+x2+" ,
+		// /////System.out.println("\n distanceFromLine( "+x1+","+y1+") ("+x2+" ,
 		// "+y2+") ("+pX+" , "+pY +")");
 		return dist;
 
@@ -495,16 +495,16 @@ public class Util
 		// IsPerpendicular() assure that xDelta(s) are not zero
 		double aSlope = slope(pt1, pt2); // 
 		double bSlope = slope(pt2, pt3);
-		// //System.out.println("\n The points in get center are");
+		// /////System.out.println("\n The points in get center are");
 		// pt1.print();
 		// pt2.print();
 		// pt3.print();
-		// System.out.println("\n slopes : aSlope "+aSlope+" bSlope "+bSlope);
+		// ///System.out.println("\n slopes : aSlope "+aSlope+" bSlope "+bSlope);
 		// double aSlope=yDelta_a/xDelta_a; //
 		// double bSlope=yDelta_b/xDelta_b;
 		if (Math.abs(aSlope - bSlope) <= 0.000000001)
 		{ // checking whether the given points are colinear.
-			// System.out.println("The three pts are colinear\n");
+			// ///System.out.println("The three pts are colinear\n");
 			return null;
 		}
 
@@ -541,7 +541,7 @@ public class Util
 		if (deltax != 0)
 		{
 			ang = Math.toDegrees(Math.atan(deltay / deltax));
-			// System.out.println("\natan o/p "+ang+" deltax "+deltax+" deltay
+			// ///System.out.println("\natan o/p "+ang+" deltax "+deltax+" deltay
 			// "+deltay);
 		}
 		else
@@ -583,12 +583,12 @@ public class Util
 		double y2 = p2.getY();
 		double y3 = p3.getY();
 		double s = (y3 - y1) - (((y2 - y1) / (x2 - x1)) * (x3 - x1));
-		// System.out.println("\n");
+		// ///System.out.println("\n");
 		p1.print();
 		p2.print();
 		p3.print();
 
-		// System.out.println("value : "+s);
+		// ///System.out.println("value : "+s);
 		return s;
 	}
 
@@ -633,13 +633,13 @@ public class Util
 
 /*	public static void showss(StyleSheet styles, String sname)
 	{
-		System.out.println("\n Stylesheet " + sname);
+		///System.out.println("\n Stylesheet " + sname);
 		Enumeration rules = styles.getStyleNames();
 		while (rules.hasMoreElements())
 		{
 			String name = (String) rules.nextElement();
 			Style rule = styles.getStyle(name);
-			System.out.println(rule.toString());
+			///System.out.println(rule.toString());
 		}
 	}
 

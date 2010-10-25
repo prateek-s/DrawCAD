@@ -124,7 +124,7 @@ public class DistanceBetweenCircularCurvesConstraint extends ConnectConstraint
 				&& 	constraintsHelper.areSlopesEqual(ap[0],ap[4],ap[7],ap[4],true) 
 			)
 			return true;
-		System.out.println("Distance between circular curves constraint failed... ");
+		///System.out.println("Distance between circular curves constraint failed... ");
 		return false;
 	}
 

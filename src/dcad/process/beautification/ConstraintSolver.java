@@ -66,7 +66,7 @@ public class ConstraintSolver
 		
 		if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.fromUserAppliedConstraints,new Vector()))
 		{
-			System.out.println(" :) :) :) :) :) Constraint added (: (: (: (: (: ");
+			///System.out.println(" :) :) :) :) :) Constraint added (: (: (: (: (: ");
 			return constraints;
 		}
 
@@ -78,10 +78,10 @@ public class ConstraintSolver
 		
 		if (savedSuspectedPromotedConstraints.size() != 0)
 		{
-			System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
+			///System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
 			if(solveConstraints(allAffectedConstraints,fixedPoints, NewtonMethod.fromUserAppliedConstraints,savedSuspectedPromotedConstraints))
 			{
-				System.out.println(" :) :) :) :) :) Constraint added after dropping some promoted constraints (: (: (: (: (: ");
+				///System.out.println(" :) :) :) :) :) Constraint added after dropping some promoted constraints (: (: (: (: (: ");
 				return constraints;
 			}
 		}
@@ -95,10 +95,10 @@ public class ConstraintSolver
 
 		if (savedAllPromotedConstraints.size() != 0)
 		{
-			System.out.println("----------------------------------   Dropping all promoted constraints   ----------------------------------");
+			///System.out.println("----------------------------------   Dropping all promoted constraints   ----------------------------------");
 			if(solveConstraints(allAffectedConstraints,fixedPoints, NewtonMethod.fromUserAppliedConstraints,savedAllPromotedConstraints))
 			{
-				System.out.println(" :) :) :) :) :) Constraint added after dropping all promoted constraints (: (: (: (: (: ");
+				///System.out.println(" :) :) :) :) :) Constraint added after dropping all promoted constraints (: (: (: (: (: ");
 				return constraints;
 			}
 		}
@@ -106,7 +106,7 @@ public class ConstraintSolver
 		
 		NewtonMethod.movePointsBackToInitialPositions();		
 		constraintsHelper.removeConstraints(constraints);
-		System.out.println(" :( :( :( :( :( Can not add this constraint ): ): ): ): ): ");
+		///System.out.println(" :( :( :( :( :( Can not add this constraint ): ): ): ): ): ");
 		return null;		
 	}
 	
@@ -123,7 +123,7 @@ public class ConstraintSolver
 		
 		if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterUserDrawingOrRecycling,new Vector()))
 		{
-			System.out.println(" :) :) :) :) :) All promoted constraints added (: (: (: (: (: ");
+			///System.out.println(" :) :) :) :) :) All promoted constraints added (: (: (: (: (: ");
 			return constraints;
 		}
 
@@ -134,19 +134,19 @@ public class ConstraintSolver
 		
 		if (savedSuspectedPromotedConstraints.size() != 0)
 		{
-			System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
+			///System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
 			if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterUserDrawingOrRecycling,savedSuspectedPromotedConstraints))
 			{
 				//Some of the removed promoted constraints might have been added JUST NOW. Remove them. 
 				constraints.removeAll(savedSuspectedPromotedConstraints);
-				System.out.println(" :) :) :) :) :) Some constraints dropped and others added (: (: (: (: (: ");
+				///System.out.println(" :) :) :) :) :) Some constraints dropped and others added (: (: (: (: (: ");
 				return constraints;
 			}
 		}
 		
 		NewtonMethod.movePointsBackToInitialPositions();		
 		constraintsHelper.removeConstraints(constraints);
-		System.out.println(" :( :( :( :( :( Could not add the constraints. System may be inconsistent  ): ): ): ): ): ");
+		///System.out.println(" :( :( :( :( :( Could not add the constraints. System may be inconsistent  ): ): ): ): ): ");
 		return new Vector();		
 	}
 	
@@ -162,7 +162,7 @@ public class ConstraintSolver
 		
 		if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterRecalculationAndSnapping,new Vector()))
 		{
-			System.out.println(" :) :) :) :) :) All promoted constraints added (: (: (: (: (: ");
+			///System.out.println(" :) :) :) :) :) All promoted constraints added (: (: (: (: (: ");
 			return allAffectedConstraints;
 		}
 
@@ -173,17 +173,17 @@ public class ConstraintSolver
 		
 		if (savedSuspectedPromotedConstraints.size() != 0)
 		{
-			System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
+			///System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
 			if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterRecalculationAndSnapping,savedSuspectedPromotedConstraints))
 			{
 				//Some promoted constraints were removed. Remove them from the system 
 				allAffectedConstraints.removeAll(savedSuspectedPromotedConstraints);
-				System.out.println(" :) :) :) :) :) Some constraints dropped and others added (: (: (: (: (: ");
+				///System.out.println(" :) :) :) :) :) Some constraints dropped and others added (: (: (: (: (: ");
 				return allAffectedConstraints;
 			}
 		}
 		NewtonMethod.movePointsBackToInitialPositions();		
-		System.out.println(" :( :( :( :( :( Could not add the constraints. System may be inconsistent  ): ): ): ): ): ");
+		///System.out.println(" :( :( :( :( :( Could not add the constraints. System may be inconsistent  ): ): ): ): ): ");
 		return new Vector();		
 	}
 	
@@ -212,7 +212,7 @@ public class ConstraintSolver
 			
 			if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterMovement,new Vector()))
 			{
-				System.out.println(" :) :) :) :) :) All constraints solved after movement (: (: (: (: (: ");
+				///System.out.println(" :) :) :) :) :) All constraints solved after movement (: (: (: (: (: ");
 				return allAffectedConstraints;
 			}
 
@@ -226,10 +226,10 @@ public class ConstraintSolver
 			
 			if (savedSuspectedPromotedConstraints.size() != 0)
 			{
-				System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
+				///System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
 				if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterMovement,savedSuspectedPromotedConstraints))
 				{
-					System.out.println(" :) :) :) :) :) All except the dropped promoted promoted constraints solved (: (: (: (: (: ");
+					///System.out.println(" :) :) :) :) :) All except the dropped promoted promoted constraints solved (: (: (: (: (: ");
 					return allAffectedConstraints;
 				}
 			}
@@ -245,10 +245,10 @@ public class ConstraintSolver
 
 			if (savedAllPromotedConstraints.size() != 0)
 			{
-				System.out.println("----------------------------------   Dropping all promoted constraints   ----------------------------------");
+				///System.out.println("----------------------------------   Dropping all promoted constraints   ----------------------------------");
 				if(solveConstraints(allAffectedConstraints,fixedPoints, NewtonMethod.fromUserAppliedConstraints,savedAllPromotedConstraints))
 				{
-					System.out.println(" :) :) :) :) :) Constraint added after dropping all promoted constraints (: (: (: (: (: ");
+					///System.out.println(" :) :) :) :) :) Constraint added after dropping all promoted constraints (: (: (: (: (: ");
 					return allAffectedConstraints;
 				}
 			}
@@ -270,7 +270,7 @@ public class ConstraintSolver
 			
 			if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.afterMovement,new Vector()))
 			{
-				System.out.println(" :) :) :) :) :) Allowing movement - All constraints solved after movement (: (: (: (: (: ");
+				///System.out.println(" :) :) :) :) :) Allowing movement - All constraints solved after movement (: (: (: (: (: ");
 				return allAffectedConstraints;
 			}
 			
@@ -282,10 +282,10 @@ public class ConstraintSolver
 			
 			if (savedSuspectedPromotedConstraints.size() != 0)
 			{
-				System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
+				///System.out.println("----------------------------------   Dropping some constraints   ----------------------------------");
 				if(solveConstraints(allAffectedConstraints,fixedPoints, NewtonMethod.afterMovement,savedSuspectedPromotedConstraints))
 				{
-					System.out.println(" :) :) :) :) :) Allowing movement - All except the dropped promoted promoted constraints solved (: (: (: (: (: ");
+					///System.out.println(" :) :) :) :) :) Allowing movement - All except the dropped promoted promoted constraints solved (: (: (: (: (: ");
 					return allAffectedConstraints;
 				}
 			}
@@ -302,10 +302,10 @@ public class ConstraintSolver
 
 			if (savedAllPromotedConstraints.size() != 0)
 			{
-				System.out.println("----------------------------------   Dropping all promoted constraints   ----------------------------------");
+				///System.out.println("----------------------------------   Dropping all promoted constraints   ----------------------------------");
 				if(solveConstraints(allAffectedConstraints,fixedPoints, NewtonMethod.fromUserAppliedConstraints,savedAllPromotedConstraints))
 				{
-					System.out.println(" :) :) :) :) :) Constraint added after dropping all promoted constraints (: (: (: (: (: ");
+					///System.out.println(" :) :) :) :) :) Constraint added after dropping all promoted constraints (: (: (: (: (: ");
 					return allAffectedConstraints;
 				}
 			}
@@ -316,14 +316,14 @@ public class ConstraintSolver
 			NewtonMethod.movePointsBackToInitialPositions();
 			
 			//Nothing worked...
-			System.out.println("\n\n\n :( :( :( :( :( Sorry :) :) :) :) :) \n\n\n");
+			///System.out.println("\n\n\n :( :( :( :( :( Sorry :) :) :) :) :) \n\n\n");
 			
 			return new Vector();
 		}
 		catch(Exception e)
 		{
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$   Exception!!!   $$$$$$$$$$$$$$$$$$$$$$$$$");
-			System.out.println(e.toString() + "\n" + e.getMessage());
+			///System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$   Exception!!!   $$$$$$$$$$$$$$$$$$$$$$$$$");
+			///System.out.println(e.toString() + "\n" + e.getMessage());
 			e.printStackTrace();
 			return new Vector();
 		}
@@ -336,12 +336,12 @@ public class ConstraintSolver
 	
 	private static void moveUserMovedPointsBackToInitialPositions()
 	{
-//		System.out.println("!!!!!!!!!         Final Positions : ");
+//		///System.out.println("!!!!!!!!!         Final Positions : ");
 		for (int j = 0; j < userMovedPoints.size(); j++)
 		{
 			AnchorPoint old= (AnchorPoint)userMovedPoints.get(j);
 			old.move4Constraints(userMovedPointsInitialPositions[j*2],userMovedPointsInitialPositions[j*2+1]);
-//			System.out.println(old.getM_label() + "  " + userMovedPointsInitialPositions[j*2] + "  " + userMovedPointsInitialPositions[j*2+1]);
+//			///System.out.println(old.getM_label() + "  " + userMovedPointsInitialPositions[j*2] + "  " + userMovedPointsInitialPositions[j*2+1]);
 		}
 	}
 

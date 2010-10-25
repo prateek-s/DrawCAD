@@ -132,7 +132,7 @@ public class DistanceBetweenCircularCurveAndLineConstraint extends ConnectConstr
 			)
 			return true;
 		
-		System.out.println("Distance between curve and line failed...");
+		///System.out.println("Distance between curve and line failed...");
 		return false;
 	}
 

@@ -94,7 +94,7 @@ public class DistanceBetweenParallelLinesConstraint extends RelLengthConstraint
 				&& constraintsHelper.areLinesPerpendicular(anchorPoints[2],anchorPoints[3],anchorPoints[4],anchorPoints[5],-1,true)
 			)
 			return true;
-		System.out.println("Distance between parallel lines constraint failed... ");
+		///System.out.println("Distance between parallel lines constraint failed... ");
 		return false;
 	}
 

@@ -76,7 +76,7 @@ public class IndRadiusConstraint extends IndependentConstraint
 				&& 	constraintsHelper.independentLengthSatisfied((AnchorPoint)points.get(1),(AnchorPoint)points.get(2),m_radius,true)
 				)
 			return true;
-		System.out.println("Indipendent radius constraint failed...");
+		///System.out.println("Indipendent radius constraint failed...");
 		return false;
 	}
 }

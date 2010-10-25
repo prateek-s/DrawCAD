@@ -56,7 +56,7 @@ public class Prefs
 				segScheme = scheme;
 		
 		else segScheme = GConstants.SEG_SCHEME_SPEED_CURVATURE;
-//		System.out.println("scheme: "+scheme);
+//		///System.out.println("scheme: "+scheme);
 	}
 
 	public static int getAnchorPtType()
@@ -70,7 +70,7 @@ public class Prefs
 			|| (apType == AnchorPoint.TYPE_SQUARE)
 			|| (apType == AnchorPoint.TYPE_TRIANGLE)) anchorPtType = apType;
 		else anchorPtType = AnchorPoint.TYPE_CIRCLE;
-//		System.out.println("anchorPtType: "+anchorPtType);
+//		///System.out.println("anchorPtType: "+anchorPtType);
 	}
 
 	public static int getAnchorPtSize()
@@ -82,7 +82,7 @@ public class Prefs
 	{
 		if((apSize >= 1) && (apSize <= 5)) anchorPtSize = apSize;
 		else anchorPtSize = GConstants.DEF_AP_SIZE;
-		//		System.out.println("anchorPtSize: "+anchorPtSize);
+		//		///System.out.println("anchorPtSize: "+anchorPtSize);
 	}
 
 	public static int getMovePtSize()
@@ -94,7 +94,7 @@ public class Prefs
 	{
 		if((mvPtSize >= 1) && (mvPtSize <= 5)) movePtSize = mvPtSize;
 		else movePtSize = GConstants.DEF_AP_SIZE;
-		//		System.out.println("movePtSize: "+movePtSize);
+		//		///System.out.println("movePtSize: "+movePtSize);
 	}
 
 	public static int getMovePtType()
@@ -108,7 +108,7 @@ public class Prefs
 				|| (mvPtType == AnchorPoint.TYPE_SQUARE)
 				|| (mvPtType == AnchorPoint.TYPE_TRIANGLE)) movePtType = mvPtType;
 		else movePtType = AnchorPoint.TYPE_CIRCLE;
-		//		System.out.println("movePtType: "+movePtType);
+		//		///System.out.println("movePtType: "+movePtType);
 	}
 
 	public static int getCalcHardConstraints()
@@ -121,7 +121,7 @@ public class Prefs
 		if((calcCons == GConstants.CALC_HARD_CONSTRAINTS_ON_MOUSE_RELEASE)
 				|| (calcCons == GConstants.CALC_HARD_CONSTRAINTS_ON_FLY)) calcHardConstraints = calcCons;
 		else calcHardConstraints = GConstants.CALC_HARD_CONSTRAINTS_ON_MOUSE_RELEASE;
-		//		System.out.println("calcHardConstraints: "+calcHardConstraints);
+		//		///System.out.println("calcHardConstraints: "+calcHardConstraints);
 	}
 
 	public static int getCalcSoftConstraints()
@@ -134,7 +134,7 @@ public class Prefs
 		if((calcCons == GConstants.CALC_SOFT_CONSTRAINTS_ON_MOUSE_RELEASE)
 				|| (calcCons == GConstants.CALC_SOFT_CONSTRAINTS_ON_FLY)) calcSoftConstraints = calcCons;
 		else calcSoftConstraints = GConstants.CALC_SOFT_CONSTRAINTS_ON_MOUSE_RELEASE;
-		//		System.out.println("calcSoftConstraints: "+calcSoftConstraints);
+		//		///System.out.println("calcSoftConstraints: "+calcSoftConstraints);
 	}
 
 	public static int getMaxSegDist()
@@ -146,7 +146,7 @@ public class Prefs
 	{
 		if((mSegDist >= 0) && (mSegDist <= GConstants.DEF_MAX_SEG_DIST)) maxSegDist = mSegDist;
 		else maxSegDist = GConstants.DEF_MAX_SEG_DIST;
-		//		System.out.println("maxSegDist: "+maxSegDist);
+		//		///System.out.println("maxSegDist: "+maxSegDist);
 	}
 
 	public static int getShowAnchorPoints()
@@ -159,7 +159,7 @@ public class Prefs
 		if((showAP == GConstants.SHOW_ANCHORPOINT_ALWAYS) 
 				|| (showAP == GConstants.SHOW_ANCHORPOINT_ON_HL)) showAnchorPoints = showAP;
 		else showAnchorPoints = showAP;
-		//		System.out.println("showAnchorPoints: "+showAnchorPoints);
+		//		///System.out.println("showAnchorPoints: "+showAnchorPoints);
 	}
 
 	public static int getShowConstraints()
@@ -178,7 +178,7 @@ public class Prefs
 				|| (showCons == GConstants.SHOW_SOFT_ON_HL_AND_HARD_CONSTRAINTS)
 				|| (showCons == GConstants.SHOW_NO_CONSTRAINTS)) showConstraints = showCons;
 		else showConstraints = GConstants.SHOW_SOFT_ON_HL_AND_HARD_CONSTRAINTS;
-		//		System.out.println("showConstraints: "+showConstraints);
+		//		///System.out.println("showConstraints: "+showConstraints);
 	}
 
 	public static int getMarkerSize()
@@ -190,7 +190,7 @@ public class Prefs
 	{
 		if((markSize >= 10) && (markSize <= 100)) markerSize = markSize;
 		else markerSize = GConstants.DEF_MARKER_SIZE;
-		//		System.out.println("markerSize: "+markerSize);
+		//		///System.out.println("markerSize: "+markerSize);
 	}
 
 	public static double getMinAcceptableNorm()
@@ -204,7 +204,7 @@ public class Prefs
 //		else minAcceptableNorm = GConstants.DEF_ACCEPTABLE_NORM;
 		if((acceptNorm >= 0.001) && (acceptNorm <= 25)) minAcceptableNorm = acceptNorm;
 		else minAcceptableNorm = GConstants.DEF_ACCEPTABLE_NORM;
-		//		System.out.println("acceptableNorm: "+minAcceptableNorm);
+		//		///System.out.println("acceptableNorm: "+minAcceptableNorm);
 	}
 
 	public static double getMinAcceptableInvertableSVDValue()
@@ -216,7 +216,7 @@ public class Prefs
 	{
 		if((acceptableSVDValue >= 0.00001) && (acceptableSVDValue <= 1)) minAcceptableInvertableSVDValue = acceptableSVDValue;
 		else minAcceptableInvertableSVDValue = GConstants.DEF_MIN_ACCEPTABLE_SVD_VALUE;
-		//		System.out.println("acceptableInvertableSVDValue: "+minAcceptableInvertableSVDValue);
+		//		///System.out.println("acceptableInvertableSVDValue: "+minAcceptableInvertableSVDValue);
 	}
 
 	public static int getClosestLocIterations()
@@ -228,7 +228,7 @@ public class Prefs
 	{
 		if((closestLocIter >= 2) && (closestLocIter <= 100)) closestLocIterations = closestLocIter;
 		else closestLocIterations = GConstants.DEF_CLOSEST_LOCATION_ITERATIONS;
-		//		System.out.println("closestLocIterations: "+closestLocIterations);
+		//		///System.out.println("closestLocIterations: "+closestLocIterations);
 	}
 
 	public static int getMaxJacobianIterations()
@@ -240,7 +240,7 @@ public class Prefs
 	{
 		if((maxJacobIter >= 100) && (maxJacobIter <= 200)) maxJacobianIterations = maxJacobIter;
 		else maxJacobianIterations = GConstants.DEF_MAX_JACOBIAN_ITERATIONS;
-		//		System.out.println("maxJacobianIterations: "+maxJacobianIterations);
+		//		///System.out.println("maxJacobianIterations: "+maxJacobianIterations);
 	}
 
 	public static int getMinJacobianIterations()
@@ -252,7 +252,7 @@ public class Prefs
 	{
 		if((minJacobIter >= 2) && (minJacobIter <= 99)) minJacobianIterations = minJacobIter;
 		else minJacobianIterations = GConstants.DEF_MIN_JACOBIAN_ITERATIONS;
-		//		System.out.println("minJacobianIterations: "+minJacobianIterations);
+		//		///System.out.println("minJacobianIterations: "+minJacobianIterations);
 	}
 
 	public static double getCurvatureScalingFactor()
@@ -264,7 +264,7 @@ public class Prefs
 	{
 		if((curvatureFactor >= 1) && (curvatureFactor <= 10)) curvatureScalingFactor = curvatureFactor;
 		else curvatureScalingFactor = CurvatureBasedDetection.DEF_SCALING_FACTOR;
-		//		System.out.println("curvatureScalingFactor: "+curvatureScalingFactor);
+		//		///System.out.println("curvatureScalingFactor: "+curvatureScalingFactor);
 	}
 
 	public static double getMaxTimeScalingFactor()
@@ -276,7 +276,7 @@ public class Prefs
 	{
 		if((maxTimeFactor >= 1) && (maxTimeFactor <= 5) && (maxTimeFactor > minTimeScalingFactor)) maxTimeScalingFactor = maxTimeFactor;
 		else maxTimeScalingFactor = TimeBasedDetection.DEF_MAX_SCALING_FACTOR;
-		//		System.out.println("maxTimeScalingFactor: "+maxTimeScalingFactor);
+		//		///System.out.println("maxTimeScalingFactor: "+maxTimeScalingFactor);
 	}
 
 	public static double getMinTimeScalingFactor()
@@ -288,7 +288,7 @@ public class Prefs
 	{
 		if((minTimeFactor >= 1) && (minTimeFactor <= 5) && (minTimeFactor < maxTimeScalingFactor)) minTimeScalingFactor = minTimeFactor;
 		else minTimeScalingFactor = TimeBasedDetection.DEF_MIN_SCALING_FACTOR;
-		//		System.out.println("minTimeScalingFactor: "+minTimeScalingFactor);
+		//		///System.out.println("minTimeScalingFactor: "+minTimeScalingFactor);
 		Prefs.minTimeScalingFactor = minTimeScalingFactor;
 	}
 
@@ -302,7 +302,7 @@ public class Prefs
 		//if((speedFactor >= 0.1) && (speedFactor <= 1)) 
 		speedScalingFactor = speedFactor;
 	//	else speedScalingFactor = SpeedBasedDetection.DEF_SCALING_FACTOR;
-		//		System.out.println("speedScalingFactor: "+speedScalingFactor);
+		//		///System.out.println("speedScalingFactor: "+speedScalingFactor);
 		//Prefs.speedScalingFactor = speedScalingFactor;
 	}
 
@@ -315,7 +315,7 @@ public class Prefs
 	{
 		if(acceptableVotes >= 1) Prefs.acceptableVotes = acceptableVotes;
 		else Prefs.acceptableVotes = SegmentPtDetectionScheme.DEF_ACCEPTABLE_VALUE;
-		//		System.out.println("acceptableVotes: "+acceptableVotes);
+		//		///System.out.println("acceptableVotes: "+acceptableVotes);
 	}
 
 	public static double getIndAngleLimit()
@@ -327,7 +327,7 @@ public class Prefs
 	{
 		if((indAngleLimit >=0.1) && (indAngleLimit <=10.0)) Prefs.indAngleLimit = indAngleLimit;
 		else Prefs.indAngleLimit = IndAngleRecognizer.DEF_MAX_ANGLE_TOL;
-		//		System.out.println("indAngleLimit: "+indAngleLimit);
+		//		///System.out.println("indAngleLimit: "+indAngleLimit);
 	}
 
 	public static double getRelAngleLimit()
@@ -339,7 +339,7 @@ public class Prefs
 	{
 		if((relAngleLimit >=0.1) && (relAngleLimit <=10.0)) Prefs.relAngleLimit = relAngleLimit;
 		else Prefs.relAngleLimit = RelAngleRecognizer.DEF_MAX_ANGLE_TOL;
-		//		System.out.println("relAngleLimit: "+relAngleLimit);
+		//		///System.out.println("relAngleLimit: "+relAngleLimit);
 	}
 
 	public static double getRelLengthPercentage()
@@ -351,7 +351,7 @@ public class Prefs
 	{
 		if((relLengthPercentage >=0.1) && (relLengthPercentage <=10.0)) Prefs.relLengthPercentage = relLengthPercentage;
 		else Prefs.relLengthPercentage = RelLengthRecognizer.DEF_MAX_EQUAL_LENGTH_TOL_PERCENT;
-		//		System.out.println("relLengthPercentage: "+relLengthPercentage);
+		//		///System.out.println("relLengthPercentage: "+relLengthPercentage);
 	}
 	public static boolean getPromotionPreference()
 	{

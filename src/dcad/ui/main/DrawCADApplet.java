@@ -18,8 +18,8 @@ public class DrawCADApplet extends JApplet
 		{
 			GMethods.applet = this;
 			
-//			System.out.println("Applet code base : " + this.getCodeBase() + "\n");
-//			System.out.println("Applet document base : " + this.getDocumentBase() + "\n" );
+//			///System.out.println("Applet code base : " + this.getCodeBase() + "\n");
+//			///System.out.println("Applet document base : " + this.getDocumentBase() + "\n" );
 			GMethods.codeBase = this.getCodeBase().toString();
 			GMethods.init("DrawCAD.properties");
 
@@ -28,7 +28,7 @@ public class DrawCADApplet extends JApplet
 			this.setContentPane(MainWindow.getApplicationContentPane());
 			this.setJMenuBar(MainWindow.getApplicationMenuBar());
 			MainWindow.startApplication();
-			System.out.println("\n\n***************    Started   *****************");
+			///System.out.println("\n\n***************    Started   *****************");
 
 			isStarted=true;
 		}

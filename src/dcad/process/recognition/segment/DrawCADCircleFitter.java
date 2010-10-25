@@ -80,13 +80,13 @@ public class DrawCADCircleFitter
 			}
 		
 			norm = errors.normF();
-			System.out.println("Norm : " + norm);
+			///System.out.println("Norm : " + norm);
 
 			if(norm==java.lang.Double.NaN)
 				break;
 			if (norm < 1 )
 			{
-				System.out.println("-----------------------------Solution found d < min norm " + Prefs.getMinAcceptableNorm() + "-----------------------------");
+				///System.out.println("-----------------------------Solution found d < min norm " + Prefs.getMinAcceptableNorm() + "-----------------------------");
 				break;
 			}
 			

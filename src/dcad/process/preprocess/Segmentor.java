@@ -90,7 +90,7 @@ public class Segmentor
 			prevPixel.setCurvature(0);
 			prevPixel.setSpeed(0);
 			prevPixel.setSlope(0);
-			// System.out.println("i = 0: "+prevPixel);
+			// ///System.out.println("i = 0: "+prevPixel);
 		}
 
 		// set the pixel property values for the remaining pixels
@@ -112,16 +112,16 @@ public class Segmentor
 				// remove the distance of the last pixel in the window
 				Point a = ((PixelInfo) ptList.get(index - winSize_speed -1));
 				Point b = ((PixelInfo)ptList.get(index - winSize_speed));
-				// System.out.println("prev dist: "+a.distance(b));
+				// ///System.out.println("prev dist: "+a.distance(b));
 				cummDist_speed -= a.distance(b); 
 			}
-			// System.out.println("Speed: "+winSize_speed);
+			// ///System.out.println("Speed: "+winSize_speed);
 			
 			// add the distance of current pixel in the window
 			double thisDist = prevPixel.distance(currPixel);
-			//System.out.println("this dist: "+thisDist);
+			/////System.out.println("this dist: "+thisDist);
 			cummDist_speed += thisDist;
-			//System.out.println("summ distance: "+cummDist_speed);
+			/////System.out.println("summ distance: "+cummDist_speed);
 			
 			// do speed calculations for this pixel
 			PixelInfo a = (PixelInfo) ptList.get(index - winSize_speed); //index - 2
@@ -148,7 +148,7 @@ public class Segmentor
 			}
 			
 			// TODO: check for this code
-			//System.out.println("Slope :start: "+start+" end: "+end);
+			/////System.out.println("Slope :start: "+start+" end: "+end);
 			double[][] winElem = theStroke.getWindowElemAs2DMatrix_Double(start, end);
 			if(winElem!=null)
 			{
@@ -156,19 +156,19 @@ public class Segmentor
 				currPixel.setSlope(odr[0]);
 				
 				//ISHWAR
-				//System.out.println(Maths.angle(currPixel.getSlope(), 1) + "  " + Maths.angle(prevPixel.getSlope(), 1) + "\n");
+				/////System.out.println(Maths.angle(currPixel.getSlope(), 1) + "  " + Maths.angle(prevPixel.getSlope(), 1) + "\n");
 				// calculate the curvature information
 				double slopeChange = Maths.angle(currPixel.getSlope(), 1) - Maths.angle(prevPixel.getSlope(), 1);
 				
 				//ISHWAR
 /*				if(  (Maths.angle(currPixel.getSlope(), 1) < 0 && Maths.angle(prevPixel.getSlope(), 1) >0)  || ( Maths.angle(currPixel.getSlope(), 1) > 0 && Maths.angle(prevPixel.getSlope(), 1) <0) )
 				{
-					System.out.println("Slope Changed");
+					///System.out.println("Slope Changed");
 					slopeChange=0.0001;
 				}*/
 				
 				
-				// System.out.println("slopeChange "+slopeChange);
+				// ///System.out.println("slopeChange "+slopeChange);
 				if(slopeChange == 0.0 && thisDist == 0.0){
 					currPixel.setCurvature(prevPixel.getCurvature());
 				}
@@ -180,7 +180,7 @@ public class Segmentor
 			{
 				// NOTE: TODO this should not happen
 			}
-			System.out.println("i = "+index+": "+currPixel);
+			///System.out.println("i = "+index+": "+currPixel);
 			
 			prevPixel = currPixel;
 			currPixel = null;
@@ -193,11 +193,11 @@ public class Segmentor
 			
 			prevCurrDist = prevPixel.distance(currPixel);
 			prevCurrAngle = GlobalMethods.angle(prevPixel, currPixel);
-			// System.out.println(prevCurrAngle);
+			// ///System.out.println(prevCurrAngle);
 			// no need to check for divide by zero error points are not sampled until the mouse moves 
 			// and when the mouse moves time will be different due to the sampling rate.
 			double speed = prevCurrDist / (currPixel.getTime() - prevPixel.getTime());
-			//System.out.println("speed: "+ speed);
+			/////System.out.println("speed: "+ speed);
 			currPixel.setSpeed(speed);
 		}
 
@@ -208,12 +208,12 @@ public class Segmentor
 			// calculate curvature at this pixel
 			double currNextDist = currPixel.distance(nextPixel);
 			double currNextAngle = GlobalMethods.angle(currPixel, nextPixel);
-			// System.out.println(currNextAngle);
+			// ///System.out.println(currNextAngle);
 			
 			// no need to check for divide by zero error points are not sampled until the mouse moves 
 			// and when the mouse moves time will be different due to the sampling rate.
 			double speed = currNextDist / (nextPixel.getTime() - currPixel.getTime());
-			//System.out.println("speed: "+ speed);
+			/////System.out.println("speed: "+ speed);
 			nextPixel.setSpeed(speed);
 			
 			// curvature is the change of slope divided by change of distance 
@@ -236,7 +236,7 @@ public class Segmentor
 		for(int i=0;i<ptList.size();i++)
 		{
 			PixelInfo pi = (PixelInfo)ptList.get(i);
-//ISHWAR			System.out.println(i + ". (" + pi.x + "," + pi.y + ") " +pi.getCurvature() + " " + pi.getTime() + " " + pi.getSpeed());
+//ISHWAR			///System.out.println(i + ". (" + pi.x + "," + pi.y + ") " +pi.getCurvature() + " " + pi.getTime() + " " + pi.getSpeed());
 		}
 	}
 	
@@ -288,7 +288,7 @@ public class Segmentor
 		}
 /*We now have a list of segment-points to work with*/
 		// get the common segment points
-		System.out.println("Modified Hybrid fits");
+		///System.out.println("Modified Hybrid fits");
 		Vector selectedSegPos;
 	/*
 		selectedSegPos = returnRelevantVector(segVectorList);
@@ -300,7 +300,7 @@ public class Segmentor
 		{
 			 Integer index = (Integer) iter.next();
 			 PixelInfo pixel = (PixelInfo)ptList.get(index.intValue());
-			 System.out.println("Index: "+index+", "+pixel);
+			 ///System.out.println("Index: "+index+", "+pixel);
 		}*/
 		/*if(segScheme == 1 || segScheme == 3){
 			
@@ -315,7 +315,7 @@ public class Segmentor
 //		Vector selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
 
 		// TODO: DONE: remove this code, This is just to print the common segments points
-	/*	System.out.println("Combination algorithm");
+	/*	///System.out.println("Combination algorithm");
 		Vector ptList = theStroke.getM_ptList();
 		Collections.sort(selectedSegPos);
 		Iterator iter = selectedSegPos.iterator();
@@ -323,10 +323,10 @@ public class Segmentor
 		{
 			 Integer index = (Integer) iter.next();
 			 PixelInfo pixel = (PixelInfo)ptList.get(index.intValue());
-			 System.out.println("Index: "+index+", "+pixel);
+			 ///System.out.println("Index: "+index+", "+pixel);
 		}
 		
-		System.out.println("\n\n");
+		///System.out.println("\n\n");
 		*/
 		
 		return selectedSegPos;
@@ -538,7 +538,7 @@ public class Segmentor
 			CurvVector.add(new Integer(obj.intValue()));
 		}
 		
-		System.out.println("Curvature Indices");
+		///System.out.println("Curvature Indices");
 		printValues(CurvVector);
 		
 		SpeedVector = new Vector();
@@ -546,7 +546,7 @@ public class Segmentor
 			Double obj = SpeedPts[index][0];
 			SpeedVector.add(new Integer(obj.intValue()));
 		}
-		System.out.println("Speed Indices");
+		///System.out.println("Speed Indices");
 		printValues(SpeedVector);
 		Sort sort = new Sort();
 		int ElementIndex;
@@ -564,7 +564,7 @@ public class Segmentor
 				
 			}		
 		}
-		System.out.println("Common Points");
+		///System.out.println("Common Points");
 		printValues(CommonSegmentPts);
 		int ElemAtIndex;
 		// Find the curvature based segment points in the Tolerance Distance of speed based segment points 
@@ -585,7 +585,7 @@ public class Segmentor
 		double PrevIterError;
 		double NewIterError;
 		Vector IterationPts = new Vector(); 
-		//System.out.println("Error " + (PrevIterError = calculateError(CommonSegmentPts, theStroke)));
+		/////System.out.println("Error " + (PrevIterError = calculateError(CommonSegmentPts, theStroke)));
 		// create a vector that stores segment points of each iteration
 		IterWiseSegPts = new Vector();
 		// for hybrid
@@ -628,7 +628,7 @@ public class Segmentor
 				SpeedVector.remove(0);
 				Collections.sort(CommonSegmentPts);
 				NewIterError = calculateError(CommonSegmentPts, theStroke);
-				System.out.println("New Error = " + NewIterError);
+				///System.out.println("New Error = " + NewIterError);
 			//CommonSegmentPts.add((Double)NewIterError);
 				if((PrevIterError  -  NewIterError) > 100.0 ){
 					vectorIndex++;
@@ -789,7 +789,7 @@ CommonSegmentPts = selectBestSegPtsSet(IterWiseSegPts);*/
 	void printValues(Vector Vect){
 		int index;
 		for(index=0;index< Vect.size(); index++){	
-			System.out.println("Element " + Vect.elementAt(index));
+			///System.out.println("Element " + Vect.elementAt(index));
 		}
 		
 	}
@@ -857,7 +857,7 @@ CommonSegmentPts = selectBestSegPtsSet(IterWiseSegPts);*/
 		{
 			SegmentRecognitionScheme brs = segRecog.recognizeSegment(seg);
 			if(brs == null){ 
-				System.out.println(" brs is null");
+				///System.out.println(" brs is null");
 			}
 			else
 			{

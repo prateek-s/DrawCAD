@@ -56,9 +56,9 @@ public class SegmentRecognizer
 	{
 		// initilize the members elements
 		init(ptMat);
-//		System.out.println("SIZE: "+ptMat.length);
+//		///System.out.println("SIZE: "+ptMat.length);
 		SegmentRecognitionScheme brs = null;
-		// System.out.println("inside recognize");
+		// ///System.out.println("inside recognize");
 		
 		if(m_points!=null)
 		{
@@ -130,7 +130,7 @@ public class SegmentRecognizer
 					if (confidance[lastIdx-1] == lineConf){
 						double radius = m_circleCurveRecog.getRadius();
 						double ratio = segkLen/radius;
-						//				System.out.println("ratio "+ratio);
+						//				///System.out.println("ratio "+ratio);
 						if(ratio > LINE_CIRCLE_THRESHOLD) m_segType = Segment.CIRCLE;
 						else m_segType = Segment.LINE;
 					}
@@ -198,7 +198,7 @@ public class SegmentRecognizer
 	{
 		m_pointRecog = new PointRecognizer(m_points);
 		double conf = m_pointRecog.approximate();
-		//System.out.println("Point conf: "+conf);
+		/////System.out.println("Point conf: "+conf);
 		return conf;
 	}
 		
@@ -206,7 +206,7 @@ public class SegmentRecognizer
 	{
 		m_lineRecog = new LineRecognizer(m_points);
 		double conf = m_lineRecog.approximate();
-		//System.out.println("line conf: "+conf);
+		/////System.out.println("line conf: "+conf);
 		return conf;
 	}
 	
@@ -228,7 +228,7 @@ public class SegmentRecognizer
 		}
 		m_circleCurveRecog = new CircularCurveRecognizer(m_points);
 		double conf = m_circleCurveRecog.approximate();
-		//System.out.println("Circle conf: "+conf);
+		/////System.out.println("Circle conf: "+conf);
 		return conf;
 	}
 	
@@ -236,7 +236,7 @@ public class SegmentRecognizer
 	{
 		m_ellipCurveRecog = new EllipticalCurveRecognizer(m_points);
 		double conf = m_ellipCurveRecog.approximate();
-		System.out.println("Ellipse: "+conf);
+		///System.out.println("Ellipse: "+conf);
 		return conf;
 	}
 

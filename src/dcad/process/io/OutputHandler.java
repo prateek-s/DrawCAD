@@ -43,7 +43,7 @@ public class OutputHandler
 
 /*	public void saveToUnknownFile(String dirName, String fName)
 	{
-		System.out.println("OutputHandler.saveToUnknownFile()");
+		///System.out.println("OutputHandler.saveToUnknownFile()");
 		saveToKnownFile(dirName, fName);
 		IOManager.setFilename(fName);
 		IOManager.setLast_dir(dirName);
@@ -51,7 +51,7 @@ public class OutputHandler
 */	
 	public void saveToUnKnownFile(String dirName, String fName) throws IOException 
 	{
-		//System.out.println("OutputHandler.saveToKnownFile()");
+		/////System.out.println("OutputHandler.saveToKnownFile()");
 		File f = new File(dirName, fName);
 		int option = JOptionPane.OK_OPTION;
 		if (f.exists())
@@ -68,7 +68,7 @@ public class OutputHandler
 	
 	public void saveToFile(String dir, String file) throws IOException
 	{
-	//	System.out.println("OutputHandler.saveToFile()");
+	//	///System.out.println("OutputHandler.saveToFile()");
 		DrawingView dv = GMethods.getCurrentView();;
 		CommandQueue cq = dv.getM_drawData().getM_commands();
 		m_fileW = new FileWriter(dir+file);

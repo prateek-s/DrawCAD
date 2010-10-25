@@ -341,7 +341,7 @@ public class constraintEquations
 				str2=getXDifferenceEQ(point1,point3)+"/"+"sqrt(" + getXDifferenceSquaredEQ(point1,point3) + ")";
 			}
 			else
-				System.out.println("ERROR : constraintEquations !!!");
+				///System.out.println("ERROR : constraintEquations !!!");
 			s1="("+str1+")+("+str2+")";
 //			v.add(s1);
 			
@@ -370,7 +370,7 @@ public class constraintEquations
 		// /_213 = /_214 + /_413
 		//String str3 = "("+constraintEquations.getAngleEQWithoutScaleFactor(point2, point1, point4)+") + ("+constraintEquations.getAngleEQWithoutScaleFactor(point4, point1, point3)+") - ("+constraintEquations.getAngleEQWithoutScaleFactor(point2, point1, point3)+")";
 		//str3=constraintsHelper.pointOnCircleConstraintScaleFactor + "*("+str3+")";
-//		System.out.println("\n" + str3);
+//		///System.out.println("\n" + str3);
 		//v.add(str3);
 		return v;		
 	}
@@ -387,7 +387,7 @@ public class constraintEquations
 		// /_213 = /_214 + /_413
 		//String str3 = "("+constraintEquations.getAnglePDWithoutScaleFactor(pt, xory, p2, p1, p4, point2, point1, point4)+") + ("+constraintEquations.getAnglePDWithoutScaleFactor(pt, xory, p4, p1, p3, point4, point1, point3)+") - ("+constraintEquations.getAnglePDWithoutScaleFactor(pt, xory, p2, p1, p3, point2, point1, point3)+")";//getAngleCCPD(pt, xory, p1, p2, p3, p4, point1, point2, point3, point4);
 		//str3=constraintsHelper.pointOnCircleConstraintScaleFactor + "*("+str3+")";
-//		System.out.println("\nPartial - " + var + ": " + str3);
+//		///System.out.println("\nPartial - " + var + ": " + str3);
 		//v.add(str3);
 		
 		return v;
@@ -495,8 +495,8 @@ public class constraintEquations
 		//str= "sqr(" + getYDifferenceEQ(point1,point2) + " - (" + getXDifferenceEQ(point2,point1) + " *  tan(" + String.valueOf(Math.toRadians(angle)) +") ) )";
 		str= "(" + getYDifferenceEQ(point1,point2) + " - (" + getXDifferenceEQ(point2,point1) + " *  tan(" + String.valueOf(Math.toRadians(angle)) +") ) )";
 		str=constraintsHelper.independentAngleConstraintScaleFactor + "*("+str+")";
-		System.out.println("Angle is : " + angle);
-		System.out.println(str);
+		///System.out.println("Angle is : " + angle);
+		///System.out.println(str);
 		return str;
 	}
 	
@@ -528,7 +528,7 @@ public class constraintEquations
 		else
 			str="0.0";
 		str=constraintsHelper.independentAngleConstraintScaleFactor + "*("+str+")";
-		System.out.println(str);
+		///System.out.println(str);
 		return str;
 	}
 

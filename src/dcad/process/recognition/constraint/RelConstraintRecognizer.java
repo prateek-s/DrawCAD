@@ -126,7 +126,7 @@ public class RelConstraintRecognizer
 					}	
 					
 					else if(seg instanceof SegLine){
-						//System.out.println("Seg Line");
+						/////System.out.println("Seg Line");
 						SegLine segL = (SegLine) seg; 
 						if(seg1 instanceof SegLine && seg2 instanceof SegLine){
 							if(segL.equals(seg1) || segL.equals(seg2)){

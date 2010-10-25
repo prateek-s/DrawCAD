@@ -32,7 +32,7 @@ public class CommandQueue
 		for (int i=m_currentCommIndex+1; i<m_commands.size(); i++)
 		{
 			Command comm = (Command)m_commands.elementAt(i);
-			System.out.println(comm);
+			///System.out.println(comm);
 			// we want to move one step even if its a Pause statement	
 			m_currentCommIndex = i; 
 			if(!comm.execute())
@@ -51,9 +51,9 @@ public class CommandQueue
 			Command comm = (Command)m_commands.elementAt(i);
 /*ISHWAR This was printing command
 			if (comm.getM_command().indexOf("mouseReleased")!=-1)
-				System.out.println("mouse released" + comm.getM_command());
+				///System.out.println("mouse released" + comm.getM_command());
 			else if(comm.getM_command().indexOf("mouseDragged")!=-1)
-				System.out.println("mouse dragged" + comm.getM_command());*/
+				///System.out.println("mouse dragged" + comm.getM_command());*/
 			comm.execute();
 		}
 		m_currentCommIndex = end; 

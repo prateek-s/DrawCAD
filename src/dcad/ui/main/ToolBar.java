@@ -288,7 +288,7 @@ public class ToolBar extends JPanel implements ActionListener
 				else if(dv.getSelectedElements().size() == 1){
 					ConvertSegment convSegment = new ConvertSegment();
 					convSegment.ConvertSelectedSegment();
-					System.out.println("Convert element");
+					///System.out.println("Convert element");
 				}
 			}
 			/*if(dv == null){
@@ -395,7 +395,7 @@ if(selElements != null){
 
 
 	if(ge instanceof SegLine){
-			System.out.println("Line");
+			///System.out.println("Line");
 			rawPoints = ((SegLine) ge).getRawPoints();
 			ge.delete();
 	
@@ -407,7 +407,7 @@ if(selElements != null){
 		}
 
 		else if(ge instanceof SegCircleCurve){
-			System.out.println("Circular arc");
+			///System.out.println("Circular arc");
 			rawPoints = ((SegCircleCurve) ge).getRawPoints();
 			ge.delete();
 			
@@ -450,7 +450,7 @@ if(selElements != null){
 			Iterator iter;
 			iter = constraints.iterator();
 			while (iter.hasNext()){
-			System.out.println("remove constraint");
+			///System.out.println("remove constraint");
 			Constraint cons =  (Constraint)iter.next();
 			dData.removeConstraint(cons);
 			}
@@ -479,7 +479,7 @@ if(selElements != null){
 							}
 							iter = constraints.iterator();
 							while (iter.hasNext()){
-								System.out.println("remove constraint");
+								///System.out.println("remove constraint");
 								Constraint cons =  (Constraint)iter.next();
 								seg.removeConstraint(cons);
 							}			

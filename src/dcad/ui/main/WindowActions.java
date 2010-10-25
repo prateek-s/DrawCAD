@@ -209,7 +209,7 @@ public class WindowActions
 		// added 06-10-09
 	/*	if(undoIndex > 0){
 			undoBit = 1;
-			System.out.println("undo" + undoIndex);
+			///System.out.println("undo" + undoIndex);
 		 		resetVectors(--undoIndex);
 		 	}	
 		*/
@@ -221,7 +221,7 @@ public class WindowActions
 		CommandQueue tempCQ = cq;
 		// do the repeat the processing till before this breakpoint
 		int prevPauseIndex = cq.prevPauseIndex();
-		//System.out.println(prevPauseIndex+"###############");
+		/////System.out.println(prevPauseIndex+"###############");
 		if(prevPauseIndex >= 0)
 		{
 			// prev pause statement found, execute from start to prevPauseIndex
@@ -273,7 +273,7 @@ public class WindowActions
 			
 			if(undoIndex < (undoVector.size() - 1)){
 				undoBit = 0;
-				System.out.println("redo" + undoIndex);
+				///System.out.println("redo" + undoIndex);
 			resetVectors(++undoIndex);
 			}
 		}*/
@@ -357,7 +357,7 @@ public class WindowActions
 		CommandView cp = new CommandView(dv.getM_drawData().getM_commands());
 		CommandWindow cw = new CommandWindow(cp);
 		cw.createAndShowGUI();
-//		System.out.println("WindowActions.showCommandsWindow()");
+//		///System.out.println("WindowActions.showCommandsWindow()");
 	}
 	
 	public void openExistingFileAction()
@@ -457,7 +457,7 @@ public class WindowActions
 		
 		
 		
-//		System.out.println("MenuBar.saveMIAction()");
+//		///System.out.println("MenuBar.saveMIAction()");
 		DrawingView dv = GMethods.getCurrentView();
 		
 		// check if the drawing is saved, already
@@ -484,7 +484,7 @@ public class WindowActions
 
 	public boolean openFile(String dir, String filename)
 	{
-//		System.out.println("MenuBar.openFile()");
+//		///System.out.println("MenuBar.openFile()");
 		InputHandler IH = IOManager.getInstance().getInputH();
 		if(IH != null)
 		try

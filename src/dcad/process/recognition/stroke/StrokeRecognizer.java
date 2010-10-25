@@ -33,7 +33,7 @@ public class StrokeRecognizer
 		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 		m_markerRecog = recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
 		m_stroke = stroke;
-		System.out.println(stroke.isSmallSize()+"  :"+stroke.getLength());
+		///System.out.println(stroke.isSmallSize()+"  :"+stroke.getLength());
 		
 		// added on 29-05-10
 		// if stroke is to be converted
@@ -48,7 +48,7 @@ public class StrokeRecognizer
 					return Stroke.TYPE_NORMAL;
 				}
 				else {
-					System.out.println("Converted to marker");
+					///System.out.println("Converted to marker");
 					return Stroke.TYPE_MARKER;
 				}
 			}

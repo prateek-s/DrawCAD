@@ -73,7 +73,7 @@ public class EqualRadiusConstraint extends RelLengthConstraint
 		SegCircleCurve c2=(SegCircleCurve)m_seg2;
 		if(constraintsHelper.areLengthsEqual(c1.getM_end(),c1.getM_center(),c2.getM_end(),c2.getM_center(),true))
 			return true;
-		System.out.println("Equal radius constraint failed...");
+		///System.out.println("Equal radius constraint failed...");
 		return false;
 	}
 

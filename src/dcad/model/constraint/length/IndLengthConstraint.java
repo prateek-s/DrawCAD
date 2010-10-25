@@ -83,7 +83,7 @@ public class IndLengthConstraint extends IndependentConstraint
 		SegLine l1=(SegLine)m_seg;
 		if(constraintsHelper.independentLengthSatisfied(l1.getM_start(),l1.getM_end(),m_length,true))
 			return true;
-		System.out.println("Independent length constraint failed..");
+		///System.out.println("Independent length constraint failed..");
 		return false;
 	}
 	

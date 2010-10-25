@@ -66,7 +66,7 @@ public class DistanceBetween2PointsConstraint extends IndependentPointConstraint
 		this.update();
 		if(constraintsHelper.independentLengthSatisfied((AnchorPoint)points.elementAt(0),(AnchorPoint)points.elementAt(1),m_distance,true))
 			return true;
-		System.out.println("Distance between points constraint failed...");
+		///System.out.println("Distance between points constraint failed...");
 		return false;
 	}
 	

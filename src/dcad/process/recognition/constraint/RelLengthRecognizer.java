@@ -129,7 +129,7 @@ public class RelLengthRecognizer extends RelConstraintRecognitionScheme
 					
 					
 					
-					System.out.println("Theta 1 = " + theta1 + "Theta 2 = " + theta2);
+					///System.out.println("Theta 1 = " + theta1 + "Theta 2 = " + theta2);
 					
 					
 					

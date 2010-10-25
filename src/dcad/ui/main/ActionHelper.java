@@ -662,7 +662,7 @@ public class ActionHelper
 	{
 		// checked it by a margin of .5 degrees on either sides
 		/*p: 0.5 degrees is the magic constant here*/
-		//System.out.println("horizontal");
+		/////System.out.println("horizontal");
 		if((((Double.compare(angle1, 0.0) == 0) || (Double.compare(angle1, 0.0) > 0))
 				&& (Double.compare(angle1, 0.5) == 0) || (Double.compare(angle1, 0.5) < 0))
 				|| ((Double.compare(angle1, 179.5) == 0) || (Double.compare(angle1, 179.5) > 0))){
@@ -677,7 +677,7 @@ public class ActionHelper
 	 */
 	public boolean isLineVertical(double angle1){
 		// checked it by a margin of .5 degrees on either sides
-		//System.out.println("vertical");
+		/////System.out.println("vertical");
 		if(((Double.compare(angle1, 89.5) == 0) || (Double.compare(angle1, 89.5) > 0))
 				&& (Double.compare(angle1, 90.5) == 0) || (Double.compare(angle1, 90.5) < 0)){
 			return true;
@@ -696,7 +696,7 @@ public class ActionHelper
 	 */
 	public void sortAnchorPoints(double segPoints[][], int sortBy){
 			    int n = segPoints.length;
-			    System.out.println("total points " + n );
+			    ///System.out.println("total points " + n );
 		    for (int pass=1; pass < n; pass++) {  // count how many times
 		        for (int i=0; i < n-pass; i++) {
 		            if (segPoints[i][sortBy] > segPoints[i+1][sortBy]) {
@@ -711,9 +711,9 @@ public class ActionHelper
 		        }
 		    }
 		    
-		    System.out.println("Sorted Points");
+		    ///System.out.println("Sorted Points");
 		    for(int i = 0; i < n; i++){
-		    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+		    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 		    }
 		    
 		   // return segPoints;
@@ -845,9 +845,9 @@ public class ActionHelper
 		}
 	int n= segPoints.length;
 			if(n > 0){
-	/*		 System.out.println("Sorted Points returned");
+	/*		 ///System.out.println("Sorted Points returned");
 			    for(int i = 0; i < n; i++){
-			    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+			    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 			    }
 		*/	    
 			
@@ -865,7 +865,7 @@ public class ActionHelper
 			    
 			}
 		else{
-			//System.out.println("size of array is" + segPoints.length);
+			/////System.out.println("size of array is" + segPoints.length);
 		}
 			return segPoints;
 	}
@@ -1035,7 +1035,7 @@ public class ActionHelper
 				//snapIP((ImpPoint)iter.next());
 			}
 			else if(seg instanceof SegLine){
-				System.out.println("Seg Line");
+				///System.out.println("Seg Line");
 				SegLine segL = (SegLine) seg; 
 				Vector segLinePts = segL.getM_impPoints();
 				iter = segLinePts.iterator();
@@ -1044,11 +1044,11 @@ public class ActionHelper
 				}	
 			}
 			else if(seg instanceof ImpPoint){
-				System.out.println("ImpPoint");
+				///System.out.println("ImpPoint");
 				snapIP((ImpPoint)seg);
 			}
 			else{
-				System.out.println("this is else part");
+				///System.out.println("this is else part");
 			}
 		}
 		

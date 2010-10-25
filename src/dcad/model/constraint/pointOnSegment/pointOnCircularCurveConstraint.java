@@ -26,7 +26,7 @@ public class pointOnCircularCurveConstraint extends PointSegmentConstraint
 		this.update();
 		if(constraintsHelper.onCircularCurveOrNot((AnchorPoint)points.get(1),(AnchorPoint)points.get(2),(AnchorPoint)points.get(0),(AnchorPoint)points.get(3),true))
 			return true;
-		System.out.println("point on curve constraint failed..");
+		///System.out.println("point on curve constraint failed..");
 		return false;
 	}
 	

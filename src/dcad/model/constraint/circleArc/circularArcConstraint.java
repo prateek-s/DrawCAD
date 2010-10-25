@@ -64,7 +64,7 @@ public class circularArcConstraint extends IndependentConstraint
 		update();
 		if(constraintsHelper.areLengthsEqual((AnchorPoint)points.get(0),(AnchorPoint)points.get(2),(AnchorPoint)points.get(1),(AnchorPoint)points.get(2),true))
 			return true;
-		System.out.println("Circular arc constraint failed...");
+		///System.out.println("Circular arc constraint failed...");
 		return false;
 	}
 

@@ -237,7 +237,7 @@ public class AnchorPoint extends ImpPoint
 
 	public void print()
 	{
-		System.out.println("\t(" + getX() + "," + getY() + ")");
+		///System.out.println("\t(" + getX() + "," + getY() + ")");
 	}
 	
 	public Vector getConstraintsByType(Class classname)

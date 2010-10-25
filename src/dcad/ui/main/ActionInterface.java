@@ -196,7 +196,7 @@ public class ActionInterface extends ActionHelper
     {
 		if (m_highlightedElements.size() > 0)
 		{
-			System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
+			///System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
 			Vector elementsToMove = new Vector();
 
 			// find all elements to move
@@ -265,13 +265,13 @@ public class ActionInterface extends ActionHelper
 
 	Vector movedPts = findAnchorPoints(elementsToMove);
 	double movedPointsPositions[] = new double[movedPts.size() * 2];
-	// System.out.println("!!!!!!!!! Initial Positions : ");
+	// ///System.out.println("!!!!!!!!! Initial Positions : ");
 	for (int temp = 0; temp < movedPts.size(); temp++)
 	    {
 		AnchorPoint ap = (AnchorPoint) movedPts.get(temp);
 		movedPointsPositions[temp * 2] = ap.getX();
 		movedPointsPositions[temp * 2 + 1] = ap.getY();
-		// System.out.println(ap.getM_label() + " " + ap.getX() + "
+		// ///System.out.println(ap.getM_label() + " " + ap.getX() + "
 		// " + ap.getY());
 	    }
 				
@@ -1503,7 +1503,7 @@ public boolean isLineHorizontal(double angle1)
 {
 	// checked it by a margin of .5 degrees on either sides
 	/*p: 0.5 degrees is the magic constant here*/
-	//System.out.println("horizontal");
+	/////System.out.println("horizontal");
 	if((((Double.compare(angle1, 0.0) == 0) || (Double.compare(angle1, 0.0) > 0))
 			&& (Double.compare(angle1, 0.5) == 0) || (Double.compare(angle1, 0.5) < 0))
 			|| ((Double.compare(angle1, 179.5) == 0) || (Double.compare(angle1, 179.5) > 0))){
@@ -1518,7 +1518,7 @@ public boolean isLineHorizontal(double angle1)
  */
 public boolean isLineVertical(double angle1){
 	// checked it by a margin of .5 degrees on either sides
-	//System.out.println("vertical");
+	/////System.out.println("vertical");
 	if(((Double.compare(angle1, 89.5) == 0) || (Double.compare(angle1, 89.5) > 0))
 			&& (Double.compare(angle1, 90.5) == 0) || (Double.compare(angle1, 90.5) < 0)){
 		return true;
@@ -1537,7 +1537,7 @@ public boolean isLineVertical(double angle1){
  */
 public void sortAnchorPoints(double segPoints[][], int sortBy){
 		    int n = segPoints.length;
-		    System.out.println("total points " + n );
+		    ///System.out.println("total points " + n );
 	    for (int pass=1; pass < n; pass++) {  // count how many times
 	        for (int i=0; i < n-pass; i++) {
 	            if (segPoints[i][sortBy] > segPoints[i+1][sortBy]) {
@@ -1552,9 +1552,9 @@ public void sortAnchorPoints(double segPoints[][], int sortBy){
 	        }
 	    }
 	    
-	    System.out.println("Sorted Points");
+	    ///System.out.println("Sorted Points");
 	    for(int i = 0; i < n; i++){
-	    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+	    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 	    }
 	    
 	   // return segPoints;
@@ -1681,9 +1681,9 @@ public double[][] findMiddlePtsWhileMoving(Segment seg1, Segment seg2){
 	}
 int n= segPoints.length;
 		if(n > 0){
-/*		 System.out.println("Sorted Points returned");
+/*		 ///System.out.println("Sorted Points returned");
 		    for(int i = 0; i < n; i++){
-		    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+		    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 		    }
 	*/	    
 		
@@ -1701,7 +1701,7 @@ int n= segPoints.length;
 		    
 		}
 	else{
-		//System.out.println("size of array is" + segPoints.length);
+		/////System.out.println("size of array is" + segPoints.length);
 	}
 		return segPoints;
 }
@@ -1871,7 +1871,7 @@ public void Snap_IP_drag(Vector<GeometryElement> m_highlightedElements)
 			//snapIP((ImpPoint)iter.next());
 		}
 		else if(seg instanceof SegLine){
-			System.out.println("Seg Line");
+			///System.out.println("Seg Line");
 			SegLine segL = (SegLine) seg; 
 			Vector segLinePts = segL.getM_impPoints();
 			iter = segLinePts.iterator();
@@ -1880,11 +1880,11 @@ public void Snap_IP_drag(Vector<GeometryElement> m_highlightedElements)
 			}	
 		}
 		else if(seg instanceof ImpPoint){
-			System.out.println("ImpPoint");
+			///System.out.println("ImpPoint");
 			snapIP((ImpPoint)seg);
 		}
 		else{
-			System.out.println("this is else part");
+			///System.out.println("this is else part");
 		}
 	}
 	

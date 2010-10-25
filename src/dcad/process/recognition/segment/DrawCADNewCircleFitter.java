@@ -82,7 +82,7 @@ public class DrawCADNewCircleFitter
 				break;
 			if (norm < 1 )
 			{
-				System.out.println("-----------------------------Solution found d < min norm " + Prefs.getMinAcceptableNorm() + "-----------------------------");
+				///System.out.println("-----------------------------Solution found d < min norm " + Prefs.getMinAcceptableNorm() + "-----------------------------");
 				break;
 			}
 			

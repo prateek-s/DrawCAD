@@ -17,7 +17,7 @@ public class Maths
 		odr[0] = odr[1] = 0.0;
 
 		int len = ptMat.length;
-		//System.out.println("windowLength "+len);
+		/////System.out.println("windowLength "+len);
 		if(len <= 1) return odr;
 		
 		double[][] A_mat = new double[len][2];
@@ -95,13 +95,13 @@ public class Maths
 			
 			// X0 = (inv(A'A))A'Y
 			Matrix sol = At_A_inverse.times(At_Y);
-//			System.out.println("slope = "+sol.get(0,0));
-//			System.out.println("intersection = "+sol.get(1,0));
+//			///System.out.println("slope = "+sol.get(0,0));
+//			///System.out.println("intersection = "+sol.get(1,0));
 			odr[0] = sol.get(0,0);
 			odr[1] = sol.get(1,0);
-//			System.out.println("----------------------");
-//			System.out.println("slope = "+sol.get(0,1));
-//			System.out.println("intersection = "+sol.get(1,1));
+//			///System.out.println("----------------------");
+//			///System.out.println("slope = "+sol.get(0,1));
+//			///System.out.println("intersection = "+sol.get(1,1));
 		} catch (Exception e)
 		{
 			// A'A is a singular matrix so inverse not possible.
@@ -116,7 +116,7 @@ public class Maths
 //		covMat.print(2,5);
 //		GlobalMethods.printArr(covMat.eig().getRealEigenvalues());
 //		covMat.eig().getV().print(2,5);
-		//System.out.println(slope);
+		/////System.out.println(slope);
 		return odr;
 	}
 	

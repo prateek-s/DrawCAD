@@ -96,8 +96,7 @@ import dcad.ui.main.ActionHelper;
 public class DrawingView extends JPanel implements MouseListener, MouseMotionListener, KeyListener,
 		KeyEventDispatcher, Serializable
 		
-	{
-	
+{	
 	public ActionInterface A ;
 	
 	public ProcessManager m_processManager;
@@ -602,14 +601,14 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			// to put highlighted element if it is a line in a segment 
 //			if(A.m_highlightedElements.size() == 1)
 //			{
-//				System.out.println("Element Selected : " + A.m_highlightedElements.get(0).getClass());
+//				///System.out.println("Element Selected : " + A.m_highlightedElements.get(0).getClass());
 //				String parsedCons[];
 //				
 //				parsedCons = A.m_highlightedElements.get(0).getClass().toString().split("[ ]+");
 //				
 //				if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
 //				{
-//					System.out.println("Equal");
+//					///System.out.println("Equal");
 //					Segment segm = (Segment)A.m_highlightedElements.get(0);
 //				}
 //			}
@@ -652,7 +651,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	{
 		boolean extraClick = false;
 		
-		//System.out.println("mouse released ");
+		/////System.out.println("mouse released ");
 		
 		Point pt1 = new Point(x,y) ;
 		setMousePointerLocation(pt1) ;
@@ -660,7 +659,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		//added on 19-04-10 for showing GUI to set properties of an element
 		if(!isParameterWinBitSet()) //not already open
 		{
-			System.out.println("Enter show elements properties ");
+			///System.out.println("Enter show elements properties ");
 			showElementPropertiesWindow(x, y, buttonType);
 		}
 		
@@ -711,7 +710,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			//added on 11-05-10
 			// check to add whether dragged element was collinear
 			if(isM_AreLinesCollinear()){
-				System.out.println("mouse released unsetting bit ");
+				///System.out.println("mouse released unsetting bit ");
 				setM_AreLinesCollinear(false);
 				repaint();
 			}		
@@ -746,7 +745,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	public void mouseDragged(MouseEvent e)
 	{
-		//System.out.println("Mouse dragged");
+		/////System.out.println("Mouse dragged");
 		mouseDragged(e.getX(), e.getY(), e.getWhen());
 	}
 	
@@ -825,7 +824,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if(!isParameterWinBitSet())
 		{
 			if (A.m_highlightedElements.size() > 0)
-			{System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
+			{///System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
 
 				boolean repaintReq = false;
 				Iterator iter = A.m_highlightedElements.iterator();
@@ -833,10 +832,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				{
 					GeometryElement ele = (GeometryElement) iter.next();
 					if(ele==null) {
-						System.out.println("********ACHTUNG");
+			
 						break ;
 					}
-					System.out.println("MOUSE POS"+m_mousePos.toString()) ;
 
 					if (!ele.containsPt(m_mousePos))
 					{
@@ -930,7 +928,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					}
 				}
 				else if(g1 instanceof ImpPoint){
-					//System.out.println("Highlight Point");
+					/////System.out.println("Highlight Point");
 					ImpPoint ip = (ImpPoint)g1;
 					if(m_keyEventCode == KeyEvent.VK_SHIFT){
 						helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT); // unselect row 7
@@ -970,7 +968,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		updateStatusBar(x, y, "( Move )", label);
 		}
 		else{
-		//	System.out.println("mouse moved Parameter window bit set");
+		//	///System.out.println("mouse moved Parameter window bit set");
 		}
 			
 	}
@@ -1011,7 +1009,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if(pt == null){
 			pt = new Point(); 
 		}
-		System.out.println("setmousepointer");
+		///System.out.println("setmousepointer");
 		pt.setLocation(pt1);
 	}
 	
@@ -1139,7 +1137,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				deleteKeyPressed();
 				break;
 			case KeyEvent.VK_ENTER:
-				System.out.println("Enter key pressed");
+				///System.out.println("Enter key pressed");
 				setEnterKeyClicked(true);
 				if (typedText.length() > 0)
 				{
@@ -1154,7 +1152,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				}
 				setEnterKeyClicked(false);
 				typedText = "";
-				System.out.println("*************************"+"typed text "+ typedText);
+				///System.out.println("*************************"+"typed text "+ typedText);
 				break;
 			default:
 				break;
@@ -1558,7 +1556,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				if(segment instanceof SegLine)
 				{
 					if(segment.getSegStart().distance(segment.getSegEnd()) < THRESHOLD){
-						System.out.println("segment removed");
+						///System.out.println("segment removed");
 						segment.clearConstraints(Constraint.SOFT);
 						segment.clearConstraints(Constraint.HARD);
 						segment.delete();
@@ -1578,7 +1576,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	public boolean checkForCollinearLines()
 	{
 		boolean are_collinear = false ;
-		//System.out.println("Entered  collinear lines ");
+		/////System.out.println("Entered  collinear lines ");
 		
 		// to put highlighted element if it is a line in a segment 
 		if(A.m_highlightedElements.size() == 1 && m_button_type == MouseEvent.BUTTON3) 
@@ -1600,7 +1598,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		
 		if (A.m_highlightedElements.size() > 0)
 		{
-			System.out.println("Mouse drag highlighted elements : " + A.m_highlightedElements.size());
+			///System.out.println("Mouse drag highlighted elements : " + A.m_highlightedElements.size());
 			Vector elementsToMove = new Vector();
 
 			// find all elements to move
@@ -1644,7 +1642,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 public void UI_log(String s) 
 {
-	System.out.println(s) ;
+	///System.out.println(s) ;
 }
 
 
@@ -1779,7 +1777,7 @@ public void UI_log(String s)
 						helpDrawView.selectRows(GConstants.SELECT_LINE);
 					}
 					else if(g1 instanceof SegCircleCurve){
-						//System.out.println("Highlight Point");
+						/////System.out.println("Highlight Point");
 						helpDrawView.selectRows(GConstants.SELECT_ARC);
 					}
 					else if(g1 instanceof AnchorPoint){
@@ -1874,12 +1872,12 @@ public void UI_log(String s)
 			seg = A.isPtOnAnySegment((Point2D)pt); 
 			this.segUnderCursor = seg ;
 			int count = A.ptOnSegments(pt);
-			//System.out.println("Count =" +count);
+			/////System.out.println("Count =" +count);
 			// count <2 
 			// count = 0 means that the point is not an anchor point
 			// count >=1 means that the anchor point is a child of # elements
 			if((seg)!=null && count < 2 && m_keyEventCode!= KeyEvent.VK_CONTROL  ){
-				//System.out.println("Control key not pressed");
+				/////System.out.println("Control key not pressed");
 				setGeoElementClicked (seg);
 				UpdateUI(2, null) ;
 			}
@@ -1930,7 +1928,7 @@ public void UI_log(String s)
 				
 				Point pt3 = getLocationOnScreen() ;
 				Point pt4 = getLocation() ;
-				System.out.println("BEGIN POINT CO_ORDINATES......................") ;
+				///System.out.println("BEGIN POINT CO_ORDINATES......................") ;
 				
 				ev.displayOptions(segm,pt2) ;
 			}

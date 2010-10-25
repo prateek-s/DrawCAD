@@ -136,7 +136,7 @@ public class PerpendicularSegConstraint extends RelAngleConstraint
 		SegLine seg2=(SegLine)m_seg2;
 		if (constraintsHelper.areLinesPerpendicular(seg1.getM_start(),seg1.getM_end(),seg2.getM_start(),seg2.getM_end(),-1,true))
 			return true;
-		System.out.println("Perpendicular segments constraint failed...");
+	///	///System.out.println("Perpendicular segments constraint failed...");
 		return false;
 	}
 }

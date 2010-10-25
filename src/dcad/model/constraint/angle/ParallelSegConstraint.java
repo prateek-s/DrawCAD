@@ -105,7 +105,7 @@ public class ParallelSegConstraint extends RelAngleConstraint
 		Line2D line = new Line2D.Double(newStartPt, shapeLine.getP2());
 		double halfDistance = line.getP1().distance(line.getP2())/2;
 		double rad = Math.sqrt(halfDistance*halfDistance + ANGLUAR_GAP*ANGLUAR_GAP);
-		//System.out.println(halfDistance*2+" asdasdas: "+rad);
+		/////System.out.println(halfDistance*2+" asdasdas: "+rad);
 		Vector centers = GMethods.CircleCircleIntersections(line.getX1(), line.getY1(), rad, line.getX2(), line.getY2(), rad);
 		Point2D lineMP = new Point2D.Double((line.getX1()+line.getX2())/2, (line.getY1()+line.getY2())/2);
 		// interpolate the line to find the newMP
@@ -125,7 +125,7 @@ public class ParallelSegConstraint extends RelAngleConstraint
 		line = new Line2D.Double(newStartPt, shapeLine.getP2());
 		halfDistance = line.getP1().distance(line.getP2())/2;
 		rad = Math.sqrt(halfDistance*halfDistance + ANGLUAR_GAP*ANGLUAR_GAP);
-		//System.out.println(halfDistance*2+" asdasdas: "+rad);
+		/////System.out.println(halfDistance*2+" asdasdas: "+rad);
 		centers = GMethods.CircleCircleIntersections(line.getX1(), line.getY1(), rad, line.getX2(), line.getY2(), rad);
 		lineMP = new Point2D.Double((line.getX1()+line.getX2())/2, (line.getY1()+line.getY2())/2);
 		// interpolate the line to find the newMP
@@ -150,7 +150,7 @@ public class ParallelSegConstraint extends RelAngleConstraint
 		SegLine l2=(SegLine)m_seg2;
 		if(constraintsHelper.areSlopesEqual(l1.getM_start(),l1.getM_end(),l2.getM_start(),l2.getM_end(),true))
 			return true;
-		System.out.println("Parallel Segment Constraint failed...");
+		///System.out.println("Parallel Segment Constraint failed...");
 		return false;
 	}
 }

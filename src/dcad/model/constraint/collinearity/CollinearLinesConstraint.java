@@ -90,7 +90,7 @@ public class CollinearLinesConstraint extends RelativeConstraint
 				&& constraintsHelper.areSlopesEqual((AnchorPoint)points.elementAt(1),(AnchorPoint)points.elementAt(2),(AnchorPoint)points.elementAt(0),(AnchorPoint)points.elementAt(3),true)
 				)
 			return true;
-		System.out.println("COllinear lines constraint failed...");
+		///System.out.println("COllinear lines constraint failed...");
 		return false;
 	}
 }

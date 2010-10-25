@@ -108,7 +108,7 @@ public class lineCircularCurveTangencyConstraint extends TangentConstraint
 				&& constraintsHelper.onCircularCurveOrNot((AnchorPoint)points.get(3),(AnchorPoint)points.get(4),(AnchorPoint)points.get(5),(AnchorPoint)points.get(0),true)
 			)
 			return true;
-		System.out.println("line curve tangency failed...");
+		///System.out.println("line curve tangency failed...");
 		return false;
 	}
 	

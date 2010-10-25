@@ -148,34 +148,34 @@ public class Text extends GeometryElement
 	
 	public boolean isCLose(GeometryElement gEle, int dist)
 	{
-//		System.out.println("Text.isCLose()");
+//		///System.out.println("Text.isCLose()");
 		return intersects(gEle, dist);
 	}
 	
 	public boolean touches(GeometryElement gEle)
 	{
-//		System.out.println("Text.touches()");
+//		///System.out.println("Text.touches()");
 		// no buffer for touching
 		return intersects(gEle, 0);
 	}
 	
 	private boolean intersects(GeometryElement gEle, int closeness)
 	{
-//		System.out.println("Text.intersects()");
+//		///System.out.println("Text.intersects()");
 		Rectangle rect = getBB();
 		if(rect != null)
 		{
 			// increase the rect by a few
-//			System.out.println(rect);
+//			///System.out.println(rect);
 			rect.setBounds(rect.x-closeness, rect.y-closeness, rect.width+(closeness*2), rect.height+(closeness*2));
-//			System.out.println(rect);
+//			///System.out.println(rect);
 			if(gEle instanceof Segment)
 			{
 				Segment seg = (Segment)gEle;
 				Shape shape = seg.getM_shape();
 				if(shape.intersects(rect))
 				{
-//					System.out.println("INTERSECTION*************");
+//					///System.out.println("INTERSECTION*************");
 					return true;
 				}
 			}
@@ -215,7 +215,7 @@ public class Text extends GeometryElement
 	
 	public void delete()
 	{
-//		System.out.println("Text.delete()");
+//		///System.out.println("Text.delete()");
 		
 		// remove this Text element from the Drawing data.
 		DrawingView dv = GMethods.getCurrentView();

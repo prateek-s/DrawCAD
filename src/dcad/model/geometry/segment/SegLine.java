@@ -183,7 +183,7 @@ public class SegLine extends Segment
 
 	public Vector intersects(Segment seg)
 	{
-		// System.out.println("SegLine.intersects()");
+		// ///System.out.println("SegLine.intersects()");
 		Vector intersects = new Vector();
 		Line2D line1 = (Line2D) this.getM_shape();
 		if (seg instanceof SegPoint)
@@ -196,7 +196,7 @@ public class SegLine extends Segment
 				if (interPt != null)
 				{
 					intersects.add(segPt.getP1());
-					// System.out.println("Point at line intersect at: "+segPt);
+					// ///System.out.println("Point at line intersect at: "+segPt);
 				}
 			}
 		} else if (seg instanceof SegLine)
@@ -210,7 +210,7 @@ public class SegLine extends Segment
 				if (interPt != null)
 				{
 					intersects.add(interPt);
-					// System.out.println("Lines Intersect at: "+interPt);
+					// ///System.out.println("Lines Intersect at: "+interPt);
 				}
 			}
 		} else
@@ -224,7 +224,7 @@ public class SegLine extends Segment
 
 	public Vector touches(Segment seg)
 	{
-		// System.out.println("SegLine.touches()");
+		// ///System.out.println("SegLine.touches()");
 		Vector touches = new Vector();
 		Line2D line1 = (Line2D) this.getM_shape();
 		if (seg instanceof SegPoint)
@@ -237,7 +237,7 @@ public class SegLine extends Segment
 			if ((touchPt != null)
 					&& (touchPt.distance(segPt.getP1()) <= Constraint.MAX_ALLOWED_CONNECT_GAP))
 			{
-				// System.out.println("Line Touches point at: "+touchPt);
+				// ///System.out.println("Line Touches point at: "+touchPt);
 				touches.add(touchPt);
 				touches.add(segPt.getP1());
 			}
@@ -329,14 +329,14 @@ public class SegLine extends Segment
 			 * nearest distance of p1 of line 1 with the end points of line 2
 			 * Point2D touchPt = this.getNearestPointOnSeg(line2.getP1());
 			 * if((touchPt != null) && (touchPt.distance(line2.getP1()) <=
-			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { System.out.println("Line
+			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { ///System.out.println("Line
 			 * Touches point at: "+touchPt); l1p1done =
 			 * touchPt.equals(line1.getP1()); l1p2done =
 			 * touchPt.equals(line1.getP2()); touches.add(touchPt);
 			 * touches.add(line2.getP1()); } touchPt =
 			 * this.getNearestPointOnSeg(line2.getP2()); if((touchPt != null) &&
 			 * (touchPt.distance(line2.getP2()) <=
-			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { System.out.println("Line
+			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { ///System.out.println("Line
 			 * Touches point at: "+touchPt); l1p1done =
 			 * touchPt.equals(line1.getP1()); l1p2done =
 			 * touchPt.equals(line1.getP2()); touches.add(touchPt);
@@ -345,12 +345,12 @@ public class SegLine extends Segment
 			 * if(!l1p1done) { touchPt =
 			 * seg.getNearestPointOnSeg(line1.getP1()); if((touchPt != null) &&
 			 * (touchPt.distance(line1.getP1()) <=
-			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { System.out.println("Line
+			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { ///System.out.println("Line
 			 * Touches point at: "+touchPt); touches.add(line1.getP1());
 			 * touches.add(touchPt); } } if(!l1p2done) { touchPt =
 			 * seg.getNearestPointOnSeg(line1.getP2()); if((touchPt != null) &&
 			 * (touchPt.distance(line1.getP2()) <=
-			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { System.out.println("Line
+			 * Constraint.MAX_ALLOWED_CONNECT_GAP)) { ///System.out.println("Line
 			 * Touches point at: "+touchPt); touches.add(line1.getP2());
 			 * touches.add(touchPt); } }
 			 */} else
@@ -371,7 +371,7 @@ public class SegLine extends Segment
 
 	public Point2D getNearestPointOnSeg(Point2D p)
 	{
-		// System.out.println("SegLine.getNearestPointOnSeg()");
+		// ///System.out.println("SegLine.getNearestPointOnSeg()");
 		Line2D line = (Line2D) m_shape;
 
 		double p1Dist = line.getP1().distance(p);

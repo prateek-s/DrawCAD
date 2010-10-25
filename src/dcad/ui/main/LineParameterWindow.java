@@ -138,7 +138,7 @@ public class LineParameterWindow implements ActionListener
 			parsedCons = constraintString.split("[ ]+");
 			
 			for(int i =0; i < parsedCons.length ; i++){
-				System.out.println(parsedCons[i]);
+				///System.out.println(parsedCons[i]);
 				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase(element) == 0) && (parsedCons[4].compareToIgnoreCase(constraint) == 0)){
 						return cons;
 				}
@@ -218,11 +218,11 @@ public class LineParameterWindow implements ActionListener
 		if((Double.compare(angle,textAngle) == 0)  
 				|| ((Double.compare(textAngle, ANGLE_TEXT_BOX_NULL) == 0 ) 
 						&& (Double.compare(angle,ANGLE_TEXT_BOX_NULL) ==0))){
-			System.out.println("Angle is same");
+			///System.out.println("Angle is same");
 		}
 		// if angle text box is now blank and previously it was not blank then remove angle constraint 
 		else if((Double.compare(textAngle, ANGLE_TEXT_BOX_NULL)==0) && (Double.compare(angle,ANGLE_TEXT_BOX_NULL) !=0)){
-			System.out.println("remove angle constraint");
+			///System.out.println("remove angle constraint");
 			cons = getSegmentConstraint("line", "angle",seg);
 			if(cons == null){
 				cons = getSegmentConstraint("vertical", "line",seg);
@@ -244,7 +244,7 @@ public class LineParameterWindow implements ActionListener
 			//dv.writeText((int)seg.getSegStart().getX(), (int)seg.getSegStart().getY(), angleString);
 			dv.writeText((int)pt.getX(),(int) pt.getY(), angleString);
 			dv.repaint();
-			System.out.println("Angle is changed to " +  angleString);
+			///System.out.println("Angle is changed to " +  angleString);
 		}
 		
 		// 24-05-10
@@ -260,12 +260,12 @@ public class LineParameterWindow implements ActionListener
 		if((Double.compare(length,textLength) == 0)  
 				|| ((Double.compare(textLength, LENGTH_TEXT_BOX_NULL) == 0 ) 
 						&& (Double.compare(length,LENGTH_TEXT_BOX_NULL) ==0))){
-			System.out.println("Line is same");
+			///System.out.println("Line is same");
 		}
 		// if textbox is currently null and previously it had some length
 		// then we need to remove that length constraint
 		else if((Double.compare(textLength, LENGTH_TEXT_BOX_NULL)==0) && (Double.compare(length,0.0) !=0)){
-			System.out.println("remove constraint");
+			///System.out.println("remove constraint");
 				// get the actual constraint
 				cons = getSegmentConstraint("line", "length",seg);
 				// find the index of constraint in recognize view constraint list
@@ -273,7 +273,7 @@ public class LineParameterWindow implements ActionListener
 				if(listIndex !=-1){
 					MainWindow.getRecognizedView().deleteConstraint(listIndex);
 					dv.repaint();
-					System.out.println("constraint removed ");
+					///System.out.println("constraint removed ");
 				}
 		}
 		// simply add the constraint and remove if any previous length constraint added
@@ -282,11 +282,11 @@ public class LineParameterWindow implements ActionListener
 			//dv.writeText((int)seg.getSegStart().getX(), (int)seg.getSegStart().getY(), lengthString);
 			dv.writeText((int)pt.getX(),(int) pt.getY(), lengthString);
 			dv.repaint();
-			System.out.println("Length is changed to " +  lengthString);
+			///System.out.println("Length is changed to " +  lengthString);
 		}
 		
 		//dv.logEvent(Command.PAUSE);
-		System.out.println("Submit Clicked");
+		///System.out.println("Submit Clicked");
 		jf.dispose();
 		jf = null;
 	}
@@ -314,7 +314,7 @@ public class LineParameterWindow implements ActionListener
 		}
 		else if(cmd.compareToIgnoreCase("Cancel") == 0){
 			//dv.logEvent("closeParamsLine();");
-			System.out.println("Cancel Clicked");
+			///System.out.println("Cancel Clicked");
 			performCancelActionLineParam();
 			dv.setParameterWinBitSet(false);
 		}
@@ -339,7 +339,7 @@ public class LineParameterWindow implements ActionListener
 			
 			parsedCons = cons.split("[ ]+");
 			for(int i =0; i < parsedCons.length ; i++){
-				System.out.println(parsedCons[i]);
+				///System.out.println(parsedCons[i]);
 				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("length") == 0)){
 					length = Double.parseDouble(parsedCons[5]);
 				}

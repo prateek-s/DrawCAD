@@ -612,7 +612,7 @@ public class MathEvaluator implements Serializable
 			String nbSpaces = "";
 			for (int i = 0; i < nLevel; i++)
 				nbSpaces += "  ";
-			System.out.println(nbSpaces + "|" + s);
+			///System.out.println(nbSpaces + "|" + s);
 		}
 	}
 
@@ -648,7 +648,7 @@ public class MathEvaluator implements Serializable
 			m.addVariable("77.y", 191);
 			m.addVariable("78.y", 20);
 			m.setExpression("((((31.x - 77.x) * (35.x- 77.x)) + ((31.y - 77.y) * (35.y- 77.y)))  / sqrt(((sqr(31.x - 77.x) + sqr(31.y- 77.y)) * (sqr(35.x -  77.x) + sqr(35.y - 77.y))))) - ((((6.x - 78.x) * (10.x- 78.x)) + ((6.y - 78.y) * (10.y- 78.y))) /sqrt(((sqr(6.x - 78.x) + sqr(6.y- 78.y)) * (sqr(10.x -  78.x) + sqr(10.y - 78.y)))))");
-			System.out.println(m.getValue());
+			///System.out.println(m.getValue());
 
 			System.exit(0);
 		}
@@ -656,7 +656,7 @@ public class MathEvaluator implements Serializable
 		try
 		{
 			MathEvaluator m = new MathEvaluator(args[0]);
-			System.out.println(m.getValue());
+			///System.out.println(m.getValue());
 		}
 		catch (Exception e)
 		{

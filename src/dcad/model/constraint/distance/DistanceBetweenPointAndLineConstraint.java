@@ -103,7 +103,7 @@ public class DistanceBetweenPointAndLineConstraint extends PointSegmentConstrain
 				&& constraintsHelper.onLineOrNot((AnchorPoint)points.get(0),(AnchorPoint)points.get(1),(AnchorPoint)points.get(2),true)
 		)
 			return true;
-		System.out.println("Point - Line Distance constraint failed...");
+		///System.out.println("Point - Line Distance constraint failed...");
 		return false;
 	}
 	

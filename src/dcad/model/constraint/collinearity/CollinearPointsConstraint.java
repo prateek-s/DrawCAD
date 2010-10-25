@@ -58,7 +58,7 @@ public class CollinearPointsConstraint extends IndependentPointConstraints
 
 	public void draw(Graphics g)
 	{
-//		System.out.println("CollinearPointConstraint.draw()");
+//		///System.out.println("CollinearPointConstraint.draw()");
 		Graphics2D g2d = (Graphics2D)g;
 		// set the color of the graphics to the color of the segment
 		Color prevColor = g.getColor();
@@ -106,7 +106,7 @@ public class CollinearPointsConstraint extends IndependentPointConstraints
 		for(int i=0; i<points.size() - 2; i++)
 			if(!(constraintsHelper.areSlopesEqual((AnchorPoint)points.elementAt(i+0),(AnchorPoint)points.elementAt(i+1),(AnchorPoint)points.elementAt(i+0),(AnchorPoint)points.elementAt(i+2),true)))
 			{
-				System.out.println("Collinear points constraint failed...");
+				///System.out.println("Collinear points constraint failed...");
 				return false;
 			}
 		return true;

@@ -22,7 +22,7 @@ public class PointRecognizer extends SegmentRecognitionScheme
 		// the segment is a point if all the points are ard the centriod of the segment
 		// get the centriod of the segment
 		double[] centriod = GMethods.getCetriod(m_points);
-//ISHWAR		System.out.println("centriod: "+centriod[0]+", "+centriod[1]);
+//ISHWAR		///System.out.println("centriod: "+centriod[0]+", "+centriod[1]);
 		
 		
 		double lsError = 0.0;

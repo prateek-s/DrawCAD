@@ -117,7 +117,7 @@ public class EqualRelLengthConstraint extends RelLengthConstraint
 		SegLine l2=(SegLine)m_seg2;
 		if(constraintsHelper.areLengthsEqual(l1.getM_start(),l1.getM_end(),l2.getM_start(),l2.getM_end(),true))
 			return true;
-		System.out.println("Equal relative length constraint failed...");
+		///System.out.println("Equal relative length constraint failed...");
 		return false;
 	}
 	

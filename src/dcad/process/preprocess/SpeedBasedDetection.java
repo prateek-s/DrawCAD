@@ -59,7 +59,7 @@ public class SpeedBasedDetection extends SegmentPtDetectionScheme
 			mean += m_data[i];
 		}
 		mean /= m_data.length;
-		System.out.println("\nSpeed Mean :"+mean);
+		///System.out.println("\nSpeed Mean :"+mean);
 		return mean;
 	}
 	
@@ -71,7 +71,7 @@ public class SpeedBasedDetection extends SegmentPtDetectionScheme
 		for (int i = 0; i < m_data.length; i++)
 		{
 			m_data[i] -= threshold;
-			System.out.println(m_data[i]);
+			///System.out.println(m_data[i]);
 			// reduce the value to 0 is more than 0
 			// if(m_speedData[i] > 0) m_speedData[i] = 0;
 		}
@@ -86,7 +86,7 @@ public class SpeedBasedDetection extends SegmentPtDetectionScheme
 		int limit = m_data.length;
 		int index = 0;
 		double threshold = getThreshold();
-		System.out.println("Threshold: "+threshold);
+		///System.out.println("Threshold: "+threshold);
 
 		// normalize to perform avg based filtering
 		//normalize(mean);
@@ -131,7 +131,7 @@ public class SpeedBasedDetection extends SegmentPtDetectionScheme
 						segPts.add(new Integer(minIndex));
 						SpeedData[index][0] = minIndex;
 						SpeedData[index++][1] = m_data[minIndex];
-						System.out.println("SPEED Segment Point detected: "+minIndex+",  "+GMethods.formatNum(minima));
+						///System.out.println("SPEED Segment Point detected: "+minIndex+",  "+GMethods.formatNum(minima));
 					}
 					minima = threshold;
 					minIndex = 0;
@@ -149,7 +149,7 @@ public class SpeedBasedDetection extends SegmentPtDetectionScheme
 		sort.bubbleSort(SpeedData,index);
 		setIndex(index);
 		for (index=0; index< getIndex(); index++){
-			System.out.println("index = " + SpeedData[index][0] + "value =" + SpeedData[index][1] + "");
+			///System.out.println("index = " + SpeedData[index][0] + "value =" + SpeedData[index][1] + "");
 		}
 		return segPts;
 	}

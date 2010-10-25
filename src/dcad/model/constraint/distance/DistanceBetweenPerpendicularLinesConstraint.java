@@ -143,7 +143,7 @@ public class DistanceBetweenPerpendicularLinesConstraint  extends RelLengthConst
 				&& constraintsHelper.areLinesPerpendicular(anchorPoints[0],anchorPoints[1],anchorPoints[2],anchorPoints[3],-1,true)
 			)
 			return true;
-		System.out.println("Distance between perpendicular lines constraint failed...");
+		///System.out.println("Distance between perpendicular lines constraint failed...");
 		return false;
 	}
 

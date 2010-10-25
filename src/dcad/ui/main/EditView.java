@@ -237,9 +237,9 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		this.pt = (Point) seg.getRawPoints().elementAt(0) ; //first point of the stroke? 
 		
 		if(pt==null) {
-			System.out.println("POINT VALUE IS NULLLLLLLLLLLLLLLLLLL") ;
+			///System.out.println("POINT VALUE IS NULLLLLLLLLLLLLLLLLLL") ;
 		}
-		System.out.println("POINT VALUE IS"+pt.toString()) ;
+		///System.out.println("POINT VALUE IS"+pt.toString()) ;
 		if(seg==null) 
 		{
 			//called spuriously, display 'nothing' and exit.
@@ -284,7 +284,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	public void getProperties()
 	{
-		System.out.println("SETTING THE PROPERTIES, DISPLAYING............");
+		///System.out.println("SETTING THE PROPERTIES, DISPLAYING............");
 
 		if (seg_type == Segment.LINE) {
 			getLineProperties() ;
@@ -295,7 +295,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			getCircleProperties() ;
 		} 
 
-		System.out.println(seg_properties.toString());
+		///System.out.println(seg_properties.toString());
 
 
 
@@ -345,13 +345,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		while (itr.hasNext()) {
 
 			String cons = itr.next().toString();
-			//System.out.println("CONSTRAINT IS >>>>>>"+cons) ;
+			/////System.out.println("CONSTRAINT IS >>>>>>"+cons) ;
 			String parsedCons[];
 			parsedCons = cons.split("[ ]+");
 
 			for(int i =0; i < parsedCons.length ; i++)
 			{
-				System.out.println("PARSED CONSTRAINT           "+parsedCons[i]);
+				///System.out.println("PARSED CONSTRAINT           "+parsedCons[i]);
 
 				if((parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("length") == 0))
 				{
@@ -430,13 +430,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 				length = seg_properties.jfield1.getText().trim() ;
 				if (length.compareTo(seg_properties.field1)==0) //field hasnt changed 
 				{
-					System.out.println("NOT CHANGED") ;
+					///System.out.println("NOT CHANGED") ;
 				}
 				else 
 				{
 					cmd = length ;
 					// magic happens!
-					System.out.println("POINT VALUE IS"+pt.toString()) ;
+					///System.out.println("POINT VALUE IS"+pt.toString()) ;
 					dv.writeText((int)pt.getX(),(int) pt.getY(), cmd) ;
 					dv.repaint();
 					
@@ -451,7 +451,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 				angle = seg_properties.jfield2.getText().trim();
 				if (angle.compareTo(seg_properties.field2)==0) //field hasnt changed 
 				{
-					System.out.println("NOT CHANGED") ;
+					///System.out.println("NOT CHANGED") ;
 				}
 				else 
 				{
@@ -570,11 +570,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		if((Double.compare(angle,textAngle) == 0)  
 				|| ((Double.compare(textAngle, ANGLE_TEXT_BOX_NULL) == 0 ) 
 						&& (Double.compare(angle,ANGLE_TEXT_BOX_NULL) ==0))){
-			System.out.println("Angle is same");
+			///System.out.println("Angle is same");
 		}
 		// if angle text box is now blank and previously it was not blank then remove angle constraint 
 		else if((Double.compare(textAngle, ANGLE_TEXT_BOX_NULL)==0) && (Double.compare(angle,ANGLE_TEXT_BOX_NULL) !=0)){
-			System.out.println("remove angle constraint");
+			///System.out.println("remove angle constraint");
 			cons = getSegmentConstraint("line", "angle",seg);
 			if(cons == null){
 				cons = getSegmentConstraint("vertical", "line",seg);
@@ -597,7 +597,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			//dv.writeText((int)seg.getSegStart().getX(), (int)seg.getSegStart().getY(), angleString);
 			dv.writeText((int)pt.getX(),(int) pt.getY(), angleString);
 			dv.repaint();
-			System.out.println("Angle is changed to " +  angleString);
+			///System.out.println("Angle is changed to " +  angleString);
 		}
 
 		// 24-05-10
@@ -613,12 +613,12 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		if((Double.compare(length,textLength) == 0)  
 				|| ((Double.compare(textLength, LENGTH_TEXT_BOX_NULL) == 0 ) 
 						&& (Double.compare(length,LENGTH_TEXT_BOX_NULL) ==0))){
-			System.out.println("Line is same");
+			///System.out.println("Line is same");
 		}
 		// if textbox is currently null and previously it had some length
 		// then we need to remove that length constraint
 		else if((Double.compare(textLength, LENGTH_TEXT_BOX_NULL)==0) && (Double.compare(length,0.0) !=0)){
-			System.out.println("remove constraint");
+			///System.out.println("remove constraint");
 			// get the actual constraint
 			cons = getSegmentConstraint("line", "length",seg);
 			// find the index of constraint in recognize view constraint list
@@ -626,7 +626,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			if(listIndex !=-1){
 				MainWindow.getRecognizedView().deleteConstraint(listIndex);
 				dv.repaint();
-				System.out.println("constraint removed ");
+				///System.out.println("constraint removed ");
 			}
 		}
 		// simply add the constraint and remove if any previous length constraint added
@@ -635,11 +635,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			//dv.writeText((int)seg.getSegStart().getX(), (int)seg.getSegStart().getY(), lengthString);
 			dv.writeText((int)pt.getX(),(int) pt.getY(), lengthString);
 			dv.repaint();
-			System.out.println("Length is changed to " +  lengthString);
+			///System.out.println("Length is changed to " +  lengthString);
 		}
 
 		//dv.logEvent(Command.PAUSE);
-		System.out.println("Submit Clicked");
+		///System.out.println("Submit Clicked");
 
 	}
 
@@ -662,7 +662,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			parsedCons = constraintString.split("[ ]+");
 
 			for(int i =0; i < parsedCons.length ; i++){
-				System.out.println(parsedCons[i]);
+				///System.out.println(parsedCons[i]);
 				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase(element) == 0) && (parsedCons[4].compareToIgnoreCase(constraint) == 0)){
 					return cons;
 				}
@@ -683,7 +683,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	public void actionPerformed(ActionEvent e)
 	{
-		System.out.println("EVENT"+e.paramString());
+		///System.out.println("EVENT"+e.paramString());
 
 		String cmd = e.getActionCommand();
 
@@ -731,7 +731,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 		else if(cmd.compareToIgnoreCase("Cancel") == 0){
 			//dv.logEvent("closeParamsLine();");
-			System.out.println("Cancel Clicked");
+			///System.out.println("Cancel Clicked");
 			//	performCancelActionLineParam();
 			//	dv.setParameterWinBitSet(false);
 		}
@@ -833,7 +833,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	public void itemStateChanged(ItemEvent arg0) {
 	
 		String item = arg0.getItem().toString();
-		System.out.println(item) ;
+		///System.out.println(item) ;
 		
 		
 		if(item.compareTo("Line")==0) {

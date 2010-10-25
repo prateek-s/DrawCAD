@@ -230,14 +230,14 @@ public class HelpRecognizeView extends JPanel
 		  public void valueChanged(ListSelectionEvent e) {
 		   
 		    if (e.getValueIsAdjusting()) {
-		     // System.out.println("The mouse button has not yet been released");
+		     // ///System.out.println("The mouse button has not yet been released");
 		    }
 		    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
             if (lsm.isSelectionEmpty()) {
-               // System.out.println("No rows are selected.");
+               // ///System.out.println("No rows are selected.");
             } else {
                 int selectedRow = lsm.getMinSelectionIndex();
-                //System.out.println("Row " + selectedRow + " is now selected.");
+                /////System.out.println("Row " + selectedRow + " is now selected.");
                 
                 setText(selectedRow);
             }

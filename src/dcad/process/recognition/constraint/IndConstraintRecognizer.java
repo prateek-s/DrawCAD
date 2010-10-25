@@ -34,7 +34,7 @@ public class IndConstraintRecognizer
 	 */
 	public Vector recognizeConstraints(Segment seg)
 	{
-//		System.out.println("IndConstraintRecognizer.recognizeConstraints()");
+//		///System.out.println("IndConstraintRecognizer.recognizeConstraints()");
 		init(seg);
 		if(seg != null)
 		{
@@ -54,7 +54,7 @@ public class IndConstraintRecognizer
 	 */
 	private Vector recogAngleConstraints()
 	{
-//		System.out.println("IndConstraintRecognizer.recogAngleConstraints()");
+//		///System.out.println("IndConstraintRecognizer.recogAngleConstraints()");
 		// find all the constraint related to angle
 		if(m_indAngleRecog == null) m_indAngleRecog = new IndAngleRecognizer(m_seg);
 		else m_indAngleRecog.init(m_seg);

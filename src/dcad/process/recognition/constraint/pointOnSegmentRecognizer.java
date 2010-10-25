@@ -202,8 +202,8 @@ public class pointOnSegmentRecognizer extends RelConstraintRecognitionScheme
 					GeometryElement segm = (GeometryElement)iter.next();
 				
 					if(segm instanceof SegLine){
-						//System.out.println("Seg Line");
-						//System.out.println("************************** line");
+						/////System.out.println("Seg Line");
+						/////System.out.println("************************** line");
 						SegLine segL = (SegLine) segm; 
 				
 							if(segL.equals(seg)){
@@ -236,7 +236,7 @@ public class pointOnSegmentRecognizer extends RelConstraintRecognitionScheme
 						}
 					}
 					else{
-						//System.out.println("************************** point");
+						/////System.out.println("************************** point");
 						AnchorPoint segPt = (AnchorPoint) segm;
           				if(p.equals(segPt)){
           					isEditMode = true;

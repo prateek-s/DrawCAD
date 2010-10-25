@@ -112,10 +112,10 @@ public class EqualAngleConstraint extends Constraint
 	public boolean isConstraintSolved()
 	{
 		this.update();
-		System.out.println("Equal angle constraint : " + m_constraint1.getM_angleDiff() + "  " + m_constraint2.getM_angleDiff());
+	///	///System.out.println("Equal angle constraint : " + m_constraint1.getM_angleDiff() + "  " + m_constraint2.getM_angleDiff());
  		if(constraintsHelper.areAnglesEqual(m_constraint1.getM_angleDiff(),m_constraint2.getM_angleDiff(),true))
  			return true;
- 		System.out.println("Equal angle constraint failed...");
+ 	///	///System.out.println("Equal angle constraint failed...");
  		return false;
  		
 	}

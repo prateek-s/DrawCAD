@@ -106,7 +106,7 @@ public class GMethods
 
 	public static void printMat(double [][] mat)
 	{
-		System.out.println("------- Printing Matrix -----------");
+		///System.out.println("------- Printing Matrix -----------");
 		int m = mat.length;
 		int n = mat[0].length;
 		for(int i = 0; i < m; i++)
@@ -115,19 +115,19 @@ public class GMethods
 			{
 				System.out.print(mat[i][j]+", ");
 			}
-			System.out.println();
+			///System.out.println();
 		}
-		System.out.println();
+		///System.out.println();
 	}
 
 	public static void printArr(double [] arr)
 	{
-		System.out.println("------- Printing Array -----------");
+		///System.out.println("------- Printing Array -----------");
 		for(int i = 0; i < arr.length; i++)
 		{
-			System.out.println(arr[i]);
+			///System.out.println(arr[i]);
 		}
-		System.out.println();
+		///System.out.println();
 	}
 	
 	public static String formatNum(double num)
@@ -137,7 +137,7 @@ public class GMethods
 	
 	public static double[] getCoords(double[][] points, int dim)
 	{
-		//System.out.println(start+", "+end);
+		/////System.out.println(start+", "+end);
 		// check if the values are legitimate
 		double [] coords = new double[points.length];
 		for(int i=0; i<points.length; i++)
@@ -161,14 +161,14 @@ public class GMethods
 		double maxVal = -Double.MAX_VALUE;
 		for (int i = 0; i < arr.length; i++)
 		{
-//			System.out.println(arr[i] - maxVal);
+//			///System.out.println(arr[i] - maxVal);
 			if((arr[i] != Double.NaN)&&(arr[i] > maxVal))
 			{
 				maxIdx = i;
 				maxVal = arr[i];
 			}
 		}
-		System.out.println("Max Index: "+maxIdx+", MaxVal: "+maxVal);
+		///System.out.println("Max Index: "+maxIdx+", MaxVal: "+maxVal);
 		return maxIdx;
 	}
 
@@ -377,7 +377,7 @@ public class GMethods
 
 	public static void main(String[] args)
 	{
-		System.out.println(intersection(100,100,1,10,1,1,1,10));
+		///System.out.println(intersection(100,100,1,10,1,1,1,10));
 	}
 
 	public static boolean equal(Point2D pt1, Point2D pt2)
@@ -412,7 +412,7 @@ public class GMethods
 
 	public static Vector CircleCircleIntersections(double x0, double y0, double r0, double x1, double y1, double r1)
 	{
-	    //System.out.println("GMethods.CircleCircleIntersections()");
+	    /////System.out.println("GMethods.CircleCircleIntersections()");
 		/* dx and dy are the vertical and horizontal distances between
 	     * the circle centers.
 	     */
@@ -453,7 +453,7 @@ public class GMethods
 	    Point2D.Double inter_p1 = new Point2D.Double(x2 + rx, y2 + ry);
 	    Point2D.Double inter_p2 = new Point2D.Double(x2 - rx, y2 - ry);
 		  
-	    //System.out.println("$$$$$$$$$$$ "+inter_p1+", "+inter_p2);
+	    /////System.out.println("$$$$$$$$$$$ "+inter_p1+", "+inter_p2);
 		Vector intersections = new Vector();
 		intersections.add(inter_p1);
 		intersections.add(inter_p2);
@@ -510,7 +510,7 @@ public class GMethods
 					}
 					else
 					{
-						System.out.println("'" + tchar + "' was not defined as a unicode character");
+						///System.out.println("'" + tchar + "' was not defined as a unicode character");
 					}
 
 					osindex = sindex;
@@ -540,7 +540,7 @@ public class GMethods
 	 */
 	public static Point2D extrapolate(Point2D p1, Point2D p2, double len)
 	{
-//		System.out.println("GMethods.extrapolate()");
+//		///System.out.println("GMethods.extrapolate()");
 		double dist = p1.distance(p2);
 		double x1 = (p2.getX()*(dist+len) - len*p1.getX())/(dist);
 		double y1 = (p2.getY()*(dist+len) - len*p1.getY())/(dist);
@@ -556,7 +556,7 @@ public class GMethods
 	 */
 	public static Point2D interpolate(Point2D p1, Point2D p2, double len)
 	{
-//		System.out.println("GMethods.interpolate()");
+//		///System.out.println("GMethods.interpolate()");
 		double ratio = len/p1.distance(p2);
 		double x1 = (p1.getX()*(1-ratio) + ratio*p2.getX());
 		double y1 = (p1.getY()*(1-ratio) + ratio*p2.getY());
@@ -574,11 +574,11 @@ public class GMethods
 			try
 			{
 				imageURL = new URL(imageURLString);
-				//System.out.println(imageURLString);
+				/////System.out.println(imageURLString);
 			}
 			catch(Exception e)
 			{
-				System.out.println("Problem with the URL");				
+				///System.out.println("Problem with the URL");				
 			}
 			return new ImageIcon(imageURL,text);
 		}
@@ -620,15 +620,15 @@ public class GMethods
 		int noOfColumns=m.getColumnDimension();
 		if(print)
 		{
-			System.out.println("Printing matrix : " + name);
+			///System.out.println("Printing matrix : " + name);
 			
 			for(int i=0;i<noOfRows;i++)
 			{
 				for(int j=0;j<noOfColumns;j++)
 					System.out.print(m.get(i,j) + "  ");
-				System.out.println("");
+				///System.out.println("");
 			}
-			System.out.println("");
+			///System.out.println("");
 		}
 	}	
 	
@@ -643,9 +643,9 @@ public class GMethods
 			timeBeforeOperation = System.currentTimeMillis();
 		}
 		if(print)
-			System.out.println(str1 + " " + text + " : " + System.currentTimeMillis());
-		if(!isBefore)
-			System.out.println("The difference is : " + (System.currentTimeMillis() - timeBeforeOperation));
+			///System.out.println(str1 + " " + text + " : " + System.currentTimeMillis());
+		if(!isBefore);
+			///System.out.println("The difference is : " + (System.currentTimeMillis() - timeBeforeOperation));
 	}
 	
 	public static Point2D getMidPoint(Point2D p, Point2D q)

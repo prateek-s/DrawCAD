@@ -79,8 +79,9 @@ public abstract class ImpPoint extends GeometryElement
 	
 	public Point2D getM_point()
 	{
-		if(m_point==null)
-			System.out.println("m_point is null.. This is getM_point function of ImpPoint.java");
+		//if(m_point==null)
+		//	;
+		///System.out.println("m_point is null.. This is getM_point function of ImpPoint.java");
 		return m_point;
 	}
 
@@ -150,27 +151,27 @@ public abstract class ImpPoint extends GeometryElement
 						
 						if(((dist1 <= (m_size+seg.getSegStart().m_size)) && (dist2 <= (m_size+seg.getSegEnd().m_size))) ){
 							dv.setMovedPointSegment(seg);
-							System.out.println("Both points are equal");
+							///System.out.println("Both points are equal");
 						}
 						else{
 							dv.setMovedPointSegment(null);
-							System.out.println("Both points are not equal");
+							///System.out.println("Both points are not equal");
 						}
 					/*	if(pt1.equals(m_point) && pt2.equals(m_point)){
 							//seg.removeAllConstraints();
 							
 							dv.setMovedPointSegment(seg);
-							System.out.println("Both points are equal");
+							///System.out.println("Both points are equal");
 						}
 						else{
 							dv.setMovedPointSegment(null);
-							System.out.println("Both points are not equal");
+							///System.out.println("Both points are not equal");
 						}*/
 						/*if(pt1.equals(m_point)){
-							System.out.println("Start point of segment is equal");
+							///System.out.println("Start point of segment is equal");
 						}
 						if(pt2.equals(m_point)){
-							System.out.println("End point of segment is equal");
+							///System.out.println("End point of segment is equal");
 						}
 					}*/
 				}
@@ -316,13 +317,13 @@ public abstract class ImpPoint extends GeometryElement
 				}
 			}
 		}
-//		System.out.println(closePt);
+//		///System.out.println(closePt);
 		return closePt;
 	}
 	
 	public String toString()
 	{
-//		System.out.println("ImpPoint.toString()");
+//		///System.out.println("ImpPoint.toString()");
 		return getM_label()+" "+getM_point() + ": "+m_parent ;
 	}
 	

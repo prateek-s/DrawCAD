@@ -88,17 +88,17 @@ public class NewtonMethod
 		// get the Jacobian matrix as the string of Partial derivaties of wrt all the variables.
 		Vector nodesJTemp=getNodesJ(conVector, points, fixedPoints);
 
-		System.out.println("\n\n******************************************** Solve function called... ********************************************\n");
+		///System.out.println("\n\n******************************************** Solve function called... ********************************************\n");
 
-		for(int pq=0;pq<no_of_rows;pq++)
-			System.out.println("Equation no. " + (pq+1) + "  " +((Node)nodesErrTemp.elementAt(pq)).nString);
-		System.out.println("\nAnchor points : ");
-		for(int pq=0;pq<points.length;pq++)
-			System.out.println(points[pq].getM_strId() + " (" + points[pq].getM_point().getX() + "," + points[pq].getM_point().getY() + ")");
-		System.out.println("\nFixed points : ");
+		for(int pq=0;pq<no_of_rows;pq++);
+			///System.out.println("Equation no. " + (pq+1) + "  " +((Node)nodesErrTemp.elementAt(pq)).nString);
+		///System.out.println("\nAnchor points : ");
+		for(int pq=0;pq<points.length;pq++);
+			///System.out.println(points[pq].getM_strId() + " (" + points[pq].getM_point().getX() + "," + points[pq].getM_point().getY() + ")");
+		///System.out.println("\nFixed points : ");
 		for(int pq=0;pq<fixedPoints.size();pq++)
 			System.out.print( ((AnchorPoint)fixedPoints.elementAt(pq)).getM_strId() + "  (" + ((AnchorPoint)fixedPoints.elementAt(pq)).getM_point().getX() + "," + ((AnchorPoint)fixedPoints.elementAt(pq)).getM_point().getY() +")");
-		System.out.println("\nDebug count : " + debugCount + " ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		///System.out.println("\nDebug count : " + debugCount + " ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		debugCount++;
 				
 		MathEvaluator tempME = new MathEvaluator();
@@ -155,7 +155,7 @@ public class NewtonMethod
 		for (k = 0; ; k++)
 		{
 
-			System.out.println("\n\n!!!!!!!!!!!!!!!!!   Iteration no. : " + k + "   !!!!!!!!!!!!!!!!!");
+			///System.out.println("\n\n!!!!!!!!!!!!!!!!!   Iteration no. : " + k + "   !!!!!!!!!!!!!!!!!");
 			if(k > Prefs.getMinJacobianIterations() && revisedCriticalIndex==-1)
 			{
 				if(decreasingNorm>10)
@@ -163,7 +163,7 @@ public class NewtonMethod
 				else
 				{
 					solutionStatus=unsolvable;
-					System.out.println("-----------------------------Un solvable k > no. of iterations-----------------------------");
+					///System.out.println("-----------------------------Un solvable k > no. of iterations-----------------------------");
 					break;
 				}
 			}
@@ -239,11 +239,11 @@ public class NewtonMethod
 			System.out.print("\nvalues of X : ");
 			for(int zz=0;zz<no_of_columns;zz++)
 				System.out.print((int)X.get(zz,0)+" ");
-			System.out.println("");
+			///System.out.println("");
 			
 				
 			double d = b.normF();
-			System.out.println("Norm : " + d);
+			///System.out.println("Norm : " + d);
 			if(d==java.lang.Double.NaN)
 			{
 				solutionStatus=unsolvable;
@@ -264,7 +264,7 @@ public class NewtonMethod
 			{
 				// set the flag to false (GOOD condition)
 				solutionStatus=solved;
-				System.out.println("-----------------------------Solution found d < min norm " + Prefs.getMinAcceptableNorm() + "-----------------------------");
+				///System.out.println("-----------------------------Solution found d < min norm " + Prefs.getMinAcceptableNorm() + "-----------------------------");
 				break;
 			}
 			
@@ -333,10 +333,10 @@ public class NewtonMethod
 			System.out.print("Singular values : ");
 			for(int lk=0;lk<s.getRowDimension();lk++)
 					System.out.print((lk+1) + ":" + s.get(lk,lk) + "   ");
-			System.out.println("");
+			///System.out.println("");
 			
 	
-//			System.out.println(" Prev norm. : " + prevNorm + "   Curr. norm : " + d);
+//			///System.out.println(" Prev norm. : " + prevNorm + "   Curr. norm : " + d);
 			
 			//Reinitialize the same norm count
 			if(prevNorm - d > (prevNorm / 20))
@@ -347,14 +347,14 @@ public class NewtonMethod
 			if( prevNorm - d < (prevNorm / 100) )
 			{
 				sameNormCount++;
-				System.out.println("Same norm count : " + sameNormCount);
+				///System.out.println("Same norm count : " + sameNormCount);
 				if(sameNormCount==3)
 				{
 					//See if all constraints are solved
 					if(allConstraintsSolved(conVector,b,fixedPoints,X))
 					{
 						solutionStatus=solved;
-						System.out.println("-----------------------------Solution found with same norm thing-----------------------------");
+						///System.out.println("-----------------------------Solution found with same norm thing-----------------------------");
 						break;
 					}
 					else
@@ -374,26 +374,26 @@ public class NewtonMethod
 							if(critical!=l)
 							{
 								revisedCriticalIndex = l;
-								System.out.println("\n\nRevising the critical index : " + revisedCriticalIndex + "\n\n");
+								///System.out.println("\n\nRevising the critical index : " + revisedCriticalIndex + "\n\n");
 							}
 							
 //							if(s.get(critical,critical) > 1)
 //							{
 //								revisedCriticalIndex=critical+1;
-//								System.out.println("\n\n\n\n\n\n Revising the critical index : " + revisedCriticalIndex);
+//								///System.out.println("\n\n\n\n\n\n Revising the critical index : " + revisedCriticalIndex);
 //							}
 							
 							else
 							{
 								solutionStatus = unsolvable;
-								System.out.println("Critical index couldn't be revised");
+								///System.out.println("Critical index couldn't be revised");
 							}
 						}
 						else
 							solutionStatus=unsolvable;
 						if(solutionStatus == unsolvable)
 						{
-//							System.out.println("-----------------------------Called for dropping constraints-----------------------------");
+//							///System.out.println("-----------------------------Called for dropping constraints-----------------------------");
 							break;
 						}
 					}
@@ -405,7 +405,7 @@ public class NewtonMethod
 			{
 				if(allConstraintsSolved(conVector,b,fixedPoints,X))
 				{
-					System.out.println("\n\n!!!!!!!!!!              Decrease in norm was less than 20 %. So, I checked whether all constraints are solved. Ane yes... they are               !!!!!!!!!!\n\n");
+					///System.out.println("\n\n!!!!!!!!!!              Decrease in norm was less than 20 %. So, I checked whether all constraints are solved. Ane yes... they are               !!!!!!!!!!\n\n");
 					solutionStatus = solved;
 					break;
 				}
@@ -434,7 +434,7 @@ public class NewtonMethod
 			if(critical < revisedCriticalIndex && revisedCriticalIndex <= s.getRowDimension() )
 				critical = revisedCriticalIndex;
 				
-			System.out.println("\n\n\nCritical Index : " + critical);
+			///System.out.println("\n\n\nCritical Index : " + critical);
 
 			for(int l=0;l<critical;l++)
 				if(s.get(l,l)!=0 && s.get(l,l)>0.001) // If value is greater than 0.001 then only take its reciprocal else don't take it.
@@ -474,7 +474,7 @@ public class NewtonMethod
 			System.out.print("Change in values : ");
 			for(int lk=0;lk<X.getRowDimension();lk++)
 				System.out.print(dx.get(lk,0) + "  ");
-			System.out.println("");
+			///System.out.println("");
 			
 			double divideRatio = 1;
 /*			if(debugCount==3 )//&& revisedCriticalIndex == -1)
@@ -495,7 +495,7 @@ public class NewtonMethod
 		}
 
 		//debug
-//		System.out.println("\n\n\n\n\n\n\n\nText to be written to the file : " + textForFile);
+//		///System.out.println("\n\n\n\n\n\n\n\nText to be written to the file : " + textForFile);
 		try
 		{
 			FileWriter fstream = new FileWriter("debugOutput.txt");
@@ -534,11 +534,11 @@ public class NewtonMethod
 		for(int i=0;i<size;i++)
 		{
 			Constraint c = (Constraint)conVector.get(i);
-			System.out.println(c.toString());
+			///System.out.println(c.toString());
 			c.isConstraintSolved();
 			if( c.isPromoted() && !c.isConstraintSolved() )
 			{
-				System.out.println("Failed...");
+				///System.out.println("Failed...");
 				suspectedPromotedConstraints.add(new Integer(i));
 			}
 		}
@@ -578,7 +578,7 @@ public class NewtonMethod
 		if(v1==0)
 			return true;
 		double ratio=Math.log(v2);
-//		System.out.println("Values : "+ v1 + "  " + v2 + "  Ratio : " + ratio);
+//		///System.out.println("Values : "+ v1 + "  " + v2 + "  Ratio : " + ratio);
 		
 		//6-5-2008
 /*		if(ratio>3)
@@ -588,10 +588,10 @@ public class NewtonMethod
 		ratio = Math.pow(ratio,powerForRatio);
 		if(v1<v2/ratio)
 		{
-//			System.out.println("Returning true");
+//			///System.out.println("Returning true");
 			return true;
 		}
-//		System.out.println("Returning false");
+//		///System.out.println("Returning false");
 		return false;
 	}
 		
@@ -610,7 +610,7 @@ public class NewtonMethod
 				a[j]=Math.abs(errorMatrix.get(currentCount,0));*/
 			if( !c.isConstraintSolved() )
 			{
-				System.out.println("Constraint failed : " + i);
+				///System.out.println("Constraint failed : " + i);
 				return false;
 			}
 		}
@@ -632,7 +632,7 @@ public class NewtonMethod
 		for (int j = 0; j < initialVariables.length; j++)
 		{
 			initialVariables[j].move4Constraints(initialPositions.get(2 * j, 0), initialPositions.get(2 * j + 1, 0));
-//			System.out.println(initialPositions.get(2*j,0) + "  " + initialPositions.get(2*j+1,0));
+//			///System.out.println(initialPositions.get(2*j,0) + "  " + initialPositions.get(2*j+1,0));
 		}
 
 

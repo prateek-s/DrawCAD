@@ -106,7 +106,7 @@ public class MarkerToConstraintConverter
 					case Marker.TYPE_ANGLE: 
 					{
 						MarkerAngle eMarker1 = (MarkerAngle)mark;
-						System.out.println("enter angle ");
+						///System.out.println("enter angle ");
 						// check if this marker has Text value set, if yes add a Relative angle constraint
 						if(eMarker1.getM_text() != null)
 						{
@@ -487,7 +487,7 @@ public class MarkerToConstraintConverter
 							marker=new MarkerDistance(new Segment[] { (Segment)selectedLines.get(0), (Segment)selectedLines.get(1)}, new AnchorPoint[]{}, text,Marker.TYPE_LINE_DISTANCE);
 						}
 						else if(selectedCircularCurves.size() == 2){
-							System.out.println("Curve Distance");
+							///System.out.println("Curve Distance");
 							//Double.parseDouble(text.getM_text());
 							//marker=new MarkerDistance(new Segment[] { (Segment)selectedCircularCurves.get(0), (Segment)selectedCircularCurves.get(1)}, new AnchorPoint[]{}, text,Marker.TYPE_CURVE_DISTANCE);
 						}
