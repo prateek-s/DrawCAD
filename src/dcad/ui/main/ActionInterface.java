@@ -1156,6 +1156,7 @@ public void updateConstraints(Vector constraints, int catagory)
 	}
 }
 
+/**************************** SNAP *********************************/
 
 
 
@@ -1220,6 +1221,73 @@ public void removeConstraints(GeometryElement gEle)
 		}
 	}
 }
+
+public Vector  A_addConstraintsForMarkers() 
+{
+	Vector newConstraints = new Vector();
+
+	// check if new markers are added.
+	if ((m_drawData.isUnusedMarker()) || (m_drawData.isUnusedText()))
+	{
+		//setM_mousePressedLogged(true);
+		// dont show the last stroke
+		
+		///m_showLastStroke = false;
+
+		// recognize markers
+		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+		MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
+		MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
+
+		// check if there are new markers related to the text objects
+		Vector newMarkers = converter.recognizeTextAsMarkers(m_drawData.getM_markers(),
+				m_drawData.getM_textElements(), m_drawData.getAllSegments(),
+				m_selectedElements, m_highlightedElements);
+
+		// add the newly obtained markers, if any
+		m_drawData.getM_markers().addAll(newMarkers);
+
+		// recognize the set of markers as constraints
+		Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
+				m_drawData.getM_textElements(), m_drawData.getAllSegments());
+
+		if (constraints != null && constraints.size() > 0)
+		{
+			//Cursor prevCursorType = this.getCursor();
+		//	this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			
+			
+			if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+			{
+				m_drawData.addConstraints(constraints);
+				newConstraints.addAll(constraints);
+				//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+				return newConstraints ;
+			//	snapIPsAndRecalculateConstraints(newConstraints);
+			}
+			//*************************************************************
+			else
+			{
+			//	JOptionPane.showMessageDialog(this,"The constraint could not be added");
+				updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
+				//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
+				return newConstraints ;
+			}
+
+		///	resizePanel();
+		///	repaint();
+		///	this.setCursor(prevCursorType);
+
+//			snapIPsAndRecalculateConstraints();
+		}
+
+	}
+return null;
+
+}
+
+
+
 
 /************************* END CONSTRAINTS ********************/
 

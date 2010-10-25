@@ -17,7 +17,8 @@ public class DrawCAD{
 	 * Speed and Curvature scaling factors to a DrawCAD.properties file
 	 * @author Sunil Kumar
 	 */
-	public void setDrawCADProperties() throws IOException{
+	public void setDrawCADProperties() throws IOException
+	{
 		    BufferedReader reader = null;
 		    PrintWriter writer = null;
 		    String absPath = System.getProperty("user.dir");
