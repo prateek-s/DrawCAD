@@ -495,30 +495,65 @@ return 1;
 
 public int A_change_Seg_property(Segment seg,String type, String val)
 {
-Text t = new Text(val) ;
-if(type=="angle") {
-if(seg instanceof SegLine) {
-	MarkerLineAngle marker = new MarkerLineAngle((SegLine)seg, t);
-}
-else if (seg instanceof SegCircleCurve) {
-	MarkerCircleArcAngle marker = new MarkerCircleArcAngle((SegCircleCurve)seg, t);
-
-}
-}
-
-if (type=="length") {
-	if(seg instanceof SegLine) {
-	MarkerLength marker = new MarkerLength((SegLine)seg, t);
+	
+	RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+	MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
+	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
+	
+	Text t = new Text(val) ; 
+	Marker  marker = null;
+	if(type=="angle") {
+		if(seg instanceof SegLine) {
+			 marker = new MarkerLineAngle((SegLine)seg, t);
+		}
+		else if (seg instanceof SegCircleCurve) {
+			 marker = new MarkerCircleArcAngle((SegCircleCurve)seg, t);
+		}
 	}
-}
-if (type=="radius") {
-	MarkerRadius marker = new MarkerRadius((SegCircleCurve)seg, t);
 
+	if (type=="length") {
+		if(seg instanceof SegLine) {
+			 marker = new MarkerLength((SegLine)seg, t);
+		}
+	}
+	if (type=="radius") {
+		 marker = new MarkerRadius((SegCircleCurve)seg, t);
+	}
+	
+	if(marker==null) return -1 ;
+	
+	Vector newMarkers = new Vector() ; newMarkers.add(marker) ;
+	
+	m_drawData.getM_markers().add(marker) ;
+
+	// recognize the set of markers as constraints
+	Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
+			m_drawData.getM_textElements(), m_drawData.getAllSegments());
+
+	if (constraints != null && constraints.size() > 0)
+	{
+		
+	
+		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+		{
+			m_drawData.addConstraints(constraints);
+			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+			Vector c = new Vector() ;
+			A_snapIPsAndRecalculateConstraints(c);
+		}
+		//*************************************************************
+		else
+		{
+			updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
+			//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
+		}
+	}
+
+	
+	return 1;
 }
 
 
-return 1;
-}
 
 public int A_clear() 
 {

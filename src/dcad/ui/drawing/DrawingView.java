@@ -101,26 +101,37 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	public ProcessManager m_processManager;
 	/**
-	 * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily)
+	 * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily).
+	 * Action interface's data is used.
 	 */
 	private DrawingData m_drawData;
 
+	/**
+	 * Current stroke being drawn, recently drawn stroke.
+	 */
 	private Stroke m_currStroke;
 
 	private Point m_prevPt;
 
+	/**
+	 * Current mouse position, updated by mouse methods
+	 */
 	private Point m_mousePos;
 
 	public Point getM_mousePos() {
 		return m_mousePos;
 	}
-
+	
 	public void setM_mousePos(Point mMousePos) {
 		m_mousePos = mMousePos;
 	}
 
+	// Skip to the next section which deals with the mouse listeners
 	/********************* UI STATE *********************/
 
+	/**
+	 * Length of the stroke being drawn
+	 */
 	private double m_length;
 
 	private Rectangle m_bBox;
@@ -305,6 +316,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		this.circArcWindow = circArcWindow;
 	}
 
+	/**
+	 * Initializes everything.
+	 */
 	public DrawingView()
 	{
 		super();
@@ -321,6 +335,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		//tb.setConvertActiveBit(false);
 	}
 
+	/**
+	 * Set up UI listeners, layout UI components etc.
+	 */
 	public void init()
 	{
 		A = new ActionInterface () ;
@@ -417,13 +434,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	public void mousePressed(MouseEvent e)
 	{
-	//	if(!isParameterWinBitSet()){
-			mousePressed(e.getButton(), e.getClickCount(), e.getX(), e.getY(), e.getWhen());
-	//	}
-	//	else{
-	//		 JOptionPane.showMessageDialog(MainWindow.getDv(),"Please close the properties window first");
-	//	}
-			
+		mousePressed(e.getButton(), e.getClickCount(), e.getX(), e.getY(), e.getWhen());
 	}
 
 	
