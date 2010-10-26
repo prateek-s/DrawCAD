@@ -307,20 +307,14 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 */
 
 	public void getProperties()
-	{
-		System.out.println("SETTING THE PROPERTIES, DISPLAYING............");
-
+	{	
 		if (seg_type == Segment.LINE) {
 			getLineProperties() ;
 		}
-
 		else if(seg_type==Segment.CIRCLE) {
 			//CIRCLE.
 			getCircleProperties() ;
 		} 
-
-		System.out.println(seg_properties.toString());
-
 		UIUpdate();
 	}	
 
@@ -355,7 +349,6 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 			for(int i =0; i < parsedCons.length ; i++)
 			{
-				System.out.println("PARSED CONSTRAINT           "+parsedCons[i]);
 
 				if((parsedCons[3].compareToIgnoreCase("Line") == 0) && (parsedCons[4].compareToIgnoreCase("length") == 0))
 				{

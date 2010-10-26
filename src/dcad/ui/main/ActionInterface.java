@@ -117,7 +117,6 @@ public class ActionInterface extends ActionHelper
 	adjustStroke(strk) ; //merges segments.
 
 	m_drawData.addStroke(strk) ;
-	
 	new_constraints = recognize_Constraints(strk);
 		 
 	return null ;
@@ -153,10 +152,10 @@ public class ActionInterface extends ActionHelper
 	if (strk.getM_type() == Stroke.TYPE_NORMAL)
 	    {
 		if ((constraints != null) && (constraints.size() > 0))
-		    {
+		{
 			if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
 			    ;
-		    }
+		 }
 		new_constraints = A_snapIPsAndRecalculateConstraints(constraints);
 		//GMethods.getHelpView().initialize(HelpView.afterDrawing);
 	    }
@@ -898,6 +897,16 @@ public Vector performSegRecycling(int x, int y)
 	return modConstraints;
 }
 
+public int post_anchor_ops(Vector constraints) 
+{
+	
+	if ((constraints != null) && (constraints.size() > 0)){
+		ConstraintSolver.addConstraintsAfterDrawing(constraints) ;
+		//	newConstraints.addAll(constraints);
+	}
+	A_snapIPsAndRecalculateConstraints(constraints);
+	return 1;
+}
 
 /************************** MERGE OPERATIONS ******************************/
 /**

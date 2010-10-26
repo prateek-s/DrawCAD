@@ -233,12 +233,12 @@ public class NewtonMethod
 			updateBFromNodesErr(me, nodesErr, b);
 			GMethods.printTime("Updation of nodes",false,true);
 			
-			System.out.print("\nError values : ");
-			for(int zz=0;zz<no_of_rows;zz++)
-				System.out.print((zz+1) +":" + (int)b.get(zz,0)+" ");
-			System.out.print("\nvalues of X : ");
-			for(int zz=0;zz<no_of_columns;zz++)
-				System.out.print((int)X.get(zz,0)+" ");
+			///System.out.print("\nError values : ");
+			///for(int zz=0;zz<no_of_rows;zz++)
+			///	System.out.print((zz+1) +":" + (int)b.get(zz,0)+" ");
+			///System.out.print("\nvalues of X : ");
+			///for(int zz=0;zz<no_of_columns;zz++)
+			///	System.out.print((int)X.get(zz,0)+" ");
 			///System.out.println("");
 			
 				
@@ -471,9 +471,9 @@ public class NewtonMethod
 			}
 			
 			// Update the new values for the variables in X
-			System.out.print("Change in values : ");
-			for(int lk=0;lk<X.getRowDimension();lk++)
-				System.out.print(dx.get(lk,0) + "  ");
+			///System.out.print("Change in values : ");
+			for(int lk=0;lk<X.getRowDimension();lk++) ;
+				///System.out.print(dx.get(lk,0) + "  ");
 			///System.out.println("");
 			
 			double divideRatio = 1;
@@ -486,8 +486,8 @@ public class NewtonMethod
 			//X.set(i, 0, X.get(i, 0) + (dx.get(i, 0) /2 ));
 
 			System.out.print("New values : ");
-			for(int lk=0;lk<X.getRowDimension();lk++)
-				System.out.print(X.get(lk,0) + "  ");
+			for(int lk=0;lk<X.getRowDimension();lk++) ;
+				///System.out.print(X.get(lk,0) + "  ");
 
 			
 			prevNorm = d;

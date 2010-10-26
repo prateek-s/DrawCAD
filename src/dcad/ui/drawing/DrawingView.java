@@ -436,7 +436,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	{
 		mousePressed(e.getButton(), e.getClickCount(), e.getX(), e.getY(), e.getWhen());
 	}
-
 	
 	public void mousePressed(int buttontype, int clickcount, int x, int y, long time)
 	{
@@ -444,50 +443,52 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		setM_button_type(buttontype);
 		if (buttontype == MouseEvent.BUTTON1)
 		{			
-		helpDrawView.selectRows(GConstants.LEFT_CLICK);
+			helpDrawView.selectRows(GConstants.LEFT_CLICK);
 			
 			if (clickcount == 1)
 			{
 				mouseButton1Pressed(x, y, time);
 			}
 		}
-		
 		else if (buttontype == MouseEvent.BUTTON2) 
 		{
-			// 04-10-09 to highlight rows in HELP table
-		if(A.m_highlightedElements.size() != 0 ) {
-			helpDrawView.selectRows(GConstants.MIDDLE_CLICK);
-			}
-		
+			if(A.m_highlightedElements.size() != 0 ) {
+				helpDrawView.selectRows(GConstants.MIDDLE_CLICK);
+				}
 			mouseButton2Pressed(x, y);
 		}
-		
 		else if (buttontype == MouseEvent.BUTTON3) 
 		{
-			// 04-10-09 to highlight rows in HELP table
-			if(A.m_highlightedElements.size() != 0 ) {
+			//highlight rows in HELP table
+			if(A.m_highlightedElements.size() != 0 ) 
+			{
 				if(m_keyEventCode == KeyEvent.VK_SHIFT)
 				{
 				// SHIFT+RIGHT-CLICK => Separate anchor points.
 					if(A.m_highlightedElements.size() == 1) 
 					{
 						GeometryElement ge = (GeometryElement) A.m_highlightedElements.get(0);
-						if(ge instanceof ImpPoint){
+						if(ge instanceof ImpPoint)
+						{
 							ImpPoint ip = (ImpPoint)ge;
-							if(ip.getAllParents().size() > 1){
+							if(ip.getAllParents().size() > 1)
+							{
 								helpDrawView.unselectRows();
 								helpDrawView.selectRow(5);
 							}
 						}
 					}
 				}
-				else{
+				else
+				{ 	
 					helpDrawView.selectRows(GConstants.RIGHT_CLICK);
 				}
 			}
-			
+			//PLAIN right-click, nothing highlighted or anything
 			mouseButton3Pressed(x, y);
 		}
+		
+		// Update the mouse position AFTER the complete event has been processed. 
 		m_mousePos.x = x;
 		m_mousePos.y = y;
 	}
@@ -514,6 +515,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
 			/**
 			 * Look for markers and apply the constraints that they can enforce.
+			 * This is not needed here, really.
 			 */
 			addConstraintsForMarkers();
 		}
@@ -538,7 +540,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			UI_log(getMethod()+"NEW STROKE BEGIN") ;
 			/**
 			 * @UI: Left-button press
-			 * @Action: Beginning of a stroke. Paint stroke on screen-++-
+			 * @Action: Beginning of a stroke. Paint stroke on screen
 			 * DrawingState: Segmentation and constraints added/modified
 			 */
 			setM_trackFlag(true);
@@ -549,9 +551,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			paint_point(pt) ;
 			addPointToStroke(m_currStroke,pt, time) ;
 			
-		//	track(x, y, time) ;
 			clearSelection() ;
-		} else 
+		}
+		else 
 		{
 			if (m_keyEventCode == KeyEvent.VK_CONTROL)
 			{
@@ -574,11 +576,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					 */
 					Vector constraints = A.performSegRecycling(x, y);
 					repaint() ;
-					if ((constraints != null) && (constraints.size() > 0)){
-						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
-							newConstraints.addAll(constraints);
-					}
-					snapIPsAndRecalculateConstraints(newConstraints);
+					A.post_anchor_ops(constraints) ;
 					repaint() ;
 				}
 			} 
@@ -608,23 +606,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// Note that selected elements may or may not be connected.
 		if (A.m_highlightedElements.size() > 0)
 		{
-			// added on 08-05-10
-			// to put highlighted element if it is a line in a segment 
-//			if(A.m_highlightedElements.size() == 1)
-//			{
-//				///System.out.println("Element Selected : " + A.m_highlightedElements.get(0).getClass());
-//				String parsedCons[];
-//				
-//				parsedCons = A.m_highlightedElements.get(0).getClass().toString().split("[ ]+");
-//				
-//				if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
-//				{
-//					///System.out.println("Equal");
-//					Segment segm = (Segment)A.m_highlightedElements.get(0);
-//				}
-//			}
-			//commented out because it seems there is no use for it
-			//***************************************************
 			if ((m_keyEventCode == KeyEvent.VK_SHIFT))
 			{
 				/**
@@ -964,13 +945,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 			////////////////////////////////////////
 			
-			Iterator iter = A.m_highlightedElements.iterator();
-			while (iter.hasNext()){
-				GeometryElement element = (GeometryElement) iter.next();
-				// select the element if its enabled
+			for (Object ele: A.m_highlightedElements) {
+				if(ele==null) break; 
+				GeometryElement element = (GeometryElement) ele ;
 				element.setHighlighted(true);
 				label += element.getM_label() + "  ";
 			}
+			
 			repaint();
 		}
 		/*else{
@@ -1613,10 +1594,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			Vector elementsToMove = new Vector();
 
 			// find all elements to move
-			Iterator iter = A.m_highlightedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement element = (GeometryElement) iter.next();
+			for (Object ele : A.m_highlightedElements) {
+				if (ele == null) break ;
+				GeometryElement element = (GeometryElement) ele ;				
 				if (!element.isFixed())
 				{
 					if (!(elementsToMove.contains(element)))
