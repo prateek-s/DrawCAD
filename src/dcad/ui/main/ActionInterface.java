@@ -2,6 +2,7 @@ package dcad.ui.main;
 
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
@@ -1996,20 +1997,56 @@ public int clear_highlighted()
 	return size ;
 }
 
-public int Highlight(Point m_mousePos) 
+/**
+ * 
+ * @param m_mousePos
+ * @param type: what modifier key etc has been pressed, etc
+ * @return
+ */
+public int Highlight(Point m_mousePos, int type) 
 {
-	for (GeometryElement ele: m_highlightedElements) {
-		if(ele==null) {
-			break ;
-		}
+	int repaint = 0 ;
+	switch(type) {
+	case 0 :
+	{	
+		for (GeometryElement ele: m_highlightedElements) {
+			if(ele==null) {
+				break ;
+			}
 
-		if (!ele.containsPt(m_mousePos))
+			if (!ele.containsPt(m_mousePos))
+			{		
+				ele.setHighlighted(false);
+				m_highlightedElements.remove(ele) ;
+				++repaint ;
+			}
+		}	
+		return repaint ;
+	}
+	
+	case KeyEvent.VK_SHIFT:
+	{
+		Stroke lastStroke = m_drawData.getLastStroke(true);
+		if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
+			addHighLightedElement(lastStroke);
+
+		else
 		{
-			repaintReq = true;
-			ele.setHighlighted(false);
-			iter.remove();
-		}
-	}	
+			Vector aps = isPtOnAnyAnchorPoint(m_mousePos);
+
+			if ((aps != null) && (aps.size() > 0))
+				addHighlightedElements(aps);
+			else
+			{
+				Vector gEles = isPtOnGeometryElement(m_mousePos);
+				if (gEles != null)
+					addHighlightedElements(gEles);
+			}
+		}	
+	}
+	
+	} // SWITCH
+	return 0;
 }
 
 public int merge_selected_highlighted()

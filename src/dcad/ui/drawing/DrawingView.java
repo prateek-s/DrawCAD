@@ -409,8 +409,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		setM_button_type(buttontype);
 		if (buttontype == MouseEvent.BUTTON1)
 		{			
-			helpDrawView.selectRows(GConstants.LEFT_CLICK);
-			
+			helpDrawView.selectRows(GConstants.LEFT_CLICK);	
 			if (clickcount == 1)
 			{
 				mouseButton1Pressed(x, y, time);
@@ -780,26 +779,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 		} //end outer-if
 
-		if (A.m_highlightedElements.size() > 0)
-		{///System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
-
-			boolean repaintReq = false;
-			Iterator iter = A.m_highlightedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement ele = (GeometryElement) iter.next();
-				if(ele==null) {
-					break ;
-				}
-
-				if (!ele.containsPt(m_mousePos))
-				{
-					repaintReq = true;
-					ele.setHighlighted(false);
-					iter.remove();
-				}
-			}
-			if (!repaintReq)
+		if (A.something_highlighted())
+		{
+			int repaintReq = A.Highlight(m_mousePos,0);
+			if (repaintReq==0)
 				// mouse is still on the same object.. no need to do anything.
 				return;
 			else{
@@ -812,26 +795,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		{
 			if (m_showLastStroke)
 			{
-				Stroke lastStroke = m_drawData.getLastStroke(true);
-				if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
-					A.addHighLightedElement(lastStroke);
-
-				else
-				{
-					Vector aps = A.isPtOnAnyAnchorPoint(m_mousePos);
-
-					if ((aps != null) && (aps.size() > 0))
-						A.addHighlightedElements(aps);
-					else
-					{
-						Vector gEles = A.isPtOnGeometryElement(m_mousePos);
-						if (gEles != null)
-							A.addHighlightedElements(gEles);
-					}
-				}
+				A.Highlight(m_mousePos, m_keyEventCode) ;
 			}
-		} 
-		else{
+		}
+		
+		else
+		{
 			// check if the mouse is close to any other geometry element
 			Vector gEles = A.isPtOnGeometryElement(m_mousePos);
 
@@ -862,9 +831,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 		}
 
-
 		String label = "";
-		if (A.m_highlightedElements.size() > 0)
+		if (A.something_highlighted())
 		{
 			// 04-10-09 to highlight rows in HELP table
 			GeometryElement g1 = (GeometryElement)A.m_highlightedElements.get(0);
@@ -904,24 +872,21 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					helpDrawView.selectRows(GConstants.ADD_AP);
 				}
 			}
-			////////////////////////////////////////
-
+	
 			for (Object ele: A.m_highlightedElements) {
 				if(ele==null) break; 
 				GeometryElement element = (GeometryElement) ele ;
 				element.setHighlighted(true);
 				label += element.getM_label() + "  ";
 			}
-
 			repaint();
 		}
-		/*else{
-			helpDrawView.unselectRows();
-		}*/
+
 		updateStatusBar(x, y, "( Move )", label);
 
-
 	}
+	
+	/***********************************************************************/
 	
 	public void setM_button_type(int m_button_type) {
 		this.m_button_type = m_button_type;
