@@ -97,7 +97,7 @@ public class ActionInterface extends ActionHelper
     
     public ProcessManager m_processManager = ProcessManager.getInstance(); 
 
-    public Vector m_highlightedElements = new Vector()  ;
+    public Vector<GeometryElement> m_highlightedElements = new Vector()  ;
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
@@ -1977,6 +1977,46 @@ public boolean smartMergeSelectedEleToHighLightedEle()
 	return intersect;
 }
 
+/******************** HIGH-LIGHT, SELECT **********************/
+
+public boolean something_highlighted()
+{
+	if (m_highlightedElements.size()>0) return true;
+	else return false ;
+}
+
+public int clear_highlighted()
+{
+	int size = m_highlightedElements.size() ;
+	for (Object ele : m_highlightedElements) {
+		GeometryElement element = (GeometryElement) ele ;
+		element.setHighlighted(false) ;
+	}
+	m_highlightedElements.clear() ;
+	return size ;
+}
+
+public int Highlight(Point m_mousePos) 
+{
+	for (GeometryElement ele: m_highlightedElements) {
+		if(ele==null) {
+			break ;
+		}
+
+		if (!ele.containsPt(m_mousePos))
+		{
+			repaintReq = true;
+			ele.setHighlighted(false);
+			iter.remove();
+		}
+	}	
+}
+
+public int merge_selected_highlighted()
+{
+	m_highlightedElements.addAll(m_selectedElements) ;
+	return m_selectedElements.size() ;
+}
 
 
 /********************* END OF CLASS ***********************************/

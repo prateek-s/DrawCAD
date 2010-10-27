@@ -220,17 +220,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		DrawingView.strokeConvertedTo = strokeConvertedTo;
 	}
 	
-	/** to check whether a new window to set parameters is open or not */
-	private static boolean parameterWinBitSet = false;
-	
-	public boolean isParameterWinBitSet() {
-		return parameterWinBitSet;
-	}
-
-	public void setParameterWinBitSet(boolean parameterWinBitSet) {
-		DrawingView.parameterWinBitSet = parameterWinBitSet;
-	}
-
 	// 22-02-10 
 	private boolean isEnterKeyClicked = false;
 	public boolean isEnterKeyClicked() {
@@ -293,28 +282,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 	
 	Point pt1 = null;  //needed for collinearity
-	Point pt2 = null;
-	
-	// for line parameter window
-	LineParameterWindow lineWindow = null;
-	public LineParameterWindow getLineWindow() {
-		return lineWindow;
-	}
-
-	public void setLineWindow(LineParameterWindow lineWindow) {
-		this.lineWindow = lineWindow;
-	}
-
-	// for circular arc parameter window
-	CircularArcParameterWindow circArcWindow = null;
-	
-	public CircularArcParameterWindow getCircArcWindow() {
-		return circArcWindow;
-	}
-
-	public void setCircArcWindow(CircularArcParameterWindow circArcWindow) {
-		this.circArcWindow = circArcWindow;
-	}
+	Point pt2 = null;  //needed for collinearity
 
 	/**
 	 * Initializes everything.
@@ -331,8 +299,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if(tb==null){
 			tb = MainWindow.getM_toolBar();
 		}
-		parameterWinBitSet = false;
-		//tb.setConvertActiveBit(false);
 	}
 
 	/**
@@ -464,7 +430,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				if(m_keyEventCode == KeyEvent.VK_SHIFT)
 				{
-				// SHIFT+RIGHT-CLICK => Separate anchor points.
+				// SHIFT+RIGHT-CLICK => Separate anchor points. 
+					// Need something highlighted for that first.
 					if(A.m_highlightedElements.size() == 1) 
 					{
 						GeometryElement ge = (GeometryElement) A.m_highlightedElements.get(0);
@@ -484,7 +451,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					helpDrawView.selectRows(GConstants.RIGHT_CLICK);
 				}
 			}
-			//PLAIN right-click, nothing highlighted or anything
+			
 			mouseButton3Pressed(x, y);
 		}
 		
@@ -649,13 +616,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		setMousePointerLocation(pt1) ;
 
 		//added on 19-04-10 for showing GUI to set properties of an element
-		if(!isParameterWinBitSet()) //not already open
-		{
-			///System.out.println("Enter show elements properties ");
-			showElementPropertiesWindow(x, y, buttonType);
-		}
+
+		///System.out.println("Enter show elements properties ");
+		showElementPropertiesWindow(x, y, buttonType);
+
 		
-	//*******************************************	
 		//If the user is clicking in the blank area of the screen, do nothing. Don't show the point
 		//If user clicks twice at the same place, 2nd time, m_currStroke is set to null. So, the condition checking it for null is required 
 		if( m_keyEventCode == -1 && m_currStroke!=null && m_currStroke.getLength() < Prefs.getAnchorPtSize() )
@@ -771,13 +736,18 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	
 	public void mouseMoved(int x, int y)
-	{		
-		if(A.m_highlightedElements.size() == 0 && A.m_selectedElements.size()==0)
+	{	
+		m_mousePos.x = x;
+		m_mousePos.y = y;
+		
+		if(!A.something_highlighted())
 		{
-			if(m_drawData.isUnusedMarker() ){
-				Vector marker = m_drawData.getUnusedMarkers();
+			//highlight help for different markers.
+			if(m_drawData.isUnusedMarker())
+			{
+				Vector markers = m_drawData.getUnusedMarkers();
 				
-				Marker mark = (Marker)(marker.get(marker.size()-1));
+				Marker mark = (Marker)(markers.get(markers.size()-1));
 				
 				if(mark instanceof MarkerAngle){
 					helpDrawView.selectRows(GConstants.MARKER_ANGLE);
@@ -809,41 +779,35 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			helpDrawView.selectRows(GConstants.LEFT_CLICK);
 			}
 		} //end outer-if
-		
-		m_mousePos.x = x;
-		m_mousePos.y = y;
-		
-		if(!isParameterWinBitSet())
-		{
-			if (A.m_highlightedElements.size() > 0)
-			{///System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
 
-				boolean repaintReq = false;
-				Iterator iter = A.m_highlightedElements.iterator();
-				while (iter.hasNext())
-				{
-					GeometryElement ele = (GeometryElement) iter.next();
-					if(ele==null) {
-			
-						break ;
-					}
+		if (A.m_highlightedElements.size() > 0)
+		{///System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
 
-					if (!ele.containsPt(m_mousePos))
-					{
-						repaintReq = true;
-						ele.setHighlighted(false);
-						iter.remove();
-					}
+			boolean repaintReq = false;
+			Iterator iter = A.m_highlightedElements.iterator();
+			while (iter.hasNext())
+			{
+				GeometryElement ele = (GeometryElement) iter.next();
+				if(ele==null) {
+					break ;
 				}
-				if (!repaintReq)
-					// mouse is still on the same object.. no need to do anything.
-					return;
-				else{
-					//addToUndoVector();
-					repaint();
+
+				if (!ele.containsPt(m_mousePos))
+				{
+					repaintReq = true;
+					ele.setHighlighted(false);
+					iter.remove();
 				}
 			}
-			
+			if (!repaintReq)
+				// mouse is still on the same object.. no need to do anything.
+				return;
+			else{
+				//addToUndoVector();
+				repaint();
+			}
+		}
+
 		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT))
 		{
 			if (m_showLastStroke)
@@ -851,11 +815,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				Stroke lastStroke = m_drawData.getLastStroke(true);
 				if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
 					A.addHighLightedElement(lastStroke);
-				
+
 				else
 				{
 					Vector aps = A.isPtOnAnyAnchorPoint(m_mousePos);
-					
+
 					if ((aps != null) && (aps.size() > 0))
 						A.addHighlightedElements(aps);
 					else
@@ -870,7 +834,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		else{
 			// check if the mouse is close to any other geometry element
 			Vector gEles = A.isPtOnGeometryElement(m_mousePos);
-			
+
 			if (m_keyEventCode == KeyEvent.VK_CONTROL)
 			{
 				for (int i = 0; i < gEles.size(); i++)
@@ -879,18 +843,15 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					{
 						SegLine seg = (SegLine) gEles.get(i);
 						Vector equalRelativeLengthConstraints = seg
-								.getConstraintByType(EqualRelLengthConstraint.class);
+						.getConstraintByType(EqualRelLengthConstraint.class);
 						for (int j = 0; j < equalRelativeLengthConstraints.size(); j++)
 						{
 							EqualRelLengthConstraint eq = (EqualRelLengthConstraint) equalRelativeLengthConstraints
-									.get(j);
+							.get(j);
 							if (eq.getM_seg1() == seg)
 								A.addHighLightedElement(eq.getM_seg2());
-							// A.m_highlightedElements.add(eq.getM_seg2());
 							else
-								A.addHighLightedElement(eq.getM_seg1());
-							// A.m_highlightedElements.add(eq.getM_seg1());
-
+								A.addHighLightedElement(eq.getM_seg1());	
 						}
 					}
 				}
@@ -901,7 +862,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			}
 		}
 
-		
+
 		String label = "";
 		if (A.m_highlightedElements.size() > 0)
 		{
@@ -924,11 +885,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					ImpPoint ip = (ImpPoint)g1;
 					if(m_keyEventCode == KeyEvent.VK_SHIFT){
 						helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT); // unselect row 7
-							if(ip.getAllParents().size() < 2){
-								//helpDrawView.unselectRows();
-								helpDrawView.unselectRow(5);
-							}
-							helpDrawView.unselectRow(4);
+						if(ip.getAllParents().size() < 2){
+							//helpDrawView.unselectRows();
+							helpDrawView.unselectRow(5);
+						}
+						helpDrawView.unselectRow(4);
 					}
 					else if(m_keyEventCode == KeyEvent.VK_CONTROL){
 						helpDrawView.unselectRow(3); // unselect row 4
@@ -944,25 +905,22 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				}
 			}
 			////////////////////////////////////////
-			
+
 			for (Object ele: A.m_highlightedElements) {
 				if(ele==null) break; 
 				GeometryElement element = (GeometryElement) ele ;
 				element.setHighlighted(true);
 				label += element.getM_label() + "  ";
 			}
-			
+
 			repaint();
 		}
 		/*else{
 			helpDrawView.unselectRows();
 		}*/
 		updateStatusBar(x, y, "( Move )", label);
-		}
-		else{
-		//	///System.out.println("mouse moved Parameter window bit set");
-		}
-			
+
+
 	}
 	
 	public void setM_button_type(int m_button_type) {
@@ -1584,8 +1542,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		UI_log(getMethod()) ;
 		boolean result = true ;
 		// check for collinearity while dragging the line
-		boolean are_collinear = checkForCollinearLines() ;
-		setM_AreLinesCollinear(are_collinear) ;  
+	//	boolean are_collinear = checkForCollinearLines() ;
+	//	setM_AreLinesCollinear(are_collinear) ;  
 		repaint() ;
 		
 		if (A.m_highlightedElements.size() > 0)
@@ -1599,8 +1557,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				GeometryElement element = (GeometryElement) ele ;				
 				if (!element.isFixed())
 				{
-					if (!(elementsToMove.contains(element)))
+					if (!(elementsToMove.contains(element))) {
 						elementsToMove.add(element);
+						System.out.println(element.toString());
+					}
+					
 				}
 			}
 
@@ -1633,7 +1594,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 public void UI_log(String s) 
 {
-	///System.out.println(s) ;
+	System.out.println(s) ;
 }
 
 

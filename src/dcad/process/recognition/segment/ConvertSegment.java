@@ -27,7 +27,12 @@ public class ConvertSegment {
 		}
 	}
 	
-	public void ConvertSelectedSegment(){
+	/**
+	 * Convert from line<-->arc. deprecated, do not use.
+	 *
+	 */
+	public void ConvertSelectedSegment()
+	{
 		// Get the selected geometric element
 		GeometryElement ge = (GeometryElement)dv.getSelectedElements().get(0);
 		
