@@ -3,9 +3,11 @@ package dcad.process.preprocess;
 import java.util.Iterator;
 import java.util.Vector;
 
+import dcad.Prefs;
 import dcad.model.geometry.PixelInfo;
 import dcad.model.geometry.SegmentPoint;
 import dcad.model.geometry.Stroke;
+import dcad.util.GConstants;
 
 public class PreProcessor
 {
@@ -35,7 +37,32 @@ public class PreProcessor
 	public Vector preProcess(Stroke theStroke)
 	{
 		// perform segmentation of the stroke to get the segment points/ breakpoints
-		Vector segmentPos = m_segmentor.performSegmentation(theStroke);
+		Vector segmentPos = m_segmentor.performSegmentation(theStroke,Prefs.getSegScheme());
+		//Vector segmentPos = m_segmentorNew.performSegmentation(theStroke);
+		
+		
+		// find the pixelInfo objects related to the segment point position
+		Vector segPts = new Vector();
+		Iterator iter = segmentPos.iterator();
+		while (iter.hasNext())
+		{
+			Integer anInt = (Integer) iter.next();
+			PixelInfo pixel = (PixelInfo) theStroke.getM_ptList().get(anInt.intValue());
+			
+			//CHINTAN
+			Vector tempV = new Vector();
+			tempV.add(theStroke);
+			segPts.add(new SegmentPoint(pixel, tempV));
+		}
+		
+		return segPts;
+//		return segmentPos;
+	}
+	
+	public Vector temp_preProcess(Stroke theStroke)
+	{
+		// perform segmentation of the stroke to get the segment points/ breakpoints
+		Vector segmentPos = m_segmentor.performSegmentation(theStroke, GConstants.SEG_SCHEME_ALL);
 		//Vector segmentPos = m_segmentorNew.performSegmentation(theStroke);
 		
 		

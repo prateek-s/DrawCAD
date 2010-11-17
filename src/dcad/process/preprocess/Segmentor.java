@@ -242,15 +242,15 @@ public class Segmentor
 	
 	
 	
-	public Vector performSegmentation(Stroke theStroke)
+	public Vector performSegmentation(Stroke theStroke,int segScheme)
 	{
 		
 		// get information about speed and direction (and hence curvature data) for the stroke.
 		setPixelInfo(theStroke);
 		/* this vector stores vectors of segment points detected through various methods */
 		Vector segVectorList = new Vector();
-		int segScheme=0;
-		switch (segScheme = Prefs.getSegScheme())
+
+		switch (segScheme)
 		{
 		//PRATEEK: Is this the place where ALL the segmentation decisions are made??
 		case GConstants.SEG_SCHEME_ALL:
@@ -286,49 +286,11 @@ public class Segmentor
 			segVectorList.add(getCurvatureSeg(theStroke));
 			break;
 		}
-/*We now have a list of segment-points to work with*/
-		// get the common segment points
-		///System.out.println("Modified Hybrid fits");
-		Vector selectedSegPos;
-	/*
-		selectedSegPos = returnRelevantVector(segVectorList);
-		
-		Vector ptList = theStroke.getM_ptList();
-		Collections.sort(selectedSegPos);
-		Iterator iter = selectedSegPos.iterator();
-		while (iter.hasNext())
-		{
-			 Integer index = (Integer) iter.next();
-			 PixelInfo pixel = (PixelInfo)ptList.get(index.intValue());
-			 ///System.out.println("Index: "+index+", "+pixel);
-		}*/
-		/*if(segScheme == 1 || segScheme == 3){
-			
-		}
-		else{*/
-		
-		selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
-		
-		
-		//selectedSegPos = combinationAlgorithm(theStroke);
-		//}
-//		Vector selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
 
-		// TODO: DONE: remove this code, This is just to print the common segments points
-	/*	///System.out.println("Combination algorithm");
-		Vector ptList = theStroke.getM_ptList();
-		Collections.sort(selectedSegPos);
-		Iterator iter = selectedSegPos.iterator();
-		while (iter.hasNext())
-		{
-			 Integer index = (Integer) iter.next();
-			 PixelInfo pixel = (PixelInfo)ptList.get(index.intValue());
-			 ///System.out.println("Index: "+index+", "+pixel);
-		}
-		
-		///System.out.println("\n\n");
-		*/
-		
+		Vector selectedSegPos;
+	
+		selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
+			
 		return selectedSegPos;
 	}
 
@@ -358,7 +320,7 @@ public class Segmentor
 	}
 	
 	
-	private Vector getSpeedSeg(Stroke theStroke)
+	public Vector getSpeedSeg(Stroke theStroke)
 	{
 		// detect segment points based of speed data
 		double[] speedData = theStroke.getSpeedData();
@@ -368,7 +330,7 @@ public class Segmentor
 	}
 
 	
-	private Vector getTimeSeg(Stroke theStroke)
+	public Vector getTimeSeg(Stroke theStroke)
 	{
 		// detect segment points based of time data
 		double[] timeData = theStroke.getTimeData();
@@ -378,7 +340,7 @@ public class Segmentor
 	}
 
 	
-	private Vector getCurvatureSeg(Stroke theStroke)
+	public Vector getCurvatureSeg(Stroke theStroke)
 	{
 		// detect segment points based of curvature data
 		double[] curvatureData = theStroke.getCurvatureData();
@@ -392,7 +354,7 @@ public class Segmentor
 	 * @param theStroke
 	 * @return
 	 */
-	private Vector detectCommonSegPt(Vector segVL, Stroke theStroke)
+	public Vector detectCommonSegPt(Vector segVL, Stroke theStroke)
 	{
 		
 		int len = theStroke.getM_ptList().size();

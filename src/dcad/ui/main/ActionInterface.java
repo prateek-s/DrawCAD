@@ -1122,16 +1122,11 @@ public Vector<Segment> recognizeSegments(Stroke theStroke)
 	try
 	{
 		SegmentRecognizer segmentRecog = recogMan.getSegmentRecogMan().getSegmentRecognizer();
-		
-		Segments = theStroke.recognizeSegments(segmentRecog);
-
+		Segments = theStroke.recognizeSegments(segmentRecog,theStroke.getM_segPtList());
 	} catch (Exception e)
 	{
-		JOptionPane.showMessageDialog(null, "Error Occured in recognize segments : "
-				+ e.getMessage());
 		e.printStackTrace();
 	}
-	
 	return Segments ;
 	
 }

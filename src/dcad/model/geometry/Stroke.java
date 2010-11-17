@@ -187,7 +187,7 @@ public class Stroke extends GeometryElement
 	 * Recognizes all the segments of this stroke. 
 	 */
 	
-		public Vector<Segment> recognizeSegments(SegmentRecognizer segRecog) throws Exception
+		public Vector<Segment> recognizeSegments(SegmentRecognizer segRecog,Vector segptlist) throws Exception
 		{
 
 		deleteSegments();
@@ -196,7 +196,7 @@ public class Stroke extends GeometryElement
 		
 		// Stroke segmentation already performed.
 	
-		Iterator iter = m_segPtList.iterator();
+		Iterator iter = segptlist.iterator();
 
 		// get the first segment point. There will be atleast one point in every stroke (in the case of a point)
 		SegmentPoint start = null;
@@ -237,7 +237,56 @@ public class Stroke extends GeometryElement
  		
 	}
 
+		public Vector<Segment> temp_recognizeSegments(SegmentRecognizer segRecog,Vector segptlist) throws Exception
+		{
+		Vector<Segment> segments = new Vector() ;
+		
+		m_prevEnd = 0;
+		
+		// Stroke segmentation already performed.
 	
+		Iterator iter = segptlist.iterator();
+
+		// get the first segment point. There will be atleast one point in every stroke (in the case of a point)
+		SegmentPoint start = null;
+		if(iter.hasNext())
+		{
+			start = (SegmentPoint)iter.next();
+		}
+
+ 		if(start != null)
+		{
+			// check if there is only one segment point in the segment point list.
+			if(!iter.hasNext())
+			{
+				// only one point detected, The stroke is a point
+				segments.add(detectSeg(segRecog, start.getM_point(), start.getM_point()));
+				/////System.out.println("******** "+m_prevEnd);
+			}
+			else
+			{
+				// find segments. NOTE that segment points are repeated for the adjacent segments
+				while (iter.hasNext())
+				{
+					// get the index in the segmentPoint list.
+					SegmentPoint end = (SegmentPoint)iter.next();
+					
+					Segment seg = detectSeg(segRecog , start.getM_point(), end.getM_point());
+					segments.add(seg);
+					/////System.out.println("******** "+m_prevEnd);
+
+					// make pointB as the start of the new segment
+					start = end;
+				}
+			}
+		}
+
+	//	}
+ 		
+ 		return segments ;
+ 		
+	}
+		
 	
 	private Segment detectSeg(SegmentRecognizer segRecog, Point2D startPt, Point2D endPt) throws Exception
 	{

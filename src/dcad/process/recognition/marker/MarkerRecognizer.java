@@ -1,5 +1,7 @@
 package dcad.process.recognition.marker;
 
+import ij.Prefs;
+
 import java.awt.geom.Point2D;
 import java.util.Vector;
 
@@ -16,6 +18,13 @@ import dcad.model.marker.MarkerAngle;
 import dcad.model.marker.MarkerEquality;
 import dcad.model.marker.MarkerParallel;
 import dcad.model.marker.MarkerPerpendicular;
+import dcad.process.ProcessManager;
+import dcad.process.preprocess.PreProcessingManager;
+import dcad.process.preprocess.PreProcessor;
+import dcad.process.preprocess.Segmentor;
+import dcad.process.recognition.RecognitionManager;
+import dcad.process.recognition.segment.SegmentRecognizer;
+import dcad.util.GConstants;
 
 public class MarkerRecognizer
 {
@@ -27,13 +36,44 @@ public class MarkerRecognizer
 		if(m_markerRecog == null) m_markerRecog = new MarkerRecognizer();
 		return m_markerRecog;
 	}
-	
+	/**
+	 * Check if the stroke is actually a marker
+	 * @param stroke
+	 * @return
+	 */
 	public int checkForMarker(Stroke stroke)
 	{
 		m_marker = null;
 		int markerType = Marker.TYPE_NONE; 
 		// size is small now check which type of marker is it
-		int segCount = stroke.getM_segList().size();
+		/**
+		 * The marker recognition depends on the segmentation previously performed.
+		 * For instance, the number of segments determines what marker it could be.
+		 * 
+		 */
+		
+		Vector Segments = stroke.getM_segList(); 
+		
+		if(dcad.Prefs.getSegScheme() == GConstants.SEG_SCHEME_SIMPLE) 
+		{
+		//	Segmentor m_segmentor = new Segmentor() ;
+		//	Vector segpts = m_segmentor.performSegmentation(stroke,GConstants.SEG_SCHEME_ALL);
+			PreProcessingManager preProcessMan = ProcessManager.getInstance().getPreProManager();
+			PreProcessor preProcessor = preProcessMan.getPreProcessor();
+			Vector segpts = preProcessor.temp_preProcess(stroke);
+			
+			RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+			SegmentRecognizer segmentRecog = recogMan.getSegmentRecogMan().getSegmentRecognizer();
+			try {
+				Segments = stroke.temp_recognizeSegments(segmentRecog , segpts);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		}
+		int segCount = Segments.size();
+		
 		switch (segCount)
 		{
 			case 1: // This could be an Angle or Equal Length Marker
@@ -94,9 +134,9 @@ public class MarkerRecognizer
 				
 			case 2: // This could be a Parallel Arrow or Right angle Marker
 				// get the segments of the marker
-				Segment markerSegment1 = (Segment)stroke.getM_segList().get(0);
-				Segment markerSegment2 = (Segment)stroke.getM_segList().get(1);
-				//if(markerSegment1 instanceof SegLine && markerSegment2 instanceof SegLine)
+				Segment markerSegment1 = (Segment)Segments.get(0);
+				Segment markerSegment2 = (Segment)Segments.get(1);
+				if(markerSegment1 instanceof SegLine && markerSegment2 instanceof SegLine)
 				{
 					Vector cons1 = (markerSegment1).getConstraintByType(IntersectionConstraint.class);
 					Vector cons2 = (markerSegment2).getConstraintByType(IntersectionConstraint.class);

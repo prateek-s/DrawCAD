@@ -1746,7 +1746,6 @@ public void UI_log(String s)
 						}
 					}
 
-
 				}
 			}
 		}
