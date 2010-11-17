@@ -16,6 +16,7 @@ import dcad.model.constraint.circleArc.circularArcConstraint;
 import dcad.model.constraint.collinearity.CollinearLinesConstraint;
 import dcad.model.constraint.collinearity.CollinearPointsConstraint;
 import dcad.model.constraint.connect.IntersectionConstraint;
+import dcad.model.constraint.length.EqualRelLengthConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnCircularCurveConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnLineConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnPointConstraint;
@@ -194,16 +195,15 @@ public class ActionInterface extends ActionHelper
      */
     public int A_move_Elements(Vector elements, Point from, Point to,int ongoing) 
     {
-		if (m_highlightedElements.size() > 0)
+		if (something_highlighted())
 		{
 			///System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
 			Vector elementsToMove = new Vector();
 
 			// find all elements to move
-			Iterator iter = m_highlightedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement element = (GeometryElement) iter.next();
+			for (Object ele : m_highlightedElements) {
+				GeometryElement element = (GeometryElement) ele ;
+				if( element==null) break ;
 				if (!element.isFixed())
 				{
 					if (!(elementsToMove.contains(element)))
@@ -216,10 +216,11 @@ public class ActionInterface extends ActionHelper
 	    {
 		boolean remMarkers = false;
 		// this is done only once
-		 iter = elementsToMove.iterator();
+		Iterator iter = elementsToMove.iterator();
 		while (iter.hasNext())
 		    {
 			GeometryElement element = (GeometryElement) iter.next();
+			if(element==null) break ;
 			if (!element.isFixed())
 			    {
 				if (element instanceof Text){
@@ -275,7 +276,7 @@ public class ActionInterface extends ActionHelper
 		// " + ap.getY());
 	    }
 				
-	 iter = elementsToMove.iterator();
+	Iterator iter = elementsToMove.iterator();
 	while (iter.hasNext())
 	    {
 		GeometryElement element = (GeometryElement) iter.next();
@@ -685,6 +686,12 @@ public int ptOnSegments(Point pt){
 	return count;
 }
 
+/**
+ * returns all the anchor points,segments,markers that the point 
+ * belongs to.
+ * @param pt : Point
+ * @return List of geometric elements
+ */
 public Vector isPtOnGeometryElement(Point pt)
 {
 	Vector gEles = new Vector();
@@ -719,7 +726,6 @@ public Vector isPtOnGeometryElement(Point pt)
 		gEles.add(gEle);
 		return gEles;
 	}
-
 	return gEles;
 }
 
@@ -857,6 +863,8 @@ public void addHighLightedElement(GeometryElement g)
 	if (!m_highlightedElements.contains(g))
 		m_highlightedElements.add(g);
 }
+
+
 public void addHighlightedElements(Vector v) 
 {
 	Iterator i = v.iterator() ;
@@ -897,6 +905,7 @@ public Vector performSegRecycling(int x, int y)
 	}
 	return modConstraints;
 }
+
 
 public int post_anchor_ops(Vector constraints) 
 {
@@ -1266,6 +1275,7 @@ public void removeConstraints(GeometryElement gEle)
 		}
 	}
 }
+
 
 public Vector  A_addConstraintsForMarkers() 
 {
@@ -1724,27 +1734,27 @@ public double[][] findMiddlePtsWhileMoving(Segment seg1, Segment seg2){
 	else{
 		sortAnchorPoints(segPoints, sortByX);
 	}
-int n= segPoints.length;
-		if(n > 0){
-/*		 ///System.out.println("Sorted Points returned");
+	int n= segPoints.length;
+	if(n > 0){
+/*			 ///System.out.println("Sorted Points returned");
 		    for(int i = 0; i < n; i++){
 		    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 		    }
 	*/	    
 		
-		    if(pt1 == null){
-		    	pt1 = new Point();
-		    }
-		    
-		    if(pt2 == null){
-		    	pt2 = new Point();
-		    }
-		    pt1.x = (int)segPoints[1][0];
-		    pt1.y = (int)segPoints[1][1];
-		    pt2.x = (int)(segPoints[2][0]);
-		    pt2.y = (int)(segPoints[2][1]);
-		    
+		if(pt1 == null){
+			pt1 = new Point();
 		}
+		
+		if(pt2 == null){
+			pt2 = new Point();
+		}
+		pt1.x = (int)segPoints[1][0];
+		pt1.y = (int)segPoints[1][1];
+		pt2.x = (int)(segPoints[2][0]);
+		pt2.y = (int)(segPoints[2][1]);
+		    
+	}
 	else{
 		/////System.out.println("size of array is" + segPoints.length);
 	}
@@ -1764,6 +1774,7 @@ public void snapAllImpPoints(Vector SegmentList)
 		snapSegment(seg);
 	}
 }
+
 
 public void snapSegment(Segment seg)
 {
@@ -1871,31 +1882,31 @@ public void Snap_IPs_new(Stroke m_currStroke)
 {
 	Vector segPts = new Vector();
 	segPts = null;
-	if(m_currStroke != null)
+	
+	if(m_currStroke==null)
+		return ;
+
+	segPts = m_currStroke.getM_segPtList();
+	Vector anchorPoints = m_drawData.getAllAnchorPoints();
+	
+	if(segPts.size()!=0)
 	{
-		segPts = m_currStroke.getM_segPtList();
-		if(segPts.size()!=0)
+		for (Object pt:segPts) 
 		{
-			Iterator iter1 = segPts.iterator();
-			while (iter1.hasNext())
+			SegmentPoint point = (SegmentPoint)pt;
+			Point2D segPoint = point.getM_point();	
+
+			for(Object ap : anchorPoints)
 			{
-				SegmentPoint point = (SegmentPoint)iter1.next();
-				Point2D segPoint = point.getM_point();	
-				
-				Vector anchorPoints = m_drawData.getAllAnchorPoints();
-				Iterator iter2 = anchorPoints.iterator();
-				while (iter2.hasNext())
-				{
-					ImpPoint ip = (ImpPoint) iter2.next();
-					if(ip.getM_point()!=null){
-						if((ip.getM_point()).equals(segPoint) 
-								|| (ip.getM_point().distance(segPoint) < (((GConstants.cmScaleDrawingRatio)/10)*2)))
-						{
-							snapIP(ip);					// distance < 2 mm
-						}
+				ImpPoint ip = (ImpPoint) ap;
+				if(ip.getM_point()!=null){
+					if((ip.getM_point()).equals(segPoint) 
+							|| (ip.getM_point().distance(segPoint) < (((GConstants.cmScaleDrawingRatio)/10)*2)))
+					{
+						snapIP(ip);					// distance < 2 mm
 					}
 				}
-			}
+			}	
 		}
 	}
 }
@@ -1978,76 +1989,119 @@ public boolean smartMergeSelectedEleToHighLightedEle()
 	return intersect;
 }
 
-/******************** HIGH-LIGHT, SELECT **********************/
+/************************ HIGH-LIGHT, SELECT **********************/
 
 public boolean something_highlighted()
 {
-	if (m_highlightedElements.size()>0) return true;
-	else return false ;
+	if (m_highlightedElements.size()>0) {
+		if (m_highlightedElements.get(0)!=null)
+			return true;
+	}
+	return false ;
 }
 
+/**
+ * Simply clearing list wont work, have to unflag the elements in the
+ * drawing data also
+ * @return
+ */
 public int clear_highlighted()
 {
 	int size = m_highlightedElements.size() ;
+	if(size ==0 || m_highlightedElements.elementAt(0)==null) return 0;
 	for (Object ele : m_highlightedElements) {
 		GeometryElement element = (GeometryElement) ele ;
-		element.setHighlighted(false) ;
+		if(element!=null)
+			element.setHighlighted(false) ;
 	}
 	m_highlightedElements.clear() ;
 	return size ;
 }
 
 /**
- * 
+ * Given the mouse position and the aux input type, add appropriate
+ * elements to the highlighted list. This is the top level highlighting
+ * method which handles all cases.
  * @param m_mousePos
  * @param type: what modifier key etc has been pressed, etc
- * @return
+ * @return number of elements highlighted.
  */
 public int Highlight(Point m_mousePos, int type) 
 {
-	int repaint = 0 ;
+	int highlighted = 0 ;
+	Vector<GeometryElement> to_highlight = new Vector() ;
+	clear_highlighted() ;
 	switch(type) {
+	//0==plain mouse movement.
 	case 0 :
 	{	
-		for (GeometryElement ele: m_highlightedElements) {
-			if(ele==null) {
-				break ;
-			}
+		//Should the highlighted elements list be cleared every time?	
+		Vector elements_under = isPtOnGeometryElement(m_mousePos);
+		to_highlight = merge_highlighted(to_highlight,elements_under) ;
+		
 
-			if (!ele.containsPt(m_mousePos))
-			{		
-				ele.setHighlighted(false);
-				m_highlightedElements.remove(ele) ;
-				++repaint ;
-			}
-		}	
-		return repaint ;
 	}
 	
 	case KeyEvent.VK_SHIFT:
 	{
 		Stroke lastStroke = m_drawData.getLastStroke(true);
-		if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
-			addHighLightedElement(lastStroke);
+		if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos))) {
+			to_highlight.add(lastStroke) ;
+		}
+			//addHighLightedElement(lastStroke);
 
 		else
 		{
 			Vector aps = isPtOnAnyAnchorPoint(m_mousePos);
 
 			if ((aps != null) && (aps.size() > 0))
-				addHighlightedElements(aps);
+				to_highlight.addAll(aps) ;
 			else
 			{
 				Vector gEles = isPtOnGeometryElement(m_mousePos);
 				if (gEles != null)
-					addHighlightedElements(gEles);
+					to_highlight.addAll(gEles);
 			}
 		}	
 	}
 	
+	case  KeyEvent.VK_CONTROL :
+	{
+		Vector gEles = isPtOnGeometryElement(m_mousePos);
+		for (int i = 0; i < gEles.size(); i++)
+		{
+			if (gEles.get(i) instanceof SegLine)
+			{
+				SegLine seg = (SegLine) gEles.get(i);
+				Vector equalRelativeLengthConstraints = seg
+				.getConstraintByType(EqualRelLengthConstraint.class);
+				for (int j = 0; j < equalRelativeLengthConstraints.size(); j++)
+				{
+					EqualRelLengthConstraint eq = (EqualRelLengthConstraint) equalRelativeLengthConstraints
+					.get(j);
+					if (eq.getM_seg1() == seg)
+						to_highlight.add(eq.getM_seg2());
+					else
+						to_highlight.add(eq.getM_seg1());	
+				}
+			}
+		}
+	}
+		
 	} // SWITCH
-	return 0;
+	
+	for(GeometryElement e: to_highlight) {
+		e.setHighlighted(true) ;
+	}
+	m_highlightedElements = to_highlight ;
+	
+	if(m_highlightedElements.size() > 0)
+		System.out.println("Highligted" + m_highlightedElements.toString()) ;
+	return to_highlight.size() ;
+	
+	
 }
+
 
 public int merge_selected_highlighted()
 {
@@ -2055,6 +2109,24 @@ public int merge_selected_highlighted()
 	return m_selectedElements.size() ;
 }
 
+/**
+ * Merges vector a into vector b. Simple intersection, but could add
+ * complicated merging rules later on.
+ * Where are all the java libraries ??? 
+ * 
+ * @param a
+ * @param b
+ * @return
+ */
+public Vector merge_highlighted(Vector a, Vector b)
+{
+	for (Object ao:a) {
+		if(!b.contains(ao)) {
+			b.add(ao) ;
+		}
+	}
+	return b ;
+}
 
 /********************* END OF CLASS ***********************************/
 }

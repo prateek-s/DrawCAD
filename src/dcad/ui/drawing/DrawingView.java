@@ -160,6 +160,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	private Vector m_movedElementsOldPos = null;
 
+	/**
+	 * Only the marker stroke should not be shown. 
+	 * This can be eliminated?
+	 */
 	private boolean m_showLastStroke = true;
 
 	private boolean m_keyPressedLogged = false;
@@ -406,6 +410,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	public void mousePressed(int buttontype, int clickcount, int x, int y, long time)
 	{
 		repaint();
+		
+		m_mousePos.x = x;
+		m_mousePos.y = y;
+		
 		setM_button_type(buttontype);
 		if (buttontype == MouseEvent.BUTTON1)
 		{			
@@ -417,46 +425,43 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 		else if (buttontype == MouseEvent.BUTTON2) 
 		{
-			if(A.m_highlightedElements.size() != 0 ) {
+			if(A.something_highlighted() ) {
 				helpDrawView.selectRows(GConstants.MIDDLE_CLICK);
 				}
+			
 			mouseButton2Pressed(x, y);
 		}
 		else if (buttontype == MouseEvent.BUTTON3) 
 		{
 			//highlight rows in HELP table
-			if(A.m_highlightedElements.size() != 0 ) 
+			if(A.something_highlighted()) 
 			{
 				if(m_keyEventCode == KeyEvent.VK_SHIFT)
 				{
 				// SHIFT+RIGHT-CLICK => Separate anchor points. 
 					// Need something highlighted for that first.
-					if(A.m_highlightedElements.size() == 1) 
-					{
+					//if(A.m_highlightedElements.size() == 1)
+					if(A.something_highlighted()) {
 						GeometryElement ge = (GeometryElement) A.m_highlightedElements.get(0);
-						if(ge instanceof ImpPoint)
-						{
+						if(ge instanceof ImpPoint) {
 							ImpPoint ip = (ImpPoint)ge;
-							if(ip.getAllParents().size() > 1)
-							{
+							if(ip.getAllParents().size() > 1) {
 								helpDrawView.unselectRows();
 								helpDrawView.selectRow(5);
 							}
 						}
 					}
 				}
-				else
-				{ 	
+				else {	
 					helpDrawView.selectRows(GConstants.RIGHT_CLICK);
 				}
+
 			}
 			
 			mouseButton3Pressed(x, y);
 		}
-		
 		// Update the mouse position AFTER the complete event has been processed. 
-		m_mousePos.x = x;
-		m_mousePos.y = y;
+		//Moved to the top of the function.
 	}
 
 	/**
@@ -552,7 +557,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
-	
 	/**
 	 * Right-click
 	 * @param x
@@ -733,160 +737,160 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		mouseMoved(e.getX(), e.getY());
 	}
 	
-	
+	/**
+	 * Highlight segments and help rows.
+	 * @param x
+	 * @param y
+	 */
 	public void mouseMoved(int x, int y)
 	{	
 		m_mousePos.x = x;
 		m_mousePos.y = y;
 		
-		if(!A.something_highlighted())
-		{
-			//highlight help for different markers.
-			if(m_drawData.isUnusedMarker())
-			{
-				Vector markers = m_drawData.getUnusedMarkers();
-				
-				Marker mark = (Marker)(markers.get(markers.size()-1));
-				
-				if(mark instanceof MarkerAngle){
-					helpDrawView.selectRows(GConstants.MARKER_ANGLE);
-				}
-				else if(mark instanceof MarkerEquality){
-					helpDrawView.selectRows(GConstants.MARKER_EQUALITY);
-				}
-				else if(mark instanceof MarkerParallel){
-					MarkerParallel markParallel = (MarkerParallel) mark;
-					Segment seg = markParallel.getM_seg();
-					if(seg instanceof SegCircleCurve){
-						helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_ARC);
-					}
-					else if(seg instanceof SegLine){
-						helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_LINE);
-					}
-				}
-				else if(mark instanceof MarkerPerpendicular){
-					helpDrawView.selectRows(GConstants.MARKER_PERP);
-				}
-			}
-			else if(m_keyEventCode == KeyEvent.VK_SHIFT){
-				helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT);
-			}
-			else if(m_keyEventCode == KeyEvent.VK_CONTROL){
-				helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
-			}
-			else{
-			helpDrawView.selectRows(GConstants.LEFT_CLICK);
-			}
-		} //end outer-if
+		A.Highlight(m_mousePos, 0) ;
+		repaint() ;
+		
+		HELP_UPDATE("default");
 
 		if (A.something_highlighted())
 		{
 			int repaintReq = A.Highlight(m_mousePos,0);
-			if (repaintReq==0)
+			if (repaintReq!=0) {
+				repaint();
 				// mouse is still on the same object.. no need to do anything.
 				return;
-			else{
-				//addToUndoVector();
-				repaint();
 			}
 		}
 
 		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT))
-		{
 			if (m_showLastStroke)
-			{
 				A.Highlight(m_mousePos, m_keyEventCode) ;
-			}
-		}
-		
+			
 		else
 		{
 			// check if the mouse is close to any other geometry element
 			Vector gEles = A.isPtOnGeometryElement(m_mousePos);
 
+			//Ctrl+click is select, so when close to something, the appropriate
+			//things, equal segments etc should get highlighted.
 			if (m_keyEventCode == KeyEvent.VK_CONTROL)
 			{
-				for (int i = 0; i < gEles.size(); i++)
-				{
-					if (gEles.get(i) instanceof SegLine)
-					{
-						SegLine seg = (SegLine) gEles.get(i);
-						Vector equalRelativeLengthConstraints = seg
-						.getConstraintByType(EqualRelLengthConstraint.class);
-						for (int j = 0; j < equalRelativeLengthConstraints.size(); j++)
-						{
-							EqualRelLengthConstraint eq = (EqualRelLengthConstraint) equalRelativeLengthConstraints
-							.get(j);
-							if (eq.getM_seg1() == seg)
-								A.addHighLightedElement(eq.getM_seg2());
-							else
-								A.addHighLightedElement(eq.getM_seg1());	
-						}
-					}
-				}
-			}
-
-			if (gEles != null){
-				A.addHighlightedElements(gEles);
+				A.Highlight(m_mousePos, KeyEvent.VK_CONTROL) ;
 			}
 		}
-
+		
+		//mostly help stuff
 		String label = "";
 		if (A.something_highlighted())
 		{
 			// 04-10-09 to highlight rows in HELP table
-			GeometryElement g1 = (GeometryElement)A.m_highlightedElements.get(0);
-			if(A.m_selectedElements.size() == 0){
-				if((g1 instanceof SegLine) || (g1 instanceof SegCircleCurve)){
-					if(m_keyEventCode == KeyEvent.VK_CONTROL){
-						helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
-					}
-					else if(m_keyEventCode == KeyEvent.VK_SHIFT){
-						helpDrawView.unselectRows();
-					}
-					else{
-						helpDrawView.selectRows(GConstants.HIGHLIGHT_ELEMENTS);
-					}
-				}
-				else if(g1 instanceof ImpPoint){
-					/////System.out.println("Highlight Point");
-					ImpPoint ip = (ImpPoint)g1;
-					if(m_keyEventCode == KeyEvent.VK_SHIFT){
-						helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT); // unselect row 7
-						if(ip.getAllParents().size() < 2){
-							//helpDrawView.unselectRows();
-							helpDrawView.unselectRow(5);
-						}
-						helpDrawView.unselectRow(4);
-					}
-					else if(m_keyEventCode == KeyEvent.VK_CONTROL){
-						helpDrawView.unselectRow(3); // unselect row 4
-					}
-					else{
-						helpDrawView.selectRows(GConstants.HIGHLIGHT_POINT);
-						if(ip.getAllParents().size() < 2)
-							helpDrawView.unselectRow(5);
-					}	
-				}
-				else if(g1 instanceof Stroke){
-					helpDrawView.selectRows(GConstants.ADD_AP);
-				}
-			}
+			HELP_UPDATE("moved") ;
 	
 			for (Object ele: A.m_highlightedElements) {
 				if(ele==null) break; 
 				GeometryElement element = (GeometryElement) ele ;
-				element.setHighlighted(true);
+			//	element.setHighlighted(true); //need this really?
 				label += element.getM_label() + "  ";
 			}
+			//repaint if something higlighted.
 			repaint();
 		}
-
 		updateStatusBar(x, y, "( Move )", label);
-
 	}
 	
-	/***********************************************************************/
+/***********************************************************************/
+/**
+ * Update all the help rows etc 
+ */
+public void HELP_UPDATE(String type) {
+if(type=="default"){
+	if(!A.something_highlighted())
+	{
+		//highlight help for different markers.
+		if(m_drawData.isUnusedMarker())
+		{
+			Vector markers = m_drawData.getUnusedMarkers();
+			
+			Marker mark = (Marker)(markers.get(markers.size()-1));
+			
+			if(mark instanceof MarkerAngle){
+				helpDrawView.selectRows(GConstants.MARKER_ANGLE);
+			}
+			else if(mark instanceof MarkerEquality){
+				helpDrawView.selectRows(GConstants.MARKER_EQUALITY);
+			}
+			else if(mark instanceof MarkerParallel){
+				MarkerParallel markParallel = (MarkerParallel) mark;
+				Segment seg = markParallel.getM_seg();
+				if(seg instanceof SegCircleCurve){
+					helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_ARC);
+				}
+				else if(seg instanceof SegLine){
+					helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_LINE);
+				}
+			}
+			else if(mark instanceof MarkerPerpendicular){
+				helpDrawView.selectRows(GConstants.MARKER_PERP);
+			}
+		}
+		else if(m_keyEventCode == KeyEvent.VK_SHIFT){
+			helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT);
+		}
+		else if(m_keyEventCode == KeyEvent.VK_CONTROL){
+			helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
+		}
+		else{
+		helpDrawView.selectRows(GConstants.LEFT_CLICK);
+		}
+	} //end outer-if
+}
+
+if(type=="moved") 
+{
+	GeometryElement g1 = (GeometryElement)A.m_highlightedElements.get(0);
+	if(A.m_selectedElements.size() == 0)
+	{
+		if((g1 instanceof SegLine) || (g1 instanceof SegCircleCurve)){
+			if(m_keyEventCode == KeyEvent.VK_CONTROL){
+				helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
+			}
+			else if(m_keyEventCode == KeyEvent.VK_SHIFT){
+				helpDrawView.unselectRows();
+			}
+			else{
+				helpDrawView.selectRows(GConstants.HIGHLIGHT_ELEMENTS);
+			}
+		}
+		else if(g1 instanceof ImpPoint){
+			/////System.out.println("Highlight Point");
+			ImpPoint ip = (ImpPoint)g1;
+			
+			if(m_keyEventCode == KeyEvent.VK_SHIFT)
+			{
+				helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT); // unselect row 7
+				if(ip.getAllParents().size() < 2){
+					//helpDrawView.unselectRows();
+					helpDrawView.unselectRow(5);
+				}
+				helpDrawView.unselectRow(4);
+			}
+			else if(m_keyEventCode == KeyEvent.VK_CONTROL){
+				helpDrawView.unselectRow(3); // unselect row 4
+			}
+			else{
+				helpDrawView.selectRows(GConstants.HIGHLIGHT_POINT);
+				if(ip.getAllParents().size() < 2)
+					helpDrawView.unselectRow(5);
+			}	
+		}
+		else if(g1 instanceof Stroke){
+			helpDrawView.selectRows(GConstants.ADD_AP);
+		}
+	}	
+}
+
+}
+	
 	
 	public void setM_button_type(int m_button_type) {
 		this.m_button_type = m_button_type;
@@ -1511,7 +1515,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	//	setM_AreLinesCollinear(are_collinear) ;  
 		repaint() ;
 		
-		if (A.m_highlightedElements.size() > 0)
+		if (A.something_highlighted())
 		{
 			///System.out.println("Mouse drag highlighted elements : " + A.m_highlightedElements.size());
 			Vector elementsToMove = new Vector();
@@ -1519,12 +1523,13 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			// find all elements to move
 			for (Object ele : A.m_highlightedElements) {
 				if (ele == null) break ;
-				GeometryElement element = (GeometryElement) ele ;				
+				GeometryElement element = (GeometryElement) ele ;
+			
 				if (!element.isFixed())
 				{
 					if (!(elementsToMove.contains(element))) {
 						elementsToMove.add(element);
-						System.out.println(element.toString());
+						System.out.println("DRAG EDIT: "+element.toString());
 					}
 					
 				}
