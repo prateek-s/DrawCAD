@@ -9,6 +9,7 @@ import dcad.process.recognition.RecognitionManager;
 import dcad.process.recognition.marker.MarkerRecognizer;
 import dcad.process.recognition.segment.SegmentRecognitionScheme;
 import dcad.ui.main.MainWindow;
+import dcad.util.GConstants;
 
 public class StrokeRecognizer
 {
@@ -54,8 +55,13 @@ public class StrokeRecognizer
 			}
 		}
 		else{
-			if(stroke.isSmallSize() && (stroke.getLength() >= SegmentRecognitionScheme.PT_WINDOW)){
-				int type = m_markerRecog.checkForMarker(stroke);
+			if(stroke.isSmallSize() && (stroke.getLength() >= SegmentRecognitionScheme.PT_WINDOW))
+			{
+				int type ;
+				if( dcad.Prefs.getSegScheme() == GConstants.SEG_SCHEME_SIMPLE  )
+						type = m_markerRecog.simple_checkForMarker(stroke);
+				else type = m_markerRecog.checkForMarker(stroke) ;
+				
 				if(type == Marker.TYPE_NONE){ 
 					return Stroke.TYPE_NORMAL;
 				}

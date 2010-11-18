@@ -51,10 +51,9 @@ public class DrawingData
 		String drawing = "BEGIN: \n" ;
 		for (Stroke strk: this.m_stkList) {
 			for (Segment seg: strk.getM_segList()) {
-				drawing= drawing+seg.toString() ;
+				drawing= drawing + "\n <SEGMENT>" + seg.toString() + "</SEGMENT>" ;
 			}
 		}
-		 
 		return drawing ;
 	}
 	

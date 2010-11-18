@@ -78,7 +78,7 @@ import dcad.util.Maths;
  * 
  */
 
-public class ActionInterface extends ActionHelper
+public class ActionInterface 
 {
     /*
      * The local variables of this class together form a subset of the state of the entire program. 
@@ -103,10 +103,18 @@ public class ActionInterface extends ActionHelper
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
-
-
     /********************************************************************/
-
+	public String getMethod()
+	{
+	     StackTraceElement stackTraceElements[] =
+	             (new Throwable()).getStackTrace();
+	     return stackTraceElements[1].toString();
+	}
+	
+public void DSTATE(String s){
+	System.out.println(s+m_drawData.toString()) ;
+}
+    
     /**
      * Perform Segmentation, recognize segments, merges strokes,
      * recognizes constraints, 
@@ -120,7 +128,7 @@ public class ActionInterface extends ActionHelper
 
 	m_drawData.addStroke(strk) ;
 	new_constraints = recognize_Constraints(strk);
-		 
+	DSTATE(getMethod()+ "STROKE COMPLETE") ;	 
 	return null ;
     }
 
@@ -1040,18 +1048,12 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
 public Vector recognize_Constraints(Stroke theStroke)
 {
 	Stroke m_currStroke = theStroke;
-	
-//	recognizeSegments(theStroke);
-//	adjustStroke(theStroke);
-//	m_drawData.addStroke(theStroke);
-	
+
 	Vector connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
 
 	RecognitionManager recogMan = m_processManager.getRecogManager();
 	StrokeRecognizer strokeRecog = recogMan.getM_strokeRecogManager().getStrokeRecognizer();
-	
-	
-	//
+
 	// to set stroke's properties in case convert option is clicked
 	//move out next two lines
 	//theStroke.setStrokeConverted(isStrokeConverted);
@@ -1064,15 +1066,19 @@ public Vector recognize_Constraints(Stroke theStroke)
 		theStroke.setM_type(Stroke.TYPE_MARKER);
 		// as this is a marker.. for each of its segments clear the points
 		// Vector for each of their constraints
+		
+		DSTATE(getMethod()) ;
+		
 		Marker marker = strokeRecog.getMarker();
-		if (marker != null)
+		if (marker != null) {
 			addGeoElement(marker) ;
+			A_addConstraintsForMarkers() ;
+			DSTATE("AFTER ADDING CONSTRAINTS") ;
+		}
 				
 	//	UpdateUI(1,m_drawData.getM_constraints());
 		return null;
 	}
-	
-	/** *** 	CAN MARKERS HAVE SEGMENTS?? :-OOOOOOOO *******/
 	
 	// We have found whether the stroke is marker or not. Now remove the
 	// intersection constraints
@@ -2089,9 +2095,7 @@ public int Highlight(Point m_mousePos, int type)
 		e.setHighlighted(true) ;
 	}
 	m_highlightedElements = to_highlight ;
-	
-	if(m_highlightedElements.size() > 0)
-		System.out.println("Highligted" + m_highlightedElements.toString()) ;
+
 	return to_highlight.size() ;
 	
 	

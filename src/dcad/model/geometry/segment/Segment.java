@@ -85,6 +85,7 @@ public abstract class Segment extends GeometryElement
 	 * To store the constraints related to this segment
 	 */
 	protected Vector m_constraints = null;
+
 	
 	/**
 	 * Store the shape object
@@ -352,8 +353,11 @@ public abstract class Segment extends GeometryElement
 
 	public String toString()
 	{
-		String s = this.m_label ;
-		return s;
+		String type = "<TYPE>: " + this.m_type ;
+		String label = "<LABEL:> " + this.m_label ;
+		String start = "<START:> " +this.getSegStart() ;
+		String foo = "<CONSTRAINTS:> " + this.m_constraints.toString() ;
+		return type+label+start+foo ;
 		//return ("*********************m_points were removed from the segment... This msg. is being displayed from tostring function of segment************************");
 		//return m_points.get(0).toString()+"----"+m_points.get(m_points.size()-1).toString();
 	}

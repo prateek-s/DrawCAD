@@ -85,7 +85,7 @@ import dcad.ui.main.ToolBar;
 import dcad.ui.drawing.*;
 
 import dcad.ui.main.ActionInterface ;
-import dcad.ui.main.ActionHelper; 
+
 
 /**
  * Top-Level class. Sets off the Stroke->Segment->Constraint->Draw chain on mouse-press/release events.
@@ -508,7 +508,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 		if (m_keyEventCode == -1)
 		{
-			UI_log(getMethod()+"NEW STROKE BEGIN") ;
+			UI_log(A.getMethod()+"NEW STROKE BEGIN") ;
 			/**
 			 * @UI: Left-button press
 			 * @Action: Beginning of a stroke. Paint stroke on screen
@@ -1326,7 +1326,7 @@ if(type=="moved")
 	 */
 	public Vector ProcessStroke(Stroke strk)
 	{
-		UI_log(getMethod()) ;
+		UI_log(A.getMethod()) ;
 		Vector constraints = null ;
 		if (strk != null )
 		{			
@@ -1508,7 +1508,7 @@ if(type=="moved")
 
 	private boolean handleMouseDragEditMode(int x, int y)
 	{
-		UI_log(getMethod()) ;
+		UI_log(A.getMethod()) ;
 		boolean result = true ;
 		// check for collinearity while dragging the line
 	//	boolean are_collinear = checkForCollinearLines() ;
@@ -1575,7 +1575,7 @@ public void UI_log(String s)
 	 */
 	public void performSelection(int x, int y)
 	{
-		UI_log(getMethod()+ "CTRL " + " SELECT") ;
+		UI_log(A.getMethod()+ "CTRL " + " SELECT") ;
 		Point pt = new Point (x,y) ;
 		A.m_selectedElements = A.A_elements_selected(pt,A.m_selectedElements) ;
 		
@@ -2021,16 +2021,16 @@ public void UI_log(String s)
 		m_showLastStroke = true;
 	}
 
-	
-	/** Get the method name from which this function is called .
-	 * Might have some good use in logging/debugging.
-	 * @return
-	 */
-	public String getMethod()
-	{
-	     StackTraceElement stackTraceElements[] =
-	             (new Throwable()).getStackTrace();
-	     return stackTraceElements[1].toString();
-	}
-	
+//	
+//	/** Get the method name from which this function is called .
+//	 * Might have some good use in logging/debugging.
+//	 * @return
+//	 */
+//	public String getMethod()
+//	{
+//	     StackTraceElement stackTraceElements[] =
+//	             (new Throwable()).getStackTrace();
+//	     return stackTraceElements[1].toString();
+//	}
+//	
 }

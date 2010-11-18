@@ -85,27 +85,18 @@ public class RelConstraintRecognizer
 	 // changed on 5-04-10	
 		if((seg1!=null) && (seg2!=null))
 		{
-			if(seg1 instanceof SegLine && seg2 instanceof SegLine){
-			
+			if(seg1 instanceof SegLine && seg2 instanceof SegLine){			
 				angleCons = recogAngleConstraints();
-				lengthCons = recogLengthConstraints();
-				
+				lengthCons = recogLengthConstraints();				
 			}
 			else if((seg1 instanceof SegLine && seg2 instanceof SegCircleCurve) || (seg1 instanceof SegCircleCurve && seg2 instanceof SegLine)){
 				tangentCons = recogTangencyConstraints();
 			}
 			else if(seg1 instanceof SegCircleCurve && seg2 instanceof SegCircleCurve){
 				tangentCons = recogTangencyConstraints();
-				lengthCons = recogLengthConstraints();
-			
+				lengthCons = recogLengthConstraints();		
 			}
-			// Find all the constraints as a vector
-			
-			
-//			Vector collinearityPtCons = recogPtCollinearityConstraints();
-			
-			
-	
+
 		}
 		
 		if(GVariables.getDRAWING_MODE() == GConstants.EDIT_MODE){
