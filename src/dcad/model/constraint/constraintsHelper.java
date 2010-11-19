@@ -83,25 +83,25 @@ public class constraintsHelper
 	public static Vector getUniquePointsForConnectedLines(SegLine seg1, SegLine seg2)
 	{
 		Vector v= new Vector();
-		if (seg1.getM_start() == seg2.getM_start() && seg1.getM_end() != seg2.getM_end())
+		if (seg1.getM_start().equals(seg2.getM_start()) && !seg1.getM_end().equals(seg2.getM_end()))
 		{
 			v.add(seg1.getM_end());
 			v.add(seg2.getM_end());
 			v.add(seg1.getM_start());
 		} 
-		else if (seg1.getM_start() == seg2.getM_end() && seg1.getM_end() != seg2.getM_start())
+		else if (seg1.getM_start().equals(seg2.getM_end()) && !seg1.getM_end().equals(seg2.getM_start()))
 		{
 			v.add(seg1.getM_end());
 			v.add(seg2.getM_start());
 			v.add(seg1.getM_start());
 		}
-		else if (seg1.getM_end() == seg2.getM_start() && seg1.getM_start() != seg2.getM_end())
+		else if (seg1.getM_end().equals(seg2.getM_start()) && !seg1.getM_start().equals(seg2.getM_end()))
 		{
 			v.add(seg1.getM_start());
 			v.add(seg2.getM_end());
 			v.add(seg1.getM_end());
 		}
-		else if (seg1.getM_end() == seg2.getM_end() && seg1.getM_start() != seg2.getM_start())
+		else if (seg1.getM_end().equals(seg2.getM_end()) && !seg1.getM_start().equals(seg2.getM_start()))
 		{
 			v.add(seg1.getM_start());
 			v.add(seg2.getM_start());
@@ -772,9 +772,12 @@ public class constraintsHelper
 	public static Vector getAllAnchorPointsOfConstraints(Vector constraints)
 	{
 		Vector result = new Vector();
-		Iterator iter = constraints.iterator();
-		while (iter.hasNext())
-			addAllIgnoreDuplicates(  result  ,  ( (Constraint)iter.next() ).getPoints()  );
+		
+		for (Object o : constraints) {
+			Constraint co = (Constraint)o ;
+			Vector points = co.getPoints() ;
+			addAllIgnoreDuplicates(  result  , points );
+		}
 		return result;
 	}
 	

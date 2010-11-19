@@ -262,6 +262,12 @@ public class AnchorPoint extends ImpPoint
 			constraints.remove(0);
 	}
 	
+	public boolean equals(AnchorPoint ap2) {
+		boolean def = false ;
+		return this.m_point.equals(ap2.m_point) ;
+		
+	}
+	
 	public void delete()
 	{
 		

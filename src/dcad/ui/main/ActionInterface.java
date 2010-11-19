@@ -1048,7 +1048,7 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
 public Vector recognize_Constraints(Stroke theStroke)
 {
 	Stroke m_currStroke = theStroke;
-
+	Vector constraints = null ;
 	Vector connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
 
 	RecognitionManager recogMan = m_processManager.getRecogManager();
@@ -1072,12 +1072,12 @@ public Vector recognize_Constraints(Stroke theStroke)
 		Marker marker = strokeRecog.getMarker();
 		if (marker != null) {
 			addGeoElement(marker) ;
-			A_addConstraintsForMarkers() ;
+			constraints = A_addConstraintsForMarkers() ;
 			DSTATE("AFTER ADDING CONSTRAINTS") ;
 		}
 				
 	//	UpdateUI(1,m_drawData.getM_constraints());
-		return null;
+		return constraints;
 	}
 	
 	// We have found whether the stroke is marker or not. Now remove the
@@ -1103,7 +1103,7 @@ public Vector recognize_Constraints(Stroke theStroke)
 
 	// find the constraints between the segments of this stroke and
 	// the segments of ALL the previous strokes.
-	Vector constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
+	 constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
 
 	if (constraints != null)
 		m_drawData.addConstraints(constraints);
@@ -1316,7 +1316,7 @@ public Vector  A_addConstraintsForMarkers()
 			if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
 			{
 				m_drawData.addConstraints(constraints);
-				newConstraints.addAll(constraints);
+				newConstraints.addAll(constraints) ;
 				//GMethods.getHelpView().initialize(HelpView.afterDrawing);
 				return newConstraints ;
 			//	snapIPsAndRecalculateConstraints(newConstraints);

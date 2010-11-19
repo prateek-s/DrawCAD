@@ -56,7 +56,8 @@ public class ConstraintSolver
 	//Adds the constraints applied using markers.
 	public static Vector addConstraintsAppliedUsingMarker(Vector constraints)
 	{
-		Vector allAffectedConstraints = constraintsHelper.getListOfConstraints( constraintsHelper.getAllAnchorPointsOfConstraints(constraints) ) ;
+		Vector ptsvec = constraintsHelper.getAllAnchorPointsOfConstraints(constraints);
+		Vector allAffectedConstraints = constraintsHelper.getListOfConstraints( ptsvec ) ;
 		Vector allAffectedPoints = constraintsHelper.getAllAnchorPointsOfConstraints(allAffectedConstraints);
 		Vector fixedPoints = new Vector();
 		fixedPoints = getUserFixedAnchorPoints(allAffectedPoints);
@@ -102,7 +103,6 @@ public class ConstraintSolver
 				return constraints;
 			}
 		}
-		
 		
 		NewtonMethod.movePointsBackToInitialPositions();		
 		constraintsHelper.removeConstraints(constraints);

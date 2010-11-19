@@ -691,7 +691,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		setM_elementDragged(false);
 		// so that the current element is selected
 		mouseMoved(x, y);
-		removeElementsWithStartEndPtMerged();
+		//removeElementsWithStartEndPtMerged();
 		repaint(); 
 	
 		// if converted bit now set to false
