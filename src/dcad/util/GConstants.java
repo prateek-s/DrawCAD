@@ -19,7 +19,7 @@ public class GConstants
 	public static final String IMAGE_SRC = "src/images/icons/";
 	
 	// constants for decoration of basepoints
-	public static final int DEF_AP_SIZE = 2;
+	public static final int DEF_AP_SIZE = 5;
 	public static final int DEF_MP_SIZE = 3;
 	public static final int DEF_MP_TYPE = 3;
 	

@@ -154,7 +154,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		{
 
 		}
-
+		
+		/**
+		 * Assign the value to the display field. 
+		 * @param field_num
+		 * @param field_value
+		 * @param level
+		 */
 		public void set(int field_num,String field_value,int level) 
 		{
 			if(field_num==1) {
@@ -190,7 +196,6 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 				c = new Color(100,0,0) ;
 			}
 			return c;
-			
 		}
 		
 		public String toString() 
@@ -217,9 +222,6 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	public void init() 
 	{
 		dv = MainWindow.getDv();
-		//	pt = new Point();
-		//pt.setLocation(dv.getMousePointerLocation()); //moved over to displayOptions
-		
 		if (this.seg==null) { 
 			//Try to get the segment through other means. 
 			this.seg = dv.getGeoElementClicked();
@@ -248,26 +250,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	public void displayOptions(Segment seg, Point pt) 
 	{
 		this.seg = seg ;
-		pt = new Point();
-//Determining the correct mouse pointer location is tricky. dv.getmouseptrlocation gives null values when it doesnt for the pop-up case. 
-		//Because when extra-clicked the mouse-moved listener is not called so the co-ordinates are "correct"! aah!
-		/**
-		 * Basically pt location is crucial for writetext to work. Can we just choose a point on the current segment? 
-		 */
-		
-		//this.pt = pt ;
-		//this.pt = dv.getMousePointerLocation() ;
-		this.pt = (Point) seg.getRawPoints().elementAt(0) ; //first point of the stroke? 
-		
-		if(pt==null) {
-			System.out.println("POINT VALUE IS NULLLLLLLLLLLLLLLLLLL") ;
-		}
-		System.out.println("POINT VALUE IS"+pt.toString()) ;
+
 		if(seg==null) 
 		{
 			//called spuriously, display 'nothing' and exit.
 			return ;
-
 		}
 
 		seg_type = seg.getM_type() ;
@@ -284,15 +271,6 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		
 		/* Check boxes */
 		displayCheckboxes(seg_type) ;
-
-		/*Segment option ui components */
-		if(seg_type==Segment.LINE) {
-
-		}
-
-		else if (seg_type == Segment.CIRCLE) {
-
-		}
 
 		super.add(seg_properties.jlabel1) ; super.add(seg_properties.jfield1) ; super.add(seg_properties.jChange1) ; super.add(seg_properties.jReset1) ;
 		super.add(seg_properties.jlabel2) ; super.add(seg_properties.jfield2) ; super.add(seg_properties.jChange2) ; super.add(seg_properties.jReset2) ;   
@@ -421,7 +399,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 * apply field values to the segment/stroke. Done using the command-queue .
 	 * 
 	 */
-	public void ChangeProperty(int seg_type,String property)
+	public void ChangeProperty(int seg_type , String property)
 	{
 		String cmd = "" ;
 		Point pt = this.pt ;

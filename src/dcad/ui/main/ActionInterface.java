@@ -91,219 +91,220 @@ public class ActionInterface
     /*************************** STATE VARIABLES.  
      * ********************* BE CAREFUL WHAT GOES HERE.	
      */
-    public Vector<Constraint> new_constraints ;
+public Vector<Constraint> new_constraints ;
 
-    public DrawingData m_drawData = new DrawingData();
+public DrawingData m_drawData = new DrawingData();
 
-    public Vector m_selectedElements = new Vector() ;
+public Vector m_selectedElements = new Vector() ;
     
-    public ProcessManager m_processManager = ProcessManager.getInstance(); 
+public ProcessManager m_processManager = ProcessManager.getInstance(); 
 
-    public Vector<GeometryElement> m_highlightedElements = new Vector()  ;
+public Vector<GeometryElement> m_highlightedElements = new Vector()  ;
     
-    public Stroke last_stroke = null ;
+public Stroke last_stroke = null ;
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
-    /********************************************************************/
-	public String getMethod()
-	{
-	     StackTraceElement stackTraceElements[] =
-	             (new Throwable()).getStackTrace();
-	     return stackTraceElements[1].toString();
-	}
-	
-public void DSTATE(String s){
-	System.out.println(s+m_drawData.toString()) ;
+/********************************************************************/
+/**
+ * Useful to get the place where the debug was called from.
+ */
+public String getMethod()
+{
+     StackTraceElement stackTraceElements[] = (new Throwable()).getStackTrace();
+     return stackTraceElements[1].toString();
+}
+
+/**
+ * Print the drawing state : all segments in drawing-data. 
+ * @param s
+ */
+public void DSTATE(String s)
+{
+	System.out.println(s + m_drawData.toString()) ;
 }
     
-    /**
-     * Perform Segmentation, recognize segments, merges strokes,
-     * recognizes constraints, 
-     */
-    public Vector A_draw_Stroke(Stroke strk) 
-    {
+/**
+ * Perform Segmentation, recognize segments, merges strokes,
+ * recognizes constraints, 
+ */
+public Vector A_draw_Stroke(Stroke strk) 
+{
 	new_constraints = null ;
 	Vector segPts = Perform_Segmentation(strk) ;
-	Vector<Segment> Segments =  recognizeSegments(strk) ; 
-	adjustStroke(strk) ; //merges segments.
+	Vector<Segment> Segments =  Recognize_Segments(strk) ; 
+	Adjust_Stroke(strk) ; //merges segments.
 
 	m_drawData.addStroke(strk) ;
 	last_stroke = strk; 
-	new_constraints = recognize_Constraints(strk);
-	DSTATE(getMethod()+ "STROKE COMPLETE") ;	 
+	new_constraints = Recognize_Constraints(strk);
+	
+	DSTATE(getMethod() + "STROKE COMPLETE") ;	 
 	return null ;
-    }
+}
 
-    /**
-     * Segmentation using the appropriate segmentation scheme which is set by other means.
-     * @param strk
-     * @return
-     */
-    public Vector Perform_Segmentation(Stroke strk)
-    {
+/**
+ * Segmentation using the appropriate segmentation scheme which is set by other means.
+ * @param strk
+ * @return
+ */
+public Vector Perform_Segmentation(Stroke strk)
+{
 	PreProcessingManager preProcessMan = m_processManager.getPreProManager();
 	PreProcessor preProcessor = preProcessMan.getPreProcessor();
-	Vector segPts = preProcessor.preProcess(strk);
+	Vector segPts = preProcessor.preProcess(strk);  //this performs the segmentation
 	strk.setM_segPtList(segPts); 
-		
+
 	return segPts ;
-		
-    }
-	
-	
-    /**
-     * Calculate new constraints which occur as a result of adding a stroke,
-     * snapips, add markers if any.
-     * @param strk
-     * @param constraints
-     * @return
-     */
-    public Vector Refresh_Drawing (Stroke strk, Vector constraints)
-    {
-	Vector new_constraints = null ;
-	if (strk.getM_type() == Stroke.TYPE_NORMAL)
-	    {
-		if ((constraints != null) && (constraints.size() > 0))
-		{
-			if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
-			    ;
-		 }
-		new_constraints = A_snapIPsAndRecalculateConstraints(constraints);
-		//GMethods.getHelpView().initialize(HelpView.afterDrawing);
-	    }
-	//25-3-2008 Added this line.
-	else {
-	    A_add_all_markers(); 
-	}
-	return new_constraints ;
-    }
-	
-	
-    /**
-     *Deletes a given element (segment/marker). Simple call, no recalculation of constraints.!
-     */
-    public int A_delete_Element(GeometryElement element) 
-    {
-	element.delete() ;
-	return 1 ;
-    }
+}
 
-    boolean m_elementDragged ;
-    
-	public boolean isM_elementDragged()
+
+/**
+ * Calculate new constraints which occur as a result of adding a stroke,
+ * snapips, add markers if any. This is to make sure that all constraints are detected
+ * after drawing.
+ * @param strk
+ * @param constraints
+ * @return
+ */
+public Vector Refresh_Drawing (Stroke strk, Vector constraints)
+{
+Vector new_constraints = null ;
+if (strk.getM_type() == Stroke.TYPE_NORMAL)
+    {
+	if ((constraints != null) && (constraints.size() > 0))
 	{
-		return m_elementDragged;
-	}
+		if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
+		    ;
+	 }
+	new_constraints = A_snapIPsAndRecalculateConstraints(constraints);
 
-	public void setM_elementDragged(boolean dragged)
+    }
+
+else {
+    A_add_all_markers(); 
+}
+return new_constraints ;
+}
+
+
+/**
+ *Deletes a given element (segment/marker). Simple call, no recalculation of constraints.!
+ */
+public int A_delete_Element(GeometryElement element) 
+{
+element.delete() ;
+return 1 ;
+}
+
+boolean m_elementDragged ;
+
+public boolean isM_elementDragged()
+{
+	return m_elementDragged;
+}
+
+public void setM_elementDragged(boolean dragged)
+{
+	m_elementDragged = dragged;
+}
+
+/**
+ *Move the elements to new location 'to'
+ */
+public int A_move_Elements(Vector elements, Point from, Point to,int ongoing) 
+{
+	if (something_highlighted())
 	{
-		m_elementDragged = dragged;
-	}
-    
-    /**
-     *Move the elements to new location 'to'
-     */
-    public int A_move_Elements(Vector elements, Point from, Point to,int ongoing) 
-    {
-		if (something_highlighted())
-		{
-			///System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
-			Vector elementsToMove = new Vector();
+		///System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
+		Vector elementsToMove = new Vector();
 
-			// find all elements to move
-			for (Object ele : m_highlightedElements) {
-				GeometryElement element = (GeometryElement) ele ;
-				if( element==null) break ;
-				if (!element.isFixed())
-				{
-					if (!(elementsToMove.contains(element)))
-						elementsToMove.add(element);
-				}
-			}
-    	
-	elementsToMove = elements ;
-	if (!isM_elementDragged())
-	    {
-		boolean remMarkers = false;
-		// this is done only once
-		Iterator iter = elementsToMove.iterator();
-		while (iter.hasNext())
-		    {
-			GeometryElement element = (GeometryElement) iter.next();
-			if(element==null) break ;
+		// find all elements to move
+		for (Object ele : m_highlightedElements) {
+			GeometryElement element = (GeometryElement) ele ;
+			if( element==null) break ;
 			if (!element.isFixed())
-			    {
-				if (element instanceof Text){
-				    // do nothing
-				} 
-				else{
-				    // clear the soft constraints for the selected
-				    // element
-				    removeConstraints(element);
-				    remMarkers = true;
-				}
-			    }
-		    }
-		//NExt 2 statement dance not really needed. 
-		// clear the list of moved elements
-	//	m_movedElementsOldPos.clear();
-		// add all the highlighted elements to the movedElements
-		// Vector
-	//	copyMovedElements(elementsToMove);
-		//
-		
-		if (remMarkers)
-		    {
-			// remove all the unused markers or Text elements
-			Iterator itr = m_drawData.getUnusedMarkers().iterator();
-			while (itr.hasNext())
-			    {
-				Marker marker = (Marker) itr.next();
-				marker.delete();
-			    }
-				
-			// remove all the unused text Elements
-			itr = m_drawData.getUnusedText().iterator();
-			while (itr.hasNext())
-			    {
-				Text text = (Text) itr.next();
-				text.delete();
-			    }
-		    }
-
-		setM_elementDragged(true);
-	    }
-
-	Vector movedPts = findAnchorPoints(elementsToMove);
-	double movedPointsPositions[] = new double[movedPts.size() * 2];
-	// ///System.out.println("!!!!!!!!! Initial Positions : ");
-	for (int temp = 0; temp < movedPts.size(); temp++)
-	    {
-		AnchorPoint ap = (AnchorPoint) movedPts.get(temp);
-		movedPointsPositions[temp * 2] = ap.getX();
-		movedPointsPositions[temp * 2 + 1] = ap.getY();
-		// ///System.out.println(ap.getM_label() + " " + ap.getX() + "
-		// " + ap.getY());
-	    }
-				
+			{
+				if (!(elementsToMove.contains(element)))
+					elementsToMove.add(element);
+			}
+		}
+	
+elementsToMove = elements ;
+if (!isM_elementDragged())
+    {
+	boolean remMarkers = false;
+	// this is done only once
 	Iterator iter = elementsToMove.iterator();
 	while (iter.hasNext())
 	    {
 		GeometryElement element = (GeometryElement) iter.next();
-		element.move(from.x, from.y, to.x, to.y);
-	    }
-				
-	//iter = elementsToMove.iterator();
-	if (movedPts.size() > 0)
-	    {
-		Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,movedPointsPositions);
-		if (affectedCons == null)
+		if(element==null) break ;
+		if (!element.isFixed())
 		    {
-			boolean result = false;
-			// undo this move
-			// 29-1-2008 WindowActions.getInstance().undo();
-			// WindowActions.getInstance().undo();
+			if (element instanceof Text){
+			    // do nothing
+			} 
+			else{
+			    // clear the soft constraints for the selected
+			    // element
+			    removeConstraints(element);
+			    remMarkers = true;
+			}
+		    }
+	    }
+
+	if (remMarkers)
+	    {
+		// remove all the unused markers or Text elements
+		Iterator itr = m_drawData.getUnusedMarkers().iterator();
+		while (itr.hasNext())
+		    {
+			Marker marker = (Marker) itr.next();
+			marker.delete();
+		    }
+			
+		// remove all the unused text Elements
+		itr = m_drawData.getUnusedText().iterator();
+		while (itr.hasNext())
+		    {
+			Text text = (Text) itr.next();
+			text.delete();
+		    }
+	    }
+
+	setM_elementDragged(true);
+    }
+
+Vector movedPts = findAnchorPoints(elementsToMove);
+double movedPointsPositions[] = new double[movedPts.size() * 2];
+// ///System.out.println("!!!!!!!!! Initial Positions : ");
+for (int temp = 0; temp < movedPts.size(); temp++)
+    {
+	AnchorPoint ap = (AnchorPoint) movedPts.get(temp);
+	movedPointsPositions[temp * 2] = ap.getX();
+	movedPointsPositions[temp * 2 + 1] = ap.getY();
+	// ///System.out.println(ap.getM_label() + " " + ap.getX() + "
+	// " + ap.getY());
+    }
+			
+Iterator iter = elementsToMove.iterator();
+while (iter.hasNext())
+    {
+	GeometryElement element = (GeometryElement) iter.next();
+	element.move(from.x, from.y, to.x, to.y);
+    }
+			
+//iter = elementsToMove.iterator();
+if (movedPts.size() > 0)
+    {
+	Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,movedPointsPositions);
+	if (affectedCons == null)
+	    {
+		boolean result = false;
+		// undo this move
+		// 29-1-2008 WindowActions.getInstance().undo();
+		// WindowActions.getInstance().undo();
 		    } else
 		    {
 			updateConstraints(affectedCons, Constraint.HARD);
@@ -314,31 +315,50 @@ public void DSTATE(String s){
 		return 1;
 }
 
-
-
-
-
+/**
+ * This will make sense here only when Undo is implemented properly.
+ * @param count
+ * @return
+ */
 public int A_undo(int count) 
 {
 return 1;
 }
 
+/**
+ * @see A_undo
+ * @param count
+ * @return
+ */
 public int A_redo(int count) 
 {
 return 1;
 }
 
+/**
+ * Change the given stroke to a marker. 
+ * @param strk
+ * @return
+ */
 public int A_change_to_marker(Stroke strk) 
 {
 return 1;
 }
 
+/**
+ * Convert a stroke recognized as a marker back to a stroke.
+ * @param strk
+ * @return
+ */
 public int A_change_marker_to_segment(Stroke strk) 
 {
 return 1;
 }
 
-
+/**
+ * Adds all the markers lying around in the drawing
+ * @return
+ */
 public int A_add_all_markers()
 {
 	// check if new markers are added.
@@ -364,7 +384,12 @@ public int A_add_all_markers()
 return 1;
 }
 
-
+/**
+ * Applies the constraints which the markers represent.
+ * Newly discovered constraints are also solved and enforced.
+ * @param markers
+ * @return
+ */
 public int A_add_markers(Vector markers)
 {
 	Vector new_constraints; 
@@ -934,7 +959,7 @@ public int post_anchor_ops(Vector constraints)
  * Merges the segments of the stroke by ensuring end-points coincide. 
  * @param theStroke
  */
-public void adjustStroke(Stroke theStroke)
+public void Adjust_Stroke(Stroke theStroke)
 {
 	// connect the end points of the stroke
 	if (theStroke.getM_segList().size() >= 2)
@@ -953,6 +978,7 @@ public void adjustStroke(Stroke theStroke)
 			prevSeg = nextSeg;
 		}
 	}
+	snapAllImpPoints(theStroke.getM_segList()) ;
 }
 
 /**
@@ -1007,6 +1033,8 @@ public int A_merge_points(ImpPoint ip1, ImpPoint ip2)
 		ip2.setFixed(true);
 	ip1.deleteSelf();
 	
+	postMergeOperations(ip2);
+	
 	return 1 ;
 }
 
@@ -1048,7 +1076,7 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
  * @param theStroke
  * @return
  */
-public Vector recognize_Constraints(Stroke theStroke)
+public Vector Recognize_Constraints(Stroke theStroke)
 {
 	Stroke m_currStroke = theStroke;
 	Vector constraints = null ;
@@ -1122,7 +1150,7 @@ public Vector recognize_Constraints(Stroke theStroke)
  * Recognize segments of the stroke.. Assumes segmentation has already 
  * been performed.  
  */
-public Vector<Segment> recognizeSegments(Stroke theStroke)
+public Vector<Segment> Recognize_Segments(Stroke theStroke)
 {
 	//m_currStroke = theStroke;
 	RecognitionManager recogMan = m_processManager.getRecogManager();
@@ -1288,12 +1316,6 @@ public Vector  A_addConstraintsForMarkers()
 	// check if new markers are added.
 	if ((m_drawData.isUnusedMarker()) || (m_drawData.isUnusedText()))
 	{
-		//setM_mousePressedLogged(true);
-		// dont show the last stroke
-		
-		///m_showLastStroke = false;
-
-		// recognize markers
 		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 		MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
 		MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
@@ -1332,12 +1354,6 @@ public Vector  A_addConstraintsForMarkers()
 				//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
 				return newConstraints ;
 			}
-
-		///	resizePanel();
-		///	repaint();
-		///	this.setCursor(prevCursorType);
-
-//			snapIPsAndRecalculateConstraints();
 		}
 
 	}
@@ -1399,12 +1415,12 @@ public Vector performSegFusion(AnchorPoint ap)
 				theStroke.deleteSegments();
 
 				
-				recognizeSegments(theStroke);
-				adjustStroke(theStroke);
+				Recognize_Segments(theStroke);
+				Adjust_Stroke(theStroke);
 				m_drawData.addStroke(theStroke);
 
-				return recognize_Constraints(theStroke) ;
-				//return recognizeSegmentsAndConstraints(theStroke);
+				return Recognize_Constraints(theStroke) ;
+				//return Recognize_SegmentsAndConstraints(theStroke);
 
 			}
 		}
@@ -1482,11 +1498,11 @@ public Vector performReSegmentation(Stroke theStroke, Point pt)
 			segPtList.add(0, sp);
 		}
 		
-		recognizeSegments(theStroke);
-		adjustStroke(theStroke);
+		Recognize_Segments(theStroke);
+		Adjust_Stroke(theStroke);
 		m_drawData.addStroke(theStroke);
-		return recognize_Constraints(theStroke) ;
-		//return recognizeSegmentsAndConstraints(theStroke);
+		return Recognize_Constraints(theStroke) ;
+		//return Recognize_SegmentsAndConstraints(theStroke);
 	} else
 	{
 		JOptionPane.showMessageDialog(null, "No Close Pixel found ", "Resegmentation Error",
@@ -1767,7 +1783,9 @@ public double[][] findMiddlePtsWhileMoving(Segment seg1, Segment seg2){
 
 /**************************** SNAPPING *****************************/
 
-
+/**
+ * 
+ */
 
 public void snapAllImpPoints(Vector SegmentList)
 {
@@ -1801,7 +1819,12 @@ public void snapSegment(Segment seg)
 	}
 }
 
-
+/**
+ * Merges closest points. With simple segmentation, it is imperative that this works 
+ * perfectly.
+ * @param ip
+ * @return
+ */
 public boolean snapIP(ImpPoint ip)
 {
 	// It may happen that this point was replaced by some point in the outer
@@ -1822,10 +1845,6 @@ public boolean snapIP(ImpPoint ip)
 	// snap ip to the closest PT;
 	if (closestPt != null)
 	{
-		// added on 09-02-10
-		// if this important point belongs to Circular arc and is center point
-		// don't merge
-		// ip.move(closestPt.getX(), closestPt.getY());
 		if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE)
 		{
 			if(!iterateParentVector(ip)){

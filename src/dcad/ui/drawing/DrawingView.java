@@ -650,7 +650,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				//added on 25-02-10
 				//if (m_currStroke != null
-				Vector constraints = ProcessStroke(m_currStroke) ;
+				Vector constraints = Process_Stroke(m_currStroke) ;
 			}
 		}
 		else //edit mode
@@ -1304,7 +1304,7 @@ if(type=="moved")
 	 * @param theStroke
 	 * @return Constraints Vector.
 	 */
-	public Vector addStroke(Stroke theStroke)
+	public Vector Add_Stroke(Stroke theStroke)
 	{
 		A.A_draw_Stroke(theStroke) ;
 		
@@ -1324,13 +1324,13 @@ if(type=="moved")
 	 * @param strk
 	 * @return
 	 */
-	public Vector ProcessStroke(Stroke strk)
+	public Vector Process_Stroke(Stroke strk)
 	{
 		UI_log(A.getMethod()) ;
 		Vector constraints = null ;
 		if (strk != null )
 		{			
-			constraints = addStroke(strk); //Does all the work
+			constraints = Add_Stroke(strk); //Does all the work
 
 			constraints = A.Refresh_Drawing(strk,constraints) ;
 			
