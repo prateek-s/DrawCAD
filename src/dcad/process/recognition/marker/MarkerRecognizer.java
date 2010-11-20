@@ -360,14 +360,14 @@ public class MarkerRecognizer
 					{
 						// check if there is a connection between the two segments
 						Vector uniquePoints=constraintsHelper.getUniquePointsForConnectedLines((SegLine)segment1,(SegLine)segment2);
-						//		if(uniquePoints.size()>0)
-						//		{
+						//if(uniquePoints.size()>0)
+						//{
 						if(markerSegment1.getM_length() <= Marker.MARKER_SIZE && markerSegment2.getM_length()<=Marker.MARKER_SIZE)
 						{
 							m_marker = new MarkerPerpendicular(stroke, (SegLine)segment1,(SegLine)segment2);	
 							markerType = m_marker.getM_type();
 						}
-						//	}
+						//}
 					}
 
 

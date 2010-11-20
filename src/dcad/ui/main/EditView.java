@@ -40,6 +40,8 @@ import dcad.model.geometry.Stroke;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
 import dcad.process.io.Command;
+import dcad.process.recognition.segment.ConvertSegment;
+import dcad.process.recognition.stroke.ConvertStrokeType;
 import dcad.ui.drawing.*;
 import dcad.util.GConstants;
 import dcad.util.GMethods;
@@ -505,6 +507,17 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	}
 
+	public int ChangeToMarker(Segment seg) 
+	{
+		Stroke strk = seg.getM_parentStk() ;
+
+		ConvertStrokeType convStrokeType = new ConvertStrokeType();
+		convStrokeType.ConvertLastDrawnStroke();
+		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
+
+		return 1;
+	}
+	
 	/****************************************************************************/
 	
 	public void UIUpdate() 
@@ -758,7 +771,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			ChangeSegment(seg,Segment.CIRCLE) ;
 		}
 		else if (item.compareTo("Marker")==0) {
-			;
+			ChangeToMarker(this.seg) ;
 		}
 
 	}
@@ -784,6 +797,9 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		return 0;
 	}
 
+	/**
+	 * clear highlighted element when mouse exits..
+	 */
 	public void mouseExited(MouseEvent e)
 	{
 		//	clearHighlighting();
@@ -791,6 +807,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		removeKeyListener(this);
 		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
 		MainWindow.getM_statusBar().setCoordLabelText("");
+		this.dv.A.clear_highlighted() ;
 		//	helpDrawView.unselectRows();
 	}
 
@@ -800,6 +817,9 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	public void mouseClicked(MouseEvent e) {}
 
+	/**
+	 * On mouse enter,show the last drawn stroke and its segments.
+	 */
 	public void mouseEntered(MouseEvent e) 
 	{
 		requestFocusInWindow();
@@ -807,10 +827,8 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		addKeyListener(this);
 		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
-		//	if(helpDrawView == null){
-		//		helpDrawView = MainWindow.getHelpDrawingView();
-		//	}
-		//	helpDrawView.selectRows(GConstants.CONSTRAINT_VIEW);
+		this.dv.A.Highlight_last_stroke() ;
+		
 	}
 
 	public void keyTyped(KeyEvent e)
@@ -840,7 +858,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	}
 
 
-}
+} // END OF CLASS
 
 
 /****************************************************************************/

@@ -264,7 +264,10 @@ public class AnchorPoint extends ImpPoint
 	
 	public boolean equals(AnchorPoint ap2) {
 		boolean def = false ;
-		return this.m_point.equals(ap2.m_point) ;
+		if(this.m_point.distance(ap2.m_point) < 5.0)
+			return true ;
+		
+		return def ;
 		
 	}
 	

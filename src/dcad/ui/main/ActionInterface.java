@@ -100,6 +100,8 @@ public class ActionInterface
     public ProcessManager m_processManager = ProcessManager.getInstance(); 
 
     public Vector<GeometryElement> m_highlightedElements = new Vector()  ;
+    
+    public Stroke last_stroke = null ;
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
@@ -127,6 +129,7 @@ public void DSTATE(String s){
 	adjustStroke(strk) ; //merges segments.
 
 	m_drawData.addStroke(strk) ;
+	last_stroke = strk; 
 	new_constraints = recognize_Constraints(strk);
 	DSTATE(getMethod()+ "STROKE COMPLETE") ;	 
 	return null ;
@@ -2091,13 +2094,20 @@ public int Highlight(Point m_mousePos, int type)
 		
 	} // SWITCH
 	
+	
+	
 	for(GeometryElement e: to_highlight) {
-		e.setHighlighted(true) ;
+		Highlight_element(e) ;
 	}
 	m_highlightedElements = to_highlight ;
 
 	return to_highlight.size() ;
 	
+	
+}
+
+public void Highlight_element(GeometryElement e) {
+	e.setHighlighted(true) ;
 	
 }
 
@@ -2126,6 +2136,24 @@ public Vector merge_highlighted(Vector a, Vector b)
 	}
 	return b ;
 }
+
+/**
+ * highlight the last drawn stroke and the segments.
+ * @return
+ */
+public int Highlight_last_stroke() 
+{
+	clear_highlighted() ;
+	Stroke strk = this.last_stroke ;
+	if(strk==null) return 0;
+	int i =0 ;
+	for (Segment s : last_stroke.getM_segList()) {
+		++i ;
+		Highlight_element(s) ;
+	}
+	return i ;
+}
+
 
 /********************* END OF CLASS ***********************************/
 }
