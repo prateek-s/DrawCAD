@@ -40,7 +40,11 @@ import dcad.model.geometry.Stroke;
 import dcad.model.geometry.segment.SegCircleCurve;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
+import dcad.process.ProcessManager;
 import dcad.process.io.Command;
+import dcad.process.recognition.RecognitionManager;
+import dcad.process.recognition.marker.MarkerRecogManager;
+import dcad.process.recognition.marker.MarkerRecognizer;
 import dcad.process.recognition.segment.ConvertSegment;
 import dcad.process.recognition.stroke.ConvertStrokeType;
 import dcad.ui.drawing.*;
@@ -503,10 +507,16 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	{
 		Stroke strk = seg.getM_parentStk() ;
 
-		ConvertStrokeType convStrokeType = new ConvertStrokeType();
-		convStrokeType.ConvertLastDrawnStroke();
-		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
+//		ConvertStrokeType convStrokeType = new ConvertStrokeType();
+//		convStrokeType.ConvertLastDrawnStroke();
+//		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
 
+		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+		MarkerRecognizer mrkrecog =  recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
+		Vector markers = mrkrecog.user_specified_marker(strk) ;
+		
+		display_marker_options(markers) ;
+		
 		return 1;
 	}
 	

@@ -10,6 +10,7 @@ import dcad.model.constraint.constraintsHelper;
 import dcad.model.constraint.connect.IntersectionConstraint;
 import dcad.model.geometry.AnchorPoint;
 import dcad.model.geometry.Stroke;
+import dcad.model.geometry.Text;
 import dcad.model.geometry.segment.SegCircleCurve;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
@@ -378,7 +379,42 @@ public class MarkerRecognizer
 		return markerType;
 	}
 
+	/**
+	 * Return a list of markers possible.
+	 * @param strk
+	 * @return
+	 */
+	public Vector user_specified_marker(Stroke strk) 
+	{
+		Vector intersecting = new Vector() ;
+		Vector temp = new Vector() ;
+		Vector markers = new Vector() ;
+		
+		for (Segment s : strk.getM_segList()) {
+			for(Object d:MainWindow.getDv().A.m_drawData.getAllSegments()) {
+				temp = s.intersects((Segment)d) ;
+				MainWindow.getDv().A.merge_highlighted(temp,intersecting) ;
+			}
+		}
+		if(intersecting.size() == 0 ) {
+			return null ; //no marker possible!
+		}
+		if (intersecting.size() == 1) {
+			Marker m1 = new MarkerEquality(strk , (Segment)intersecting.elementAt(0));
+			Marker m2 = new MarkerParallel (strk , (Segment)intersecting.elementAt(0));
+			markers.add(m1) ; markers.add(m2) ;
+		}
+		else if(intersecting.size()==2) {
+			Marker m1 = new MarkerPerpendicular(strk,(Segment)intersecting.elementAt(0) ,(Segment)intersecting.elementAt(1)) ;
+			Text text = null;
+			Marker m2 = new MarkerAngle(strk, (Segment)intersecting.elementAt(0), (Segment)intersecting.elementAt(1), text);
+			markers.add(m1) ; markers.add(m2) ;
+		}
+		
+		return markers ;
+	}
 
+	
 	public Marker getM_marker()
 	{
 		return m_marker;

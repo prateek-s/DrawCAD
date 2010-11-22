@@ -238,16 +238,17 @@ public Vector Refresh_Drawing (Stroke strk, Vector constraints)
  *previous state, or it should leave existing constraints as is, it will be cleared up in the
  *later stages of the drawing anyway.
  */
+
 public int A_delete_Element(GeometryElement element) 
 {
-	restore_old_draw_data() ;
-	return 1;
-//	element.delete() ;
+//	restore_old_draw_data() ;
+//	return 1;
+	element.delete() ;
 //	Add constraint recalculation here..
-//	removeConstraints(element);
-//	Vector constraints = new Vector() ;
-//	constraints = A_snapIPsAndRecalculateConstraints(constraints) ; //just want to pass an empty vector.
-//	return constraints.size() ;
+	removeConstraints(element);
+	Vector constraints = new Vector() ;
+	constraints = A_RecalculateConstraints(constraints) ; //just want to pass an empty vector.
+	return constraints.size() ;
 }
 
 boolean m_elementDragged ;
