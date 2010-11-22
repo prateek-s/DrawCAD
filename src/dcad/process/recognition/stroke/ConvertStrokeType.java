@@ -50,7 +50,8 @@ import dcad.ui.main.MainWindow;
  * Class to convert normal stroke to marker and vice-versa
  * @author Sunil 
  */
-public class ConvertStrokeType {
+public class ConvertStrokeType 
+{
 	private final int NORMAL_STROKE = 0;
 	private final int MARKER = 1;
 	private DrawingView dv = null;
@@ -75,7 +76,8 @@ public class ConvertStrokeType {
 		dv.setStrokeConverted(true);
 		boolean converted = true;
 		GMethods.getCurrentView().logEvent("setStrokeConverted({boolean}" + converted + ");");
-		if(strokeType == MARKER){
+		if(strokeType == MARKER)
+		{
 			// change to normal stroke
 			Vector markerList = dv.getM_drawData().getM_markers();
 			Marker marker = (Marker)markerList.get(markerList.size()-1);
@@ -88,7 +90,8 @@ public class ConvertStrokeType {
 			dv.setStrokeConvertedTo(NORMAL_STROKE);
 			GMethods.getCurrentView().logEvent("setStrokeConvertedTo({int}" + NORMAL_STROKE + ");");
 		}
-		else if(strokeType == NORMAL_STROKE){
+		else if(strokeType == NORMAL_STROKE)
+		{
 			dv.setStrokeConvertedTo(MARKER);
 			GMethods.getCurrentView().logEvent("setStrokeConvertedTo({int}" + MARKER + ");");
 			// set bit to marker
@@ -121,7 +124,7 @@ public class ConvertStrokeType {
 		Stroke stk = (Stroke)stkList.get(stkList.size()-1);
 		ConvertStroke(stk) ;
 
-		}
+	}
 
 	
 }

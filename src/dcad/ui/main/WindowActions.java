@@ -87,7 +87,8 @@ public class WindowActions
 	}
 
 
-	public void addElementToUndoVector(){
+	public void addElementToUndoVector()
+	{
 		DrawingView dv = GMethods.getCurrentView();
 		DrawingData m_drawData = dv.getDrawData();
 		

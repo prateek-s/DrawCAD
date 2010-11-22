@@ -18,7 +18,7 @@ import dcad.util.GVariables;
  * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily)
  * DrawingData object contains all the displayable objects in the current drawing
  */
-public class DrawingData
+public class DrawingData implements Cloneable
 {
 	
 	private static Vector m_constraints;
@@ -407,4 +407,17 @@ public class DrawingData
 			c.resetDrawingRatio(GConstants.drawingRatio,1);
 		}
 	}
+	
+	
+	 public Object clone()
+     {
+         try {
+             return super.clone();
+         }
+     catch( CloneNotSupportedException e ) {
+             return null;
+         }
+     } 
+	
+/****************************** END OF CLASS ******************************/
 }

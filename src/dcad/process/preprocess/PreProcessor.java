@@ -34,10 +34,10 @@ public class PreProcessor
 	 * this method would call other routines for segmentation, basic beautification etc.
 	 * @return Vector, Decorated segment points as a Vector
 	 */
-	public Vector preProcess(Stroke theStroke)
+	public Vector preProcess(Stroke theStroke, int SegmentationScheme)
 	{
 		// perform segmentation of the stroke to get the segment points/ breakpoints
-		Vector segmentPos = m_segmentor.performSegmentation(theStroke,Prefs.getSegScheme());
+		Vector segmentPos = m_segmentor.performSegmentation(theStroke, SegmentationScheme);
 		//Vector segmentPos = m_segmentorNew.performSegmentation(theStroke);
 		
 		

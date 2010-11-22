@@ -185,51 +185,7 @@ public class Segmentor
 			prevPixel = currPixel;
 			currPixel = null;
 		}		
-/*		
-		if(iter.hasNext())
-		{
-			// get the second point
-			currPixel = (PixelInfo)iter.next();
-			
-			prevCurrDist = prevPixel.distance(currPixel);
-			prevCurrAngle = GlobalMethods.angle(prevPixel, currPixel);
-			// ///System.out.println(prevCurrAngle);
-			// no need to check for divide by zero error points are not sampled until the mouse moves 
-			// and when the mouse moves time will be different due to the sampling rate.
-			double speed = prevCurrDist / (currPixel.getTime() - prevPixel.getTime());
-			/////System.out.println("speed: "+ speed);
-			currPixel.setSpeed(speed);
-		}
 
-		while (iter.hasNext())
-		{
-			PixelInfo nextPixel = (PixelInfo) iter.next();
-			
-			// calculate curvature at this pixel
-			double currNextDist = currPixel.distance(nextPixel);
-			double currNextAngle = GlobalMethods.angle(currPixel, nextPixel);
-			// ///System.out.println(currNextAngle);
-			
-			// no need to check for divide by zero error points are not sampled until the mouse moves 
-			// and when the mouse moves time will be different due to the sampling rate.
-			double speed = currNextDist / (nextPixel.getTime() - currPixel.getTime());
-			/////System.out.println("speed: "+ speed);
-			nextPixel.setSpeed(speed);
-			
-			// curvature is the change of slope divided by change of distance 
-			// double curvature = (currNextAngle-prevCurrAngle)/(currNextDist+prevCurrDist);
-			double curvature = (currNextAngle-prevCurrAngle)/prevCurrDist;
-	    	
-	    	// set the value of curvature for this pixel
-	    	currPixel.setCurvature(Math.abs(curvature));
-	    	
-	    	// transfer values
-	    	prevPixel = currPixel;
-	    	currPixel = nextPixel;
-	    	prevCurrDist = currNextDist;
-	    	prevCurrAngle = currNextAngle;
-		}
-*/		
 		// set the curvature of the last pixel to 0, the last pixel is stored in currPixel
 		if(currPixel != null) currPixel.setCurvature(0);
 		
@@ -239,8 +195,6 @@ public class Segmentor
 //ISHWAR			///System.out.println(i + ". (" + pi.x + "," + pi.y + ") " +pi.getCurvature() + " " + pi.getTime() + " " + pi.getSpeed());
 		}
 	}
-	
-	
 	
 	public Vector performSegmentation(Stroke theStroke,int segScheme)
 	{
@@ -559,125 +513,7 @@ public class Segmentor
 		IterationPts.add((double ) PrevError);
 		IterWiseSegPts = appendVector(IterWiseSegPts,IterationPts);
 		double NewError = -1;
-/*		int vectorIndex = 0;
-		
-		while(CurvVector.size()!=0 || SpeedVector.size()!=0){
-	*/		
-			// code for accepting seg points uptil pts reduce the error by 100
-		/*
-			if(CurvVector.size()!=0){
-				int CurvIndex = (Integer)CurvVector.get(0);
-				CommonSegmentPts.add(CurvIndex);
-				CurvVector.remove(0);
-				Collections.sort(CommonSegmentPts);
-				NewIterError = calculateError(CommonSegmentPts, theStroke);
-				if((PrevIterError - NewIterError) > 100.0){
-					vectorIndex++;
-					IterWiseSegPts.add(CurvIndex);
-					PrevIterError = NewIterError;
-				}
-				else{
-					while(CurvVector.size()!=0){
-						CurvVector.remove(0);
-					}					//return IterWiseSegPts;
-				}
-			}
-			
-			
-			if(SpeedVector.size()!=0){
-				int SpeedIndex = (Integer)SpeedVector.get(0);
-				CommonSegmentPts.add(SpeedIndex);
-				SpeedVector.remove(0);
-				Collections.sort(CommonSegmentPts);
-				NewIterError = calculateError(CommonSegmentPts, theStroke);
-				///System.out.println("New Error = " + NewIterError);
-			//CommonSegmentPts.add((Double)NewIterError);
-				if((PrevIterError  -  NewIterError) > 100.0 ){
-					vectorIndex++;
-					IterWiseSegPts.add(SpeedIndex);
-					PrevIterError = NewIterError;
-				}
-				else{
-					while(SpeedVector.size()!=0){
-						SpeedVector.remove(0);
-					}		
-					//return IterWiseSegPts;
-				}
-			
-				
-			}*/
-			// my approach
-	/*		
-			if(CurvVector.size()!=0){
-				int Index = findMinimumErrorIndex(CurvVector,CommonSegmentPts,theStroke);
-				if(Index != -1){
-				int CurvIndex = (Integer)CurvVector.get(Index);
-				CommonSegmentPts.add((Integer)CurvIndex);
-				CurvVector.remove(Index);
-				}
-				else{
-					CurvVector = clearVector(CurvVector);
-				}
-			}
-			if(SpeedVector.size()!=0){
-				int Index = findMinimumErrorIndex(SpeedVector,CommonSegmentPts,theStroke);
-				if(Index != -1){
-				int SpeedIndex = (Integer)SpeedVector.get(Index);
-				CommonSegmentPts.add((Integer)SpeedIndex);
-				SpeedVector.remove(Index);
-				}
-				else{
-					SpeedVector = clearVector(SpeedVector);
-				}
-			}
-			IterationPts = clearVector(IterationPts);
-			IterationPts = copyVector(IterationPts, CommonSegmentPts);
-			Collections.sort(IterationPts);
-			IterError = calculateError(IterationPts, theStroke);
-			IterationPts.add((double) IterError);
-			IterWiseSegPts = appendVector(IterWiseSegPts,IterationPts);
-			removeNearbyPixels(theStroke);
 
-		}
-		CommonSegmentPts = clearVector(CommonSegmentPts);
-		CommonSegmentPts = selectBestSegPtsSet(IterWiseSegPts);*/
-		
-		/*	if(CurvVector.size()!=0){
-		int Index = findMinimumErrorIndex(CurvVector,CommonSegmentPts,theStroke);
-		if(Index != -1){
-		int CurvIndex = (Integer)CurvVector.get(Index);
-		CommonSegmentPts.add((Integer)CurvIndex);
-		CurvVector.remove(Index);
-		}
-		else{
-			CurvVector = clearVector(CurvVector);
-		}
-	}
-	if(SpeedVector.size()!=0){
-		int Index = findMinimumErrorIndex(SpeedVector,CommonSegmentPts,theStroke);
-		if(Index != -1){
-		int SpeedIndex = (Integer)SpeedVector.get(Index);
-		CommonSegmentPts.add((Integer)SpeedIndex);
-		SpeedVector.remove(Index);
-		}
-		else{
-			SpeedVector = clearVector(SpeedVector);
-		}
-	}
-	IterationPts = clearVector(IterationPts);
-	IterationPts = copyVector(IterationPts, CommonSegmentPts);
-	Collections.sort(IterationPts);
-	IterError = calculateError(IterationPts, theStroke);
-	IterationPts.add((double) IterError);
-	IterWiseSegPts = appendVector(IterWiseSegPts,IterationPts);
-	removeNearbyPixels(theStroke);
-
-}
-CommonSegmentPts = clearVector(CommonSegmentPts);
-CommonSegmentPts = selectBestSegPtsSet(IterWiseSegPts);*/
-		
-		
-		// hybrid fit approach
 		int curvIndex = -1, speedIndex = -1;
 		double curvError,speedError;
 		Vector curvPts = new Vector();

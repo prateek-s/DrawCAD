@@ -587,19 +587,20 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				 */
 				GeometryElement e = (GeometryElement) A.m_highlightedElements.get(0) ;
 				Vector es = (Vector) A.m_highlightedElements.subList(0, 1) ;
+				
 				A.A_add_anchor_point(es , pt) ;
 			
 				//partitionLineSegments(e, x, y);
 				//WAS HERE
 			}
-			else
-			{
+//			else
+//			{
 				GVariables.setDRAWING_MODE(GConstants.EDIT_MODE);
-				if (!A.smartMergeSelectedEleToHighLightedEle())
-				{
+	//			if (!A.smartMergeSelectedEleToHighLightedEle())
+	//			{
 					clearSelection();
-				}
-			}
+	//		}
+//			}
 		} 
 	}
 	
@@ -1104,27 +1105,38 @@ if(type=="moved")
 		}
 	}
 
-	
+	/**
+	 * Delete the highlighted elements..
+	 */
 	public void deleteKeyPressed()
-	{
-		if (A.m_selectedElements.size() > 0)
+	{	
+		if (A.something_highlighted())
 		{
 			logEvent("deleteKeyPressed()");
 			logEvent(Command.PAUSE);
 
-			Iterator iter = A.m_selectedElements.iterator();
-			while (iter.hasNext())
-			{
-			    A.A_delete_Element((GeometryElement )iter.next()) ;
-
+			for (Object o : A.m_highlightedElements) {
+				A.A_delete_Element((GeometryElement)o) ;
 			}
-			A.m_selectedElements.clear();
+			
+			A.m_highlightedElements.clear();
 			repaint();
 
 			UpdateUI(1,m_drawData.getM_constraints());
 		}
 	}
 
+	public void DeleteObject(GeometryElement e) 
+	{
+		logEvent("deleteKeyPressed()");
+		logEvent(Command.PAUSE);
+		A.A_delete_Element(e) ;	
+		A.m_highlightedElements.clear();
+		repaint();
+
+		UpdateUI(1,m_drawData.getM_constraints());
+	}	
+	
 
 /********************* DRAWING ON SCREEN ***************************/
 
@@ -1356,27 +1368,27 @@ if(type=="moved")
  * center of circle with any other point.
  * Merge it only in Edit mode(when an element is being dragged)
  */
-	public void snapIPs()
+public void snapIPs()
+{
+	// found on 22-02-10 when we type a text then also the tool is in Drawing mode.
+	// so checked here whether the Enter key is clicked do not do this
+	if(!isEnterKeyClicked())
 	{
-		// found on 22-02-10 when we type a text then also the tool is in Drawing mode.
-		// so checked here whether the Enter key is clicked do not do this
-		if(!isEnterKeyClicked())
+		if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE && m_drawData.getStrokeList().size()>=1)
 		{
-			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE && m_drawData.getStrokeList().size()>=1)
+			A.Snap_IPs_new(m_currStroke) ;
+		}
+		//else, not draw mode, or no strokes.
+		else	
+		{
+			if (A.something_highlighted())
+		//if (isM_elementDragged() && (A.m_highlightedElements.size() > 0))
 			{
-				A.Snap_IPs_new(m_currStroke) ;
-			}
-			//else, not draw mode, or no strokes.
-			else	
-			{
-				if (A.m_highlightedElements.size() > 0)
-//FIXME				//if (isM_elementDragged() && (A.m_highlightedElements.size() > 0))
-				{
-					A.Snap_IP_drag(A.m_highlightedElements) ; 
-				}
+				A.Snap_IP_drag(A.m_highlightedElements) ; 
 			}
 		}
 	}
+}
 
 /***********************************************************************/
 	
@@ -1410,10 +1422,10 @@ if(type=="moved")
 	private void fixElements(int x, int y)
 	{
 		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
-		if (!A.smartMergeSelectedEleToHighLightedEle())
-		{
-			clearSelection();
-		}
+//		if (!A.smartMergeSelectedEleToHighLightedEle())
+//		{
+//			clearSelection();
+//		}
 
 		logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
 		setM_mousePressedLogged(true);
@@ -1429,7 +1441,7 @@ if(type=="moved")
 	 */
 	private void clearSelection()
 	{
-		A.A_clear_selection() ;
+		A.clear_selected() ;
 		GMethods.getRecognizedView().updateSelection(A.m_selectedElements);
 	}
 	
@@ -1605,7 +1617,7 @@ public void UI_log(String s)
 	{
 		snapIPs(); 
 		
-		newConstraints = A.A_snapIPsAndRecalculateConstraints(NewConstraints) ;
+		newConstraints = A.A_RecalculateConstraints(NewConstraints) ;
 		
 		UpdateUI(1,newConstraints);
 	}
@@ -1772,11 +1784,10 @@ public void UI_log(String s)
 		}
 	}
 	
-	/**Function to check whether Mouse_Button 3 is clicked on any element
-	 * If yes then show appropriate parameter window
-	 * @author Sunil Kumar
+	/**
+	 * Update the Edit pane
 	 */
-	public void showElementPropertiesWindow(int x, int y,int buttonType)
+	public void showElementPropertiesWindow (int x, int y,int buttonType)
 	{
 		if((m_currStroke==null || 
 				(m_currStroke.getLength()==0 )) 
@@ -1840,19 +1851,13 @@ public void UI_log(String s)
 			segL = stroke.getM_segList();
 
 			segm = (Segment)segL.elementAt(0) ;
-		}
+			
 			//lineWindow = new LineParameterWindow();
-			if(segm!=null)
-			{
-				//Point pt = getMousePointerLocation() ;
-				Point pt = getM_mousePos() ;
-				
-				Point pt3 = getLocationOnScreen() ;
-				Point pt4 = getLocation() ;
-				///System.out.println("BEGIN POINT CO_ORDINATES......................") ;
-				
-				ev.displayOptions(segm,pt2) ;
-			}
+		if(segm!=null)
+		{
+			ev.displayOptions(segm) ;
+		}
+		}
 			//A.m_highlightedElements.clear();		
 	//	}
 	}

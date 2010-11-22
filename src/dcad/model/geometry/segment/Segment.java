@@ -365,21 +365,16 @@ public abstract class Segment extends GeometryElement
 	
 	public void clearConstraints(int catagory)
 	{
-//		///System.out.println("Segment.clearConstraints()"+getM_strId());
-		// remove all the constarints
-		//ISHWAR Changed "SOFT" to catagory
+
 		Vector constraints = getConstraintsByCatagory(catagory);
 		Iterator iter = constraints.iterator();
 		while (iter.hasNext())
 		{
 			Constraint cons = (Constraint) iter.next();
-//			///System.out.println(cons);
-			
-			// remove only constraints of the given catagory
+
 			if(cons.getM_category() == catagory)
 			{
 				cons.remove();
-//				///System.out.println("Constraint Removed: "+cons);
 			}
 			iter.remove();
 		}

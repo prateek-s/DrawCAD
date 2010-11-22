@@ -204,8 +204,6 @@ public class MarkerRecognizer
 						}
 						//	}
 					}
-
-
 				}
 			}
 			break;
@@ -369,8 +367,6 @@ public class MarkerRecognizer
 						}
 						//}
 					}
-
-
 				}
 			}
 			break;
