@@ -65,8 +65,8 @@ public class ConstraintSolver
 		NewtonMethod.initializeVariables(getVariableList(fixedPoints,allAffectedPoints));
 		NewtonMethod.saveInitialValues();
 		
-		if(solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.fromUserAppliedConstraints,new Vector()))
-		{
+		boolean solved = solveConstraints(allAffectedConstraints,fixedPoints,NewtonMethod.fromUserAppliedConstraints,new Vector());
+		if (solved){
 			///System.out.println(" :) :) :) :) :) Constraint added (: (: (: (: (: ");
 			return constraints;
 		}

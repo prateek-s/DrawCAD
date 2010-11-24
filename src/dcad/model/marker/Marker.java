@@ -133,6 +133,5 @@ public abstract class Marker extends GeometryElement
 	{
 		return null;
 	}
-
 	
 }

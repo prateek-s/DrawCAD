@@ -40,6 +40,9 @@ import dcad.model.geometry.Stroke;
 import dcad.model.geometry.segment.SegCircleCurve;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
+import dcad.model.marker.Marker;
+import dcad.model.marker.MarkerEquality;
+import dcad.model.marker.MarkerLineAngle;
 import dcad.process.ProcessManager;
 import dcad.process.io.Command;
 import dcad.process.recognition.RecognitionManager;
@@ -230,6 +233,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			//Try to get the segment through other means. 
 			this.seg = dv.getGeoElementClicked();
 		}
+		this.markers = null ;
 	}	
 
 	/******************************************************************************/
@@ -509,9 +513,9 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	{
 		Stroke strk = seg.getM_parentStk() ;
 
-		ConvertStrokeType convStrokeType = new ConvertStrokeType();
-		convStrokeType.ConvertLastDrawnStroke();
-		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
+//		ConvertStrokeType convStrokeType = new ConvertStrokeType();
+//		convStrokeType.ConvertLastDrawnStroke();
+//		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
 //		ConvertStrokeType convStrokeType = new ConvertStrokeType();
 //		convStrokeType.ConvertLastDrawnStroke();
 //		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
@@ -519,15 +523,63 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 		MarkerRecognizer mrkrecog =  recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
 		Vector markers = mrkrecog.user_specified_marker(strk) ;
+		System.out.println("POSSIBLE MARKERS") ;
+		
+		for (Object m: markers) { 
+			Marker mm = (Marker) m;
+			System.out.println(mm.getClass().getSimpleName()) ;
+		}
 		
 		display_marker_options(markers) ;
 
 		return 1;
 	}
 
-	public int set_as_marker(int index, Vector markers)
+	
+	
+	private void display_marker_options(Vector markers)
 	{
+		if (markers ==null) return;
+	CheckboxGroup markergroup = new CheckboxGroup();
+	Vector <Checkbox> checkboxes = new Vector<Checkbox>() ;
+	    
+	for (Object o:markers) 
+	{
+		Marker m = (Marker) o;
+		Checkbox cm = new Checkbox(m.getClass().getSimpleName() , markergroup , false) ;
+		cm.addItemListener(this) ; 		//super.add(cm) ;
+
+		checkboxes.add(cm);
+	}
+	for (Checkbox b: checkboxes) {
+		super.add(b) ;
+	}
+	UIUpdate() ;
+	this.markers = markers ;
+	}
+
+	Vector markers = new Vector() ;
+	
+	public int set_as_marker(int type,Vector markers)
+	{
+		Stroke strk = seg.getM_parentStk() ;
+		Marker marker = null ;
+		//strk.deleteSegments() ;
+		for (Object o: markers) {
+			Marker m = (Marker)o ;
+			if(m.getM_type() == type) {
+				marker  = m ;
+			}
+		}
+		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+		MarkerRecognizer mrkrecog =  recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
+		mrkrecog.choose_marker(marker, markers); //sets m_marker.
 		
+		dv.A.Recognize_Constraints(strk , marker.getM_type()) ;
+		 // dv.A.Refresh_Drawing(stroke, markers) ;
+		dv.repaint();
+		
+		return 1;
 	}
 	
 	/****************************************************************************/
@@ -536,54 +588,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	{
 		updateUI() ;
 		dv.repaint();
-	}
-
-	/**************************************************************************/
-
-
-	/**Function to get index of a particular constraint in the
-	 * Constraint list (in constraint window) 
-	 * @author Sunil Kumar
-	 */
-	public static int getListConstraintIndex(Constraint cons)
-	{
-		Vector listConstraints = new Vector();
-		listConstraints = MainWindow.getRecognizedView().getListConstraints();
-		int index =-1;
-		Iterator itr = listConstraints.iterator();
-		while (itr.hasNext()){
-			index++;
-			if(cons.toString().trim().compareToIgnoreCase(itr.next().toString().trim()) == 0){
-				return index;
-			}
-		}
-		return -1;
-	}
-
-	/**Function to get particular constraint on an element if it exists
-	 * @author Sunil Kumar
-	 */
-	/*String representation of constraints everywhere. AAaaargh */
-	public static Constraint getSegmentConstraint(String element, String constraint, Segment seg)
-	{
-		Vector constraints = seg.getM_constraints();
-		Iterator itr = constraints.iterator();
-		while (itr.hasNext())
-		{
-			Constraint cons = (Constraint)itr.next();
-			String constraintString = cons.toString();
-			String parsedCons[];
-
-			parsedCons = constraintString.split("[ ]+");
-
-			for(int i =0; i < parsedCons.length ; i++){
-				System.out.println(parsedCons[i]);
-				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase(element) == 0) && (parsedCons[4].compareToIgnoreCase(constraint) == 0)){
-					return cons;
-				}
-			}
-		}
-		return null;
+		this.markers = null;
 	}
 
 
@@ -661,6 +666,10 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		}
 		else if (item.compareTo("Marker")==0) {
 			ChangeToMarker(this.seg) ;
+		}
+		
+		else if (item.endsWith("Equality")) {
+			set_as_marker(Marker.TYPE_EQUALITY, this.markers); 
 		}
 
 	}

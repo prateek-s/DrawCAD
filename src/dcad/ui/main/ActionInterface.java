@@ -137,7 +137,7 @@ public Vector A_draw_Stroke(Stroke strk)
 
 	m_drawData.addStroke(strk) ;
 	last_stroke = strk; 
-	new_constraints = Recognize_Constraints(strk);
+	new_constraints = Recognize_Constraints(strk,0);
 	
 	DSTATE(getMethod() + "STROKE COMPLETE") ;	 
 	return null ;
@@ -1076,11 +1076,16 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
  * @param theStroke
  * @return
  */
-public Vector Recognize_Constraints(Stroke theStroke)
+public Vector Recognize_Constraints(Stroke theStroke,int user_given)
 {
+	System.out.println("STROKE"+theStroke.toString());
+
 	Stroke m_currStroke = theStroke;
 	Vector constraints = null ;
-	Vector connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
+	Vector connectConstraints = new Vector() ;
+	if(user_given <= 0) {
+		connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
+	}
 
 	RecognitionManager recogMan = m_processManager.getRecogManager();
 	StrokeRecognizer strokeRecog = recogMan.getM_strokeRecogManager().getStrokeRecognizer();
@@ -1090,8 +1095,14 @@ public Vector Recognize_Constraints(Stroke theStroke)
 	//theStroke.setStrokeConverted(isStrokeConverted);
 	//theStroke.setStrokeConvertedTo(strokeConvertedTo);
 	//
-	
-	int stkType = strokeRecog.findType(theStroke);	//marker or stroke?
+	int stkType ;
+	if(user_given <= 0) {
+		 stkType = strokeRecog.findType(theStroke, user_given);	//marker or stroke?
+
+	}
+	else {
+		stkType  = Stroke.TYPE_MARKER ;
+	}
 	if (stkType == Stroke.TYPE_MARKER)
 	{
 		theStroke.setM_type(Stroke.TYPE_MARKER);
@@ -1419,7 +1430,7 @@ public Vector performSegFusion(AnchorPoint ap)
 				Adjust_Stroke(theStroke);
 				m_drawData.addStroke(theStroke);
 
-				return Recognize_Constraints(theStroke) ;
+				return Recognize_Constraints(theStroke,0) ;
 				//return Recognize_SegmentsAndConstraints(theStroke);
 
 			}
@@ -1501,7 +1512,7 @@ public Vector performReSegmentation(Stroke theStroke, Point pt)
 		Recognize_Segments(theStroke);
 		Adjust_Stroke(theStroke);
 		m_drawData.addStroke(theStroke);
-		return Recognize_Constraints(theStroke) ;
+		return Recognize_Constraints(theStroke,0) ;
 		//return Recognize_SegmentsAndConstraints(theStroke);
 	} else
 	{

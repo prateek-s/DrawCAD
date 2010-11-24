@@ -370,8 +370,6 @@ public class MarkerRecognizer
 						}
 						//}
 					}
-
-
 				}
 			}
 			break;
@@ -383,18 +381,31 @@ public class MarkerRecognizer
 		return markerType;
 	}
 
+	
 	public Vector user_specified_marker(Stroke strk) 
 	{
 		Vector intersecting = new Vector() ;
 		Vector temp = new Vector() ;
 		Vector markers = new Vector() ;
 		
-		for (Segment s : strk.getM_segList()) {
-			for(Object d:MainWindow.getDv().A.m_drawData.getAllSegments()) {
-				temp = s.intersects((Segment)d) ;
+		for (Object o : strk.getM_ptList()) 
+		{
+			Point2D p = (Point2D) o;
+		
+			for(Object d:MainWindow.getDv().A.m_drawData.getAllSegments()) 
+			{
+				Segment s = (Segment)d;
+				if( s.containsPt(p) ) {
+					temp.add(s) ;
+				}
 				MainWindow.getDv().A.merge_highlighted(temp,intersecting) ;
 			}
 		}
+		System.out.println(" INTERSECTING ") ;
+
+		for (Object o: intersecting)
+			System.out.println(o.toString()) ;
+		
 		if(intersecting.size() == 0 ) {
 			return null ; //no marker possible!
 		}
@@ -415,7 +426,7 @@ public class MarkerRecognizer
  
 	public void choose_marker (Marker marker, Vector markers)
 	{
-		
+		m_marker = marker ;
 	}
 
 	public Marker getM_marker()
