@@ -43,7 +43,7 @@ public class GConstants
 	public static final int SHOW_SOFT_ON_HL_AND_HARD_CONSTRAINTS = 6;
 	public static final int SHOW_NO_CONSTRAINTS = 7;
 	
-	public static final int DEF_MARKER_SIZE = 50;
+	public static final int DEF_MARKER_SIZE = 70;
 
 	public static final int CALC_SOFT_CONSTRAINTS_ON_MOUSE_RELEASE = 0;
 	public static final int CALC_SOFT_CONSTRAINTS_ON_FLY = 1;

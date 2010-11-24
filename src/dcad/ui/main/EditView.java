@@ -575,10 +575,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		MarkerRecognizer mrkrecog =  recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
 		mrkrecog.choose_marker(marker, markers); //sets m_marker.
 		
-		dv.A.Recognize_Constraints(strk , marker.getM_type()) ;
+		Vector c = dv.A.Recognize_Constraints(strk , marker.getM_type()) ;
 		 // dv.A.Refresh_Drawing(stroke, markers) ;
 		dv.repaint();
-		
+		dv.A.Refresh_Drawing(strk, c);
+		dv.repaint() ;
 		return 1;
 	}
 	
@@ -670,6 +671,12 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		
 		else if (item.endsWith("Equality")) {
 			set_as_marker(Marker.TYPE_EQUALITY, this.markers); 
+		}
+		else if (item.endsWith("Perpendicular")) {
+			set_as_marker(Marker.TYPE_RIGHT_ANGLE, this.markers); 
+		}
+		else if (item.endsWith("Parallel")) {
+			set_as_marker(Marker.TYPE_PARALLEL, this.markers); 
 		}
 
 	}

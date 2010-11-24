@@ -53,6 +53,9 @@ public class DrawingData
 			for (Segment seg: strk.getM_segList()) {
 				drawing= drawing + "\n <SEGMENT>" + seg.toString() + "</SEGMENT>" ;
 			}
+		if(strk.getM_type()==Stroke.TYPE_MARKER) {
+			drawing = drawing + "\n <MARKER> " + strk.toString() ;
+		}
 		}
 		return drawing ;
 	}

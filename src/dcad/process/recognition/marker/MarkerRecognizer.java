@@ -395,7 +395,8 @@ public class MarkerRecognizer
 			for(Object d:MainWindow.getDv().A.m_drawData.getAllSegments()) 
 			{
 				Segment s = (Segment)d;
-				if( s.containsPt(p) ) {
+				if( s.containsPt(p) )
+				{
 					temp.add(s) ;
 				}
 				MainWindow.getDv().A.merge_highlighted(temp,intersecting) ;

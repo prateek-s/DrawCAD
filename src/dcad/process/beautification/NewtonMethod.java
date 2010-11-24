@@ -68,6 +68,7 @@ public class NewtonMethod
 		int no_of_columns = 2 * points.length; // no of variables
 		
 		Vector nodesErrTemp=getNodesErr(conVector,fixedPoints);
+		System.out.println("SOLVE:"+ nodesErrTemp.toString()) ;
 		int no_of_rows=nodesErrTemp.size();
 		
 		// JX = b ?????????

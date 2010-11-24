@@ -359,9 +359,12 @@ public class ConstraintSolver
 			AnchorPoint temp = (AnchorPoint)fixedPoints.get(j);
 			temp.move(temp.getM_point().getX(),temp.getM_point().getY());
 		}
+		System.out.println("NEWTON METHOD") ;
 		// move the points to the specified positions
-		for (int j = 0; j < NewtonMethod.apArr.length; j++)
+		for (int j = 0; j < NewtonMethod.apArr.length; j++) {
+			System.out.println(NewtonMethod.apArr[j].toString()+" -> "+NewtonMethod.finalPositionsMatrix.get(2 * j, 0)+","+ NewtonMethod.finalPositionsMatrix.get(2 * j + 1, 0)) ;
 			NewtonMethod.apArr[j].move4Constraints(NewtonMethod.finalPositionsMatrix.get(2 * j, 0), NewtonMethod.finalPositionsMatrix.get(2 * j + 1, 0));
+		}
 		return true;
 	}
 	
