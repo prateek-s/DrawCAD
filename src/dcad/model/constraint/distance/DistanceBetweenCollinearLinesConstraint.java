@@ -91,7 +91,7 @@ public class DistanceBetweenCollinearLinesConstraint  extends RelLengthConstrain
 		AnchorPoint[] anchorPoints=constraintsHelper.getAnchorPoints(points);
 		if(constraintsHelper.independentLengthSatisfied(anchorPoints[0],anchorPoints[1],m_distance,true))
 			return true;
-		System.out.println("Distance between collinear lines constraint failed... ");
+		///System.out.println("Distance between collinear lines constraint failed... ");
 		return false;
 	}
 

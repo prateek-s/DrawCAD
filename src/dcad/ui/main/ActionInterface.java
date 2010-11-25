@@ -2,6 +2,7 @@ package dcad.ui.main;
 
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
@@ -15,6 +16,7 @@ import dcad.model.constraint.circleArc.circularArcConstraint;
 import dcad.model.constraint.collinearity.CollinearLinesConstraint;
 import dcad.model.constraint.collinearity.CollinearPointsConstraint;
 import dcad.model.constraint.connect.IntersectionConstraint;
+import dcad.model.constraint.length.EqualRelLengthConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnCircularCurveConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnLineConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnPointConstraint;
@@ -76,7 +78,7 @@ import dcad.util.Maths;
  * 
  */
 
-public class ActionInterface extends ActionHelper
+public class ActionInterface 
 {
     /*
      * The local variables of this class together form a subset of the state of the entire program. 
@@ -89,209 +91,221 @@ public class ActionInterface extends ActionHelper
     /*************************** STATE VARIABLES.  
      * ********************* BE CAREFUL WHAT GOES HERE.	
      */
-    public Vector<Constraint> new_constraints ;
+public Vector<Constraint> new_constraints ;
 
-    public DrawingData m_drawData = new DrawingData();
+public DrawingData m_drawData = new DrawingData();
 
-    public Vector m_selectedElements = new Vector() ;
+public Vector m_selectedElements = new Vector() ;
     
-    public ProcessManager m_processManager = ProcessManager.getInstance(); 
+public ProcessManager m_processManager = ProcessManager.getInstance(); 
 
-    public Vector m_highlightedElements = new Vector()  ;
+public Vector<GeometryElement> m_highlightedElements = new Vector()  ;
+    
+public Stroke last_stroke = null ;
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
+/********************************************************************/
+/**
+ * Useful to get the place where the debug was called from.
+ */
+public String getMethod()
+{
+     StackTraceElement stackTraceElements[] = (new Throwable()).getStackTrace();
+     return stackTraceElements[1].toString();
+}
 
-
-    /********************************************************************/
-
-    /**
-     * Perform Segmentation, recognize segments, merges strokes,
-     * recognizes constraints, 
-     */
-    public Vector A_draw_Stroke(Stroke strk) 
-    {
+/**
+ * Print the drawing state : all segments in drawing-data. 
+ * @param s
+ */
+public void DSTATE(String s)
+{
+	System.out.println(s + m_drawData.toString()) ;
+}
+    
+/**
+ * Perform Segmentation, recognize segments, merges strokes,
+ * recognizes constraints, 
+ */
+public Vector A_draw_Stroke(Stroke strk) 
+{
 	new_constraints = null ;
 	Vector segPts = Perform_Segmentation(strk) ;
-	Vector<Segment> Segments =  recognizeSegments(strk) ; 
-	adjustStroke(strk) ; //merges segments.
+	Vector<Segment> Segments =  Recognize_Segments(strk) ; 
+	Adjust_Stroke(strk) ; //merges segments.
 
 	m_drawData.addStroke(strk) ;
+	last_stroke = strk; 
+	new_constraints = Recognize_Constraints(strk,0);
 	
-	new_constraints = recognize_Constraints(strk);
-		 
+	DSTATE(getMethod() + "STROKE COMPLETE") ;	 
+	System.out.println(ProcessManager.dump(m_drawData, 2,null)) ;
 	return null ;
-    }
+}
 
-    /**
-     * Segmentation using the appropriate segmentation scheme which is set by other means.
-     * @param strk
-     * @return
-     */
-    public Vector Perform_Segmentation(Stroke strk)
-    {
+/**
+ * Segmentation using the appropriate segmentation scheme which is set by other means.
+ * @param strk
+ * @return
+ */
+public Vector Perform_Segmentation(Stroke strk)
+{
 	PreProcessingManager preProcessMan = m_processManager.getPreProManager();
 	PreProcessor preProcessor = preProcessMan.getPreProcessor();
-	Vector segPts = preProcessor.preProcess(strk);
+	Vector segPts = preProcessor.preProcess(strk);  //this performs the segmentation
 	strk.setM_segPtList(segPts); 
-		
+
 	return segPts ;
-		
-    }
-	
-	
-    /**
-     * Calculate new constraints which occur as a result of adding a stroke,
-     * snapips, add markers if any.
-     * @param strk
-     * @param constraints
-     * @return
-     */
-    public Vector Refresh_Drawing (Stroke strk, Vector constraints)
-    {
-	Vector new_constraints = null ;
-	if (strk.getM_type() == Stroke.TYPE_NORMAL)
-	    {
-		if ((constraints != null) && (constraints.size() > 0))
-		    {
-			if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
-			    ;
-		    }
-		new_constraints = A_snapIPsAndRecalculateConstraints(constraints);
-		//GMethods.getHelpView().initialize(HelpView.afterDrawing);
-	    }
-	//25-3-2008 Added this line.
-	else {
-	    A_add_all_markers(); 
-	}
-	return new_constraints ;
-    }
-	
-	
-    /**
-     *Deletes a given element (segment/marker). Simple call, no recalculation of constraints.!
-     */
-    public int A_delete_Element(GeometryElement element) 
-    {
-	element.delete() ;
-	return 1 ;
-    }
+}
 
-    boolean m_elementDragged ;
-    
-	public boolean isM_elementDragged()
+
+/**
+ * Calculate new constraints which occur as a result of adding a stroke,
+ * snapips, add markers if any. This is to make sure that all constraints are detected
+ * after drawing.
+ * @param strk
+ * @param constraints
+ * @return
+ */
+public Vector Refresh_Drawing (Stroke strk, Vector constraints)
+{
+Vector new_constraints = null ;
+if (strk.getM_type() == Stroke.TYPE_NORMAL)
+    {
+	if ((constraints != null) && (constraints.size() > 0))
 	{
-		return m_elementDragged;
-	}
+		if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
+		    ;
+	 }
+	new_constraints = A_snapIPsAndRecalculateConstraints(constraints);
 
-	public void setM_elementDragged(boolean dragged)
+    }
+
+else {
+    A_add_all_markers(); 
+}
+return new_constraints ;
+}
+
+
+/**
+ *Deletes a given element (segment/marker). Simple call, no recalculation of constraints.!
+ */
+public int A_delete_Element(GeometryElement element) 
+{
+element.delete() ;
+return 1 ;
+}
+
+boolean m_elementDragged ;
+
+public boolean isM_elementDragged()
+{
+	return m_elementDragged;
+}
+
+public void setM_elementDragged(boolean dragged)
+{
+	m_elementDragged = dragged;
+}
+
+/**
+ *Move the elements to new location 'to'
+ */
+public int A_move_Elements(Vector elements, Point from, Point to,int ongoing) 
+{
+	if (something_highlighted())
 	{
-		m_elementDragged = dragged;
-	}
-    
-    /**
-     *Move the elements to new location 'to'
-     */
-    public int A_move_Elements(Vector elements, Point from, Point to,int ongoing) 
-    {
-		if (m_highlightedElements.size() > 0)
-		{
-			System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
-			Vector elementsToMove = new Vector();
+		///System.out.println("Mouse drag highlighted elements : " + m_highlightedElements.size());
+		Vector elementsToMove = new Vector();
 
-			// find all elements to move
-			Iterator iter = m_highlightedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement element = (GeometryElement) iter.next();
-				if (!element.isFixed())
-				{
-					if (!(elementsToMove.contains(element)))
-						elementsToMove.add(element);
-				}
-			}
-    	
-	elementsToMove = elements ;
-	if (!isM_elementDragged())
-	    {
-		boolean remMarkers = false;
-		// this is done only once
-		 iter = elementsToMove.iterator();
-		while (iter.hasNext())
-		    {
-			GeometryElement element = (GeometryElement) iter.next();
+		// find all elements to move
+		for (Object ele : m_highlightedElements) {
+			GeometryElement element = (GeometryElement) ele ;
+			if( element==null) break ;
 			if (!element.isFixed())
-			    {
-				if (element instanceof Text){
-				    // do nothing
-				} 
-				else{
-				    // clear the soft constraints for the selected
-				    // element
-				    removeConstraints(element);
-				    remMarkers = true;
-				}
-			    }
-		    }
-		//NExt 2 statement dance not really needed. 
-		// clear the list of moved elements
-	//	m_movedElementsOldPos.clear();
-		// add all the highlighted elements to the movedElements
-		// Vector
-	//	copyMovedElements(elementsToMove);
-		//
-		
-		if (remMarkers)
-		    {
-			// remove all the unused markers or Text elements
-			Iterator itr = m_drawData.getUnusedMarkers().iterator();
-			while (itr.hasNext())
-			    {
-				Marker marker = (Marker) itr.next();
-				marker.delete();
-			    }
-				
-			// remove all the unused text Elements
-			itr = m_drawData.getUnusedText().iterator();
-			while (itr.hasNext())
-			    {
-				Text text = (Text) itr.next();
-				text.delete();
-			    }
-		    }
-
-		setM_elementDragged(true);
-	    }
-
-	Vector movedPts = findAnchorPoints(elementsToMove);
-	double movedPointsPositions[] = new double[movedPts.size() * 2];
-	// System.out.println("!!!!!!!!! Initial Positions : ");
-	for (int temp = 0; temp < movedPts.size(); temp++)
-	    {
-		AnchorPoint ap = (AnchorPoint) movedPts.get(temp);
-		movedPointsPositions[temp * 2] = ap.getX();
-		movedPointsPositions[temp * 2 + 1] = ap.getY();
-		// System.out.println(ap.getM_label() + " " + ap.getX() + "
-		// " + ap.getY());
-	    }
-				
-	 iter = elementsToMove.iterator();
+			{
+				if (!(elementsToMove.contains(element)))
+					elementsToMove.add(element);
+			}
+		}
+	
+elementsToMove = elements ;
+if (!isM_elementDragged())
+    {
+	boolean remMarkers = false;
+	// this is done only once
+	Iterator iter = elementsToMove.iterator();
 	while (iter.hasNext())
 	    {
 		GeometryElement element = (GeometryElement) iter.next();
-		element.move(from.x, from.y, to.x, to.y);
-	    }
-				
-	//iter = elementsToMove.iterator();
-	if (movedPts.size() > 0)
-	    {
-		Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,movedPointsPositions);
-		if (affectedCons == null)
+		if(element==null) break ;
+		if (!element.isFixed())
 		    {
-			boolean result = false;
-			// undo this move
-			// 29-1-2008 WindowActions.getInstance().undo();
-			// WindowActions.getInstance().undo();
+			if (element instanceof Text){
+			    // do nothing
+			} 
+			else{
+			    // clear the soft constraints for the selected
+			    // element
+			    removeConstraints(element);
+			    remMarkers = true;
+			}
+		    }
+	    }
+
+	if (remMarkers)
+	    {
+		// remove all the unused markers or Text elements
+		Iterator itr = m_drawData.getUnusedMarkers().iterator();
+		while (itr.hasNext())
+		    {
+			Marker marker = (Marker) itr.next();
+			marker.delete();
+		    }
+			
+		// remove all the unused text Elements
+		itr = m_drawData.getUnusedText().iterator();
+		while (itr.hasNext())
+		    {
+			Text text = (Text) itr.next();
+			text.delete();
+		    }
+	    }
+
+	setM_elementDragged(true);
+    }
+
+Vector movedPts = findAnchorPoints(elementsToMove);
+double movedPointsPositions[] = new double[movedPts.size() * 2];
+// ///System.out.println("!!!!!!!!! Initial Positions : ");
+for (int temp = 0; temp < movedPts.size(); temp++)
+    {
+	AnchorPoint ap = (AnchorPoint) movedPts.get(temp);
+	movedPointsPositions[temp * 2] = ap.getX();
+	movedPointsPositions[temp * 2 + 1] = ap.getY();
+	// ///System.out.println(ap.getM_label() + " " + ap.getX() + "
+	// " + ap.getY());
+    }
+			
+Iterator iter = elementsToMove.iterator();
+while (iter.hasNext())
+    {
+	GeometryElement element = (GeometryElement) iter.next();
+	element.move(from.x, from.y, to.x, to.y);
+    }
+			
+//iter = elementsToMove.iterator();
+if (movedPts.size() > 0)
+    {
+	Vector affectedCons = ConstraintSolver.solveConstraintsAfterMovement(movedPts,movedPointsPositions);
+	if (affectedCons == null)
+	    {
+		boolean result = false;
+		// undo this move
+		// 29-1-2008 WindowActions.getInstance().undo();
+		// WindowActions.getInstance().undo();
 		    } else
 		    {
 			updateConstraints(affectedCons, Constraint.HARD);
@@ -302,31 +316,50 @@ public class ActionInterface extends ActionHelper
 		return 1;
 }
 
-
-
-
-
+/**
+ * This will make sense here only when Undo is implemented properly.
+ * @param count
+ * @return
+ */
 public int A_undo(int count) 
 {
 return 1;
 }
 
+/**
+ * @see A_undo
+ * @param count
+ * @return
+ */
 public int A_redo(int count) 
 {
 return 1;
 }
 
+/**
+ * Change the given stroke to a marker. 
+ * @param strk
+ * @return
+ */
 public int A_change_to_marker(Stroke strk) 
 {
 return 1;
 }
 
+/**
+ * Convert a stroke recognized as a marker back to a stroke.
+ * @param strk
+ * @return
+ */
 public int A_change_marker_to_segment(Stroke strk) 
 {
 return 1;
 }
 
-
+/**
+ * Adds all the markers lying around in the drawing
+ * @return
+ */
 public int A_add_all_markers()
 {
 	// check if new markers are added.
@@ -352,7 +385,12 @@ public int A_add_all_markers()
 return 1;
 }
 
-
+/**
+ * Applies the constraints which the markers represent.
+ * Newly discovered constraints are also solved and enforced.
+ * @param markers
+ * @return
+ */
 public int A_add_markers(Vector markers)
 {
 	Vector new_constraints; 
@@ -361,15 +399,18 @@ public int A_add_markers(Vector markers)
 	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
 	// recognize the set of markers as constraints.text elements not read at all. relax
 	Vector constraints = converter.recognizeMarkersAsConstraints(markers,
-			m_drawData.getM_textElements(), m_drawData.getAllSegments());
+			m_drawData.getM_textElements(), new Vector());
 
 	if (constraints != null && constraints.size() > 0)
 	{
-		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+		Vector c = ConstraintSolver.addConstraintsAppliedUsingMarker(constraints);
+		if ( c!= null)
 		{
 			m_drawData.addConstraints(constraints);
 			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
-			A_snapIPsAndRecalculateConstraints(constraints );
+			
+			A_add_constraints(c);
+		//	A_snapIPsAndRecalculateConstraints(constraints);
 		}
 		//*************************************************************
 	}
@@ -377,6 +418,41 @@ public int A_add_markers(Vector markers)
 	return 1; 
 }
 	
+
+
+
+public int A_add_markers_simple(int type, Vector segments)
+{
+	Vector new_constraints; 
+	RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+	MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
+	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
+	// recognize the set of markers as constraints.text elements not read at all. relax
+	
+	
+	Constraint c = converter.simple_marker_recog(type, segments);
+	System.out.println("CONSTRAINT ...."+ c.toString()) ;
+	Vector constraints = new Vector() ; constraints.add(c) ;
+	m_drawData.addConstraints(constraints);
+	if (constraints != null && constraints.size() > 0)
+	{
+		Vector r = ConstraintSolver.addConstraintsAppliedUsingMarker(constraints);
+	//	Vector r =ConstraintSolver.addConstraintsAfterDrawing(constraints) ;
+		if ( r!= null)
+		{
+			m_drawData.addConstraints(constraints);
+			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+			DSTATE("") ;
+			//A_add_constraints(r);
+		//	A_snapIPsAndRecalculateConstraints(constraints);
+		}
+		//*************************************************************
+	}
+	
+	return 1; 
+}
+	
+
 /**
  * partition line segment earlier.
  * @param pt
@@ -495,30 +571,65 @@ return 1;
 
 public int A_change_Seg_property(Segment seg,String type, String val)
 {
-Text t = new Text(val) ;
-if(type=="angle") {
-if(seg instanceof SegLine) {
-	MarkerLineAngle marker = new MarkerLineAngle((SegLine)seg, t);
-}
-else if (seg instanceof SegCircleCurve) {
-	MarkerCircleArcAngle marker = new MarkerCircleArcAngle((SegCircleCurve)seg, t);
-
-}
-}
-
-if (type=="length") {
-	if(seg instanceof SegLine) {
-	MarkerLength marker = new MarkerLength((SegLine)seg, t);
+	
+	RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+	MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
+	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
+	
+	Text t = new Text(val) ; 
+	Marker  marker = null;
+	if(type=="angle") {
+		if(seg instanceof SegLine) {
+			 marker = new MarkerLineAngle((SegLine)seg, t);
+		}
+		else if (seg instanceof SegCircleCurve) {
+			 marker = new MarkerCircleArcAngle((SegCircleCurve)seg, t);
+		}
 	}
-}
-if (type=="radius") {
-	MarkerRadius marker = new MarkerRadius((SegCircleCurve)seg, t);
 
+	if (type=="length") {
+		if(seg instanceof SegLine) {
+			 marker = new MarkerLength((SegLine)seg, t);
+		}
+	}
+	if (type=="radius") {
+		 marker = new MarkerRadius((SegCircleCurve)seg, t);
+	}
+	
+	if(marker==null) return -1 ;
+	
+	Vector newMarkers = new Vector() ; newMarkers.add(marker) ;
+	
+	m_drawData.getM_markers().add(marker) ;
+
+	// recognize the set of markers as constraints
+	Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
+			m_drawData.getM_textElements(), m_drawData.getAllSegments());
+
+	if (constraints != null && constraints.size() > 0)
+	{
+		
+	
+		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+		{
+			m_drawData.addConstraints(constraints);
+			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+			Vector c = new Vector() ;
+			A_snapIPsAndRecalculateConstraints(c);
+		}
+		//*************************************************************
+		else
+		{
+			updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
+			//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
+		}
+	}
+
+	
+	return 1;
 }
 
 
-return 1;
-}
 
 public int A_clear() 
 {
@@ -546,7 +657,8 @@ return 1;
  */
 public int A_add_constraints(Vector constraints) 
 {
-	ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) ;
+	Vector c = ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) ;
+	m_drawData.addConstraints(c);
 	return 1;
 	
 }
@@ -650,6 +762,12 @@ public int ptOnSegments(Point pt){
 	return count;
 }
 
+/**
+ * returns all the anchor points,segments,markers that the point 
+ * belongs to.
+ * @param pt : Point
+ * @return List of geometric elements
+ */
 public Vector isPtOnGeometryElement(Point pt)
 {
 	Vector gEles = new Vector();
@@ -684,7 +802,6 @@ public Vector isPtOnGeometryElement(Point pt)
 		gEles.add(gEle);
 		return gEles;
 	}
-
 	return gEles;
 }
 
@@ -822,6 +939,8 @@ public void addHighLightedElement(GeometryElement g)
 	if (!m_highlightedElements.contains(g))
 		m_highlightedElements.add(g);
 }
+
+
 public void addHighlightedElements(Vector v) 
 {
 	Iterator i = v.iterator() ;
@@ -864,12 +983,23 @@ public Vector performSegRecycling(int x, int y)
 }
 
 
+public int post_anchor_ops(Vector constraints) 
+{
+	
+	if ((constraints != null) && (constraints.size() > 0)){
+		ConstraintSolver.addConstraintsAfterDrawing(constraints) ;
+		//	newConstraints.addAll(constraints);
+	}
+	A_snapIPsAndRecalculateConstraints(constraints);
+	return 1;
+}
+
 /************************** MERGE OPERATIONS ******************************/
 /**
  * Merges the segments of the stroke by ensuring end-points coincide. 
  * @param theStroke
  */
-public void adjustStroke(Stroke theStroke)
+public void Adjust_Stroke(Stroke theStroke)
 {
 	// connect the end points of the stroke
 	if (theStroke.getM_segList().size() >= 2)
@@ -888,6 +1018,7 @@ public void adjustStroke(Stroke theStroke)
 			prevSeg = nextSeg;
 		}
 	}
+	snapAllImpPoints(theStroke.getM_segList()) ;
 }
 
 /**
@@ -942,6 +1073,8 @@ public int A_merge_points(ImpPoint ip1, ImpPoint ip2)
 		ip2.setFixed(true);
 	ip1.deleteSelf();
 	
+	postMergeOperations(ip2);
+	
 	return 1 ;
 }
 
@@ -974,6 +1107,42 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
 		}
 	}
 }
+/***************************************************************************.
+ */
+
+/**
+ * Add one constraint to the drawing. 
+ */
+public int A_Add_Constraint(Constraint c)
+{
+	System.out.println("Adding constraint"+c.toString()) ;
+
+	Vector constraints = new Vector() ;
+	constraints.add(c) ;
+	if (c != null)
+	{
+		//Cursor prevCursorType = this.getCursor();
+	//	this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		
+		
+		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+		{
+			m_drawData.addConstraints(constraints);
+
+		}
+		//*************************************************************
+		else
+		{
+		//	JOptionPane.showMessageDialog(this,"The constraint could not be added");
+			updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
+			//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
+		}
+	}
+
+	return 0;
+}
+
+
 
 /**************************************************************************/
 
@@ -983,42 +1152,51 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
  * @param theStroke
  * @return
  */
-public Vector recognize_Constraints(Stroke theStroke)
+public Vector Recognize_Constraints(Stroke theStroke,int user_given)
 {
+	System.out.println("STROKE"+theStroke.toString());
+
 	Stroke m_currStroke = theStroke;
-	
-//	recognizeSegments(theStroke);
-//	adjustStroke(theStroke);
-//	m_drawData.addStroke(theStroke);
-	
-	Vector connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
+	Vector constraints = null ;
+	Vector connectConstraints = new Vector() ;
+	if(user_given <= 0) {
+		connectConstraints = theStroke.recognizeConnectConstraints(m_drawData.getStrokeList());
+	}
 
 	RecognitionManager recogMan = m_processManager.getRecogManager();
 	StrokeRecognizer strokeRecog = recogMan.getM_strokeRecogManager().getStrokeRecognizer();
-	
-	
-	//
+
 	// to set stroke's properties in case convert option is clicked
 	//move out next two lines
 	//theStroke.setStrokeConverted(isStrokeConverted);
 	//theStroke.setStrokeConvertedTo(strokeConvertedTo);
 	//
-	
-	int stkType = strokeRecog.findType(theStroke);	//marker or stroke?
+	int stkType ;
+	if(user_given <= 0) {
+		 stkType = strokeRecog.findType(theStroke, user_given);	//marker or stroke?
+
+	}
+	else {
+		stkType  = Stroke.TYPE_MARKER ;
+	}
 	if (stkType == Stroke.TYPE_MARKER)
 	{
 		theStroke.setM_type(Stroke.TYPE_MARKER);
 		// as this is a marker.. for each of its segments clear the points
 		// Vector for each of their constraints
+		
+		DSTATE(getMethod()) ;
+		
 		Marker marker = strokeRecog.getMarker();
-		if (marker != null)
+		if (marker != null) {
 			addGeoElement(marker) ;
+			constraints = A_addConstraintsForMarkers() ;
+			DSTATE("AFTER ADDING CONSTRAINTS") ;
+		}
 				
 	//	UpdateUI(1,m_drawData.getM_constraints());
-		return null;
+		return constraints;
 	}
-	
-	/** *** 	CAN MARKERS HAVE SEGMENTS?? :-OOOOOOOO *******/
 	
 	// We have found whether the stroke is marker or not. Now remove the
 	// intersection constraints
@@ -1043,7 +1221,7 @@ public Vector recognize_Constraints(Stroke theStroke)
 
 	// find the constraints between the segments of this stroke and
 	// the segments of ALL the previous strokes.
-	Vector constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
+	 constraints = theStroke.recognizeAllConstraints(m_drawData.getStrokeList());
 
 	if (constraints != null)
 		m_drawData.addConstraints(constraints);
@@ -1059,7 +1237,7 @@ public Vector recognize_Constraints(Stroke theStroke)
  * Recognize segments of the stroke.. Assumes segmentation has already 
  * been performed.  
  */
-public Vector<Segment> recognizeSegments(Stroke theStroke)
+public Vector<Segment> Recognize_Segments(Stroke theStroke)
 {
 	//m_currStroke = theStroke;
 	RecognitionManager recogMan = m_processManager.getRecogManager();
@@ -1068,16 +1246,11 @@ public Vector<Segment> recognizeSegments(Stroke theStroke)
 	try
 	{
 		SegmentRecognizer segmentRecog = recogMan.getSegmentRecogMan().getSegmentRecognizer();
-		
-		Segments = theStroke.recognizeSegments(segmentRecog);
-
+		Segments = theStroke.recognizeSegments(segmentRecog,theStroke.getM_segPtList());
 	} catch (Exception e)
 	{
-		JOptionPane.showMessageDialog(null, "Error Occured in recognize segments : "
-				+ e.getMessage());
 		e.printStackTrace();
 	}
-	
 	return Segments ;
 	
 }
@@ -1156,6 +1329,7 @@ public void updateConstraints(Vector constraints, int catagory)
 	}
 }
 
+/**************************** SNAP *********************************/
 
 
 
@@ -1221,6 +1395,64 @@ public void removeConstraints(GeometryElement gEle)
 	}
 }
 
+
+public Vector  A_addConstraintsForMarkers() 
+{
+	Vector newConstraints = new Vector();
+
+	// check if new markers are added.
+	if ((m_drawData.isUnusedMarker()) || (m_drawData.isUnusedText()))
+	{
+		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+		MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
+		MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
+
+		// check if there are new markers related to the text objects
+		Vector newMarkers = converter.recognizeTextAsMarkers(m_drawData.getM_markers(),
+				m_drawData.getM_textElements(), m_drawData.getAllSegments(),
+				m_selectedElements, m_highlightedElements);
+
+		// add the newly obtained markers, if any
+		m_drawData.getM_markers().addAll(newMarkers);
+
+		// recognize the set of markers as constraints
+		Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
+				m_drawData.getM_textElements(), m_drawData.getAllSegments());
+
+		System.out.println("IMMEDIATE CONS"+constraints.elementAt(0).toString());
+		
+		if (constraints != null && constraints.size() > 0)
+		{
+			//Cursor prevCursorType = this.getCursor();
+		//	this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			
+			
+			if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+			{
+				m_drawData.addConstraints(constraints);
+				newConstraints.addAll(constraints) ;
+				//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+				return newConstraints ;
+			//	snapIPsAndRecalculateConstraints(newConstraints);
+			}
+			//*************************************************************
+			else
+			{
+			//	JOptionPane.showMessageDialog(this,"The constraint could not be added");
+				updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
+				//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
+				return newConstraints ;
+			}
+		}
+
+	}
+return null;
+
+}
+
+
+
+
 /************************* END CONSTRAINTS ********************/
 
 /**
@@ -1272,12 +1504,12 @@ public Vector performSegFusion(AnchorPoint ap)
 				theStroke.deleteSegments();
 
 				
-				recognizeSegments(theStroke);
-				adjustStroke(theStroke);
+				Recognize_Segments(theStroke);
+				Adjust_Stroke(theStroke);
 				m_drawData.addStroke(theStroke);
 
-				return recognize_Constraints(theStroke) ;
-				//return recognizeSegmentsAndConstraints(theStroke);
+				return Recognize_Constraints(theStroke,0) ;
+				//return Recognize_SegmentsAndConstraints(theStroke);
 
 			}
 		}
@@ -1355,11 +1587,11 @@ public Vector performReSegmentation(Stroke theStroke, Point pt)
 			segPtList.add(0, sp);
 		}
 		
-		recognizeSegments(theStroke);
-		adjustStroke(theStroke);
+		Recognize_Segments(theStroke);
+		Adjust_Stroke(theStroke);
 		m_drawData.addStroke(theStroke);
-		return recognize_Constraints(theStroke) ;
-		//return recognizeSegmentsAndConstraints(theStroke);
+		return Recognize_Constraints(theStroke,0) ;
+		//return Recognize_SegmentsAndConstraints(theStroke);
 	} else
 	{
 		JOptionPane.showMessageDialog(null, "No Close Pixel found ", "Resegmentation Error",
@@ -1435,7 +1667,7 @@ public boolean isLineHorizontal(double angle1)
 {
 	// checked it by a margin of .5 degrees on either sides
 	/*p: 0.5 degrees is the magic constant here*/
-	//System.out.println("horizontal");
+	/////System.out.println("horizontal");
 	if((((Double.compare(angle1, 0.0) == 0) || (Double.compare(angle1, 0.0) > 0))
 			&& (Double.compare(angle1, 0.5) == 0) || (Double.compare(angle1, 0.5) < 0))
 			|| ((Double.compare(angle1, 179.5) == 0) || (Double.compare(angle1, 179.5) > 0))){
@@ -1450,7 +1682,7 @@ public boolean isLineHorizontal(double angle1)
  */
 public boolean isLineVertical(double angle1){
 	// checked it by a margin of .5 degrees on either sides
-	//System.out.println("vertical");
+	/////System.out.println("vertical");
 	if(((Double.compare(angle1, 89.5) == 0) || (Double.compare(angle1, 89.5) > 0))
 			&& (Double.compare(angle1, 90.5) == 0) || (Double.compare(angle1, 90.5) < 0)){
 		return true;
@@ -1469,7 +1701,7 @@ public boolean isLineVertical(double angle1){
  */
 public void sortAnchorPoints(double segPoints[][], int sortBy){
 		    int n = segPoints.length;
-		    System.out.println("total points " + n );
+		    ///System.out.println("total points " + n );
 	    for (int pass=1; pass < n; pass++) {  // count how many times
 	        for (int i=0; i < n-pass; i++) {
 	            if (segPoints[i][sortBy] > segPoints[i+1][sortBy]) {
@@ -1484,9 +1716,9 @@ public void sortAnchorPoints(double segPoints[][], int sortBy){
 	        }
 	    }
 	    
-	    System.out.println("Sorted Points");
+	    ///System.out.println("Sorted Points");
 	    for(int i = 0; i < n; i++){
-	    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+	    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 	    }
 	    
 	   // return segPoints;
@@ -1532,16 +1764,11 @@ public Vector findAnchorPoints(Vector elements)
 public boolean Check_for_Collinearity(GeometryElement e)
 {
 	String parsedCons[];
-	
-	
-	
 	parsedCons = e.getClass().toString().split("[ ]+");
 	
 	if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
 	{
-
 		Segment seg  = (Segment)e;
-
 		Vector parallelLinesConstraintList = getParallelLinesConsList("lines", "parellel", seg);
 		if(parallelLinesConstraintList.size() != 0 ){
 			int consNumber = 0;
@@ -1616,36 +1843,38 @@ public double[][] findMiddlePtsWhileMoving(Segment seg1, Segment seg2){
 	else{
 		sortAnchorPoints(segPoints, sortByX);
 	}
-int n= segPoints.length;
-		if(n > 0){
-/*		 System.out.println("Sorted Points returned");
+	int n= segPoints.length;
+	if(n > 0){
+/*			 ///System.out.println("Sorted Points returned");
 		    for(int i = 0; i < n; i++){
-		    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
+		    	///System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
 		    }
 	*/	    
 		
-		    if(pt1 == null){
-		    	pt1 = new Point();
-		    }
-		    
-		    if(pt2 == null){
-		    	pt2 = new Point();
-		    }
-		    pt1.x = (int)segPoints[1][0];
-		    pt1.y = (int)segPoints[1][1];
-		    pt2.x = (int)(segPoints[2][0]);
-		    pt2.y = (int)(segPoints[2][1]);
-		    
+		if(pt1 == null){
+			pt1 = new Point();
 		}
+		
+		if(pt2 == null){
+			pt2 = new Point();
+		}
+		pt1.x = (int)segPoints[1][0];
+		pt1.y = (int)segPoints[1][1];
+		pt2.x = (int)(segPoints[2][0]);
+		pt2.y = (int)(segPoints[2][1]);
+		    
+	}
 	else{
-		//System.out.println("size of array is" + segPoints.length);
+		/////System.out.println("size of array is" + segPoints.length);
 	}
 		return segPoints;
 }
 
 /**************************** SNAPPING *****************************/
 
-
+/**
+ * 
+ */
 
 public void snapAllImpPoints(Vector SegmentList)
 {
@@ -1656,6 +1885,7 @@ public void snapAllImpPoints(Vector SegmentList)
 		snapSegment(seg);
 	}
 }
+
 
 public void snapSegment(Segment seg)
 {
@@ -1678,7 +1908,12 @@ public void snapSegment(Segment seg)
 	}
 }
 
-
+/**
+ * Merges closest points. With simple segmentation, it is imperative that this works 
+ * perfectly.
+ * @param ip
+ * @return
+ */
 public boolean snapIP(ImpPoint ip)
 {
 	// It may happen that this point was replaced by some point in the outer
@@ -1699,10 +1934,6 @@ public boolean snapIP(ImpPoint ip)
 	// snap ip to the closest PT;
 	if (closestPt != null)
 	{
-		// added on 09-02-10
-		// if this important point belongs to Circular arc and is center point
-		// don't merge
-		// ip.move(closestPt.getX(), closestPt.getY());
 		if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE)
 		{
 			if(!iterateParentVector(ip)){
@@ -1763,31 +1994,31 @@ public void Snap_IPs_new(Stroke m_currStroke)
 {
 	Vector segPts = new Vector();
 	segPts = null;
-	if(m_currStroke != null)
+	
+	if(m_currStroke==null)
+		return ;
+
+	segPts = m_currStroke.getM_segPtList();
+	Vector anchorPoints = m_drawData.getAllAnchorPoints();
+	
+	if(segPts.size()!=0)
 	{
-		segPts = m_currStroke.getM_segPtList();
-		if(segPts.size()!=0)
+		for (Object pt:segPts) 
 		{
-			Iterator iter1 = segPts.iterator();
-			while (iter1.hasNext())
+			SegmentPoint point = (SegmentPoint)pt;
+			Point2D segPoint = point.getM_point();	
+
+			for(Object ap : anchorPoints)
 			{
-				SegmentPoint point = (SegmentPoint)iter1.next();
-				Point2D segPoint = point.getM_point();	
-				
-				Vector anchorPoints = m_drawData.getAllAnchorPoints();
-				Iterator iter2 = anchorPoints.iterator();
-				while (iter2.hasNext())
-				{
-					ImpPoint ip = (ImpPoint) iter2.next();
-					if(ip.getM_point()!=null){
-						if((ip.getM_point()).equals(segPoint) 
-								|| (ip.getM_point().distance(segPoint) < (((GConstants.cmScaleDrawingRatio)/10)*2)))
-						{
-							snapIP(ip);					// distance < 2 mm
-						}
+				ImpPoint ip = (ImpPoint) ap;
+				if(ip.getM_point()!=null){
+					if((ip.getM_point()).equals(segPoint) 
+							|| (ip.getM_point().distance(segPoint) < (((GConstants.cmScaleDrawingRatio)/10)*2)))
+					{
+						snapIP(ip);					// distance < 2 mm
 					}
 				}
-			}
+			}	
 		}
 	}
 }
@@ -1808,7 +2039,7 @@ public void Snap_IP_drag(Vector<GeometryElement> m_highlightedElements)
 			//snapIP((ImpPoint)iter.next());
 		}
 		else if(seg instanceof SegLine){
-			System.out.println("Seg Line");
+			///System.out.println("Seg Line");
 			SegLine segL = (SegLine) seg; 
 			Vector segLinePts = segL.getM_impPoints();
 			iter = segLinePts.iterator();
@@ -1817,11 +2048,11 @@ public void Snap_IP_drag(Vector<GeometryElement> m_highlightedElements)
 			}	
 		}
 		else if(seg instanceof ImpPoint){
-			System.out.println("ImpPoint");
+			///System.out.println("ImpPoint");
 			snapIP((ImpPoint)seg);
 		}
 		else{
-			System.out.println("this is else part");
+			///System.out.println("this is else part");
 		}
 	}
 	
@@ -1870,6 +2101,166 @@ public boolean smartMergeSelectedEleToHighLightedEle()
 	return intersect;
 }
 
+/************************ HIGH-LIGHT, SELECT **********************/
+
+public boolean something_highlighted()
+{
+	if (m_highlightedElements.size()>0) {
+		if (m_highlightedElements.get(0)!=null)
+			return true;
+	}
+	return false ;
+}
+
+/**
+ * Simply clearing list wont work, have to unflag the elements in the
+ * drawing data also
+ * @return
+ */
+public int clear_highlighted()
+{
+	int size = m_highlightedElements.size() ;
+	if(size ==0 || m_highlightedElements.elementAt(0)==null) return 0;
+	for (Object ele : m_highlightedElements) {
+		GeometryElement element = (GeometryElement) ele ;
+		if(element!=null)
+			element.setHighlighted(false) ;
+	}
+	m_highlightedElements.clear() ;
+	return size ;
+}
+
+/**
+ * Given the mouse position and the aux input type, add appropriate
+ * elements to the highlighted list. This is the top level highlighting
+ * method which handles all cases.
+ * @param m_mousePos
+ * @param type: what modifier key etc has been pressed, etc
+ * @return number of elements highlighted.
+ */
+public int Highlight(Point m_mousePos, int type) 
+{
+	int highlighted = 0 ;
+	Vector<GeometryElement> to_highlight = new Vector() ;
+	clear_highlighted() ;
+	switch(type) {
+	//0==plain mouse movement.
+	case 0 :
+	{	
+		//Should the highlighted elements list be cleared every time?	
+		Vector elements_under = isPtOnGeometryElement(m_mousePos);
+		to_highlight = merge_highlighted(to_highlight,elements_under) ;
+		
+
+	}
+	
+	case KeyEvent.VK_SHIFT:
+	{
+		Stroke lastStroke = m_drawData.getLastStroke(true);
+		if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos))) {
+			to_highlight.add(lastStroke) ;
+		}
+			//addHighLightedElement(lastStroke);
+
+		else
+		{
+			Vector aps = isPtOnAnyAnchorPoint(m_mousePos);
+
+			if ((aps != null) && (aps.size() > 0))
+				to_highlight.addAll(aps) ;
+			else
+			{
+				Vector gEles = isPtOnGeometryElement(m_mousePos);
+				if (gEles != null)
+					to_highlight.addAll(gEles);
+			}
+		}	
+	}
+	
+	case  KeyEvent.VK_CONTROL :
+	{
+		Vector gEles = isPtOnGeometryElement(m_mousePos);
+		for (int i = 0; i < gEles.size(); i++)
+		{
+			if (gEles.get(i) instanceof SegLine)
+			{
+				SegLine seg = (SegLine) gEles.get(i);
+				Vector equalRelativeLengthConstraints = seg
+				.getConstraintByType(EqualRelLengthConstraint.class);
+				for (int j = 0; j < equalRelativeLengthConstraints.size(); j++)
+				{
+					EqualRelLengthConstraint eq = (EqualRelLengthConstraint) equalRelativeLengthConstraints
+					.get(j);
+					if (eq.getM_seg1() == seg)
+						to_highlight.add(eq.getM_seg2());
+					else
+						to_highlight.add(eq.getM_seg1());	
+				}
+			}
+		}
+	}
+		
+	} // SWITCH
+	
+	
+	
+	for(GeometryElement e: to_highlight) {
+		Highlight_element(e) ;
+	}
+	m_highlightedElements = to_highlight ;
+
+	return to_highlight.size() ;
+	
+	
+}
+
+public void Highlight_element(GeometryElement e) {
+	e.setHighlighted(true) ;
+	
+}
+
+
+public int merge_selected_highlighted()
+{
+	m_highlightedElements.addAll(m_selectedElements) ;
+	return m_selectedElements.size() ;
+}
+
+/**
+ * Merges vector a into vector b. Simple intersection, but could add
+ * complicated merging rules later on.
+ * Where are all the java libraries ??? 
+ * 
+ * @param a
+ * @param b
+ * @return
+ */
+public Vector merge_highlighted(Vector a, Vector b)
+{
+	for (Object ao:a) {
+		if(!b.contains(ao)) {
+			b.add(ao) ;
+		}
+	}
+	return b ;
+}
+
+/**
+ * highlight the last drawn stroke and the segments.
+ * @return
+ */
+public int Highlight_last_stroke() 
+{
+	clear_highlighted() ;
+	Stroke strk = this.last_stroke ;
+	if(strk==null) return 0;
+	int i =0 ;
+	for (Segment s : last_stroke.getM_segList()) {
+		++i ;
+		Highlight_element(s) ;
+	}
+	return i ;
+}
 
 
 /********************* END OF CLASS ***********************************/

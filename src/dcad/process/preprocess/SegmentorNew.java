@@ -39,7 +39,7 @@ public class SegmentorNew
 		//1/6/2008 Added this for smoothening the stroke
 		int stkLen = m_ptList.size();
 /*		for(int i=0;i<stkLen;i++)
-			System.out.println((PixelInfo)m_ptList.get(i));*/
+			///System.out.println((PixelInfo)m_ptList.get(i));*/
 		double leftx, lefty, rightx, righty;
 		for(int i=5;i<stkLen-5;i++)
 		{
@@ -74,7 +74,7 @@ public class SegmentorNew
 			p.y = (int) y;
 		}
 /*		for(int i=0;i<stkLen;i++)
-			System.out.println((PixelInfo)m_ptList.get(i));*/
+			///System.out.println((PixelInfo)m_ptList.get(i));*/
 	}
 
 	
@@ -99,7 +99,7 @@ public class SegmentorNew
 			slopes[i]*=-1;
 			if(slopes[i] < 0)
 				slopes[i]= 180 - (slopes[i]*-1);
-//			System.out.println("Points : " + p1.toString() + "  " + p2.toString() + "  " + slopes[i]);
+//			///System.out.println("Points : " + p1.toString() + "  " + p2.toString() + "  " + slopes[i]);
 		}
 		slopes[0] = slopes[1];
 		
@@ -134,7 +134,7 @@ public class SegmentorNew
 			PixelInfo currentPixel = (PixelInfo)ptList.get(i);
 			Point2D p1 = new Point2D.Double(oldPixel.getX(),oldPixel.getY());
 			Point2D p2 = new Point2D.Double(currentPixel.getX(),currentPixel.getY());
-			System.out.println("Points : " + p1.toString() + "  " + p2.toString() + "  " + slopes[i] + "  " + newSlopes[i]);
+			///System.out.println("Points : " + p1.toString() + "  " + p2.toString() + "  " + slopes[i] + "  " + newSlopes[i]);
 		}
 		
 		
@@ -155,7 +155,7 @@ public class SegmentorNew
 			prevPixel.setCurvature(0);
 			prevPixel.setSpeed(0);
 			prevPixel.setSlope(0);
-			// System.out.println("i = 0: "+prevPixel);
+			// ///System.out.println("i = 0: "+prevPixel);
 		}
 
 		// set the pixel property values for the remaining pixels
@@ -177,16 +177,16 @@ public class SegmentorNew
 				// remove the distance of the last pixel in the window
 				Point a = ((PixelInfo) ptList.get(index - winSize_speed -1));
 				Point b = ((PixelInfo)ptList.get(index - winSize_speed));
-				// System.out.println("prev dist: "+a.distance(b));
+				// ///System.out.println("prev dist: "+a.distance(b));
 				cummDist_speed -= a.distance(b); 
 			}
-			// System.out.println("Speed: "+winSize_speed);
+			// ///System.out.println("Speed: "+winSize_speed);
 			
 			// add the distance of current pixel in the window
 			double thisDist = prevPixel.distance(currPixel);
-			//System.out.println("this dist: "+thisDist);
+			/////System.out.println("this dist: "+thisDist);
 			cummDist_speed += thisDist;
-			//System.out.println("summ distance: "+cummDist_speed);
+			/////System.out.println("summ distance: "+cummDist_speed);
 			
 			// do speed calculations for this pixel
 			PixelInfo a = (PixelInfo) ptList.get(index - winSize_speed);
@@ -211,7 +211,7 @@ public class SegmentorNew
 			}
 			
 			// TODO: check for this code
-			//System.out.println("Slope :start: "+start+" end: "+end);
+			/////System.out.println("Slope :start: "+start+" end: "+end);
 			double[][] winElem = theStroke.getWindowElemAs2DMatrix_Double(start, end);
 			if(winElem!=null)
 			{
@@ -220,26 +220,26 @@ public class SegmentorNew
 				System.out.print(" Angle : " + Math.toDegrees(Math.atan(odr[0])));
 				
 				//ISHWAR
-				//System.out.println(Maths.angle(currPixel.getSlope(), 1) + "  " + Maths.angle(prevPixel.getSlope(), 1) + "\n");
+				/////System.out.println(Maths.angle(currPixel.getSlope(), 1) + "  " + Maths.angle(prevPixel.getSlope(), 1) + "\n");
 				// calculate the curvature information
 				double slopeChange = Maths.angle(currPixel.getSlope(), 1) - Maths.angle(prevPixel.getSlope(), 1);
 				
 				//ISHWAR
 /*				if(  (Maths.angle(currPixel.getSlope(), 1) < 0 && Maths.angle(prevPixel.getSlope(), 1) >0)  || ( Maths.angle(currPixel.getSlope(), 1) > 0 && Maths.angle(prevPixel.getSlope(), 1) <0) )
 				{
-					System.out.println("Slope Changed");
+					///System.out.println("Slope Changed");
 					slopeChange=0.0001;
 				}*/
 				
 				
-				// System.out.println("slopeChange "+slopeChange);
+				// ///System.out.println("slopeChange "+slopeChange);
 				currPixel.setCurvature(slopeChange/thisDist);
 			}
 			else
 			{
 				// NOTE: TODO this should not happen
 			}
-			System.out.println("i = "+index+": "+currPixel);
+			///System.out.println("i = "+index+": "+currPixel);
 			
 			prevPixel = currPixel;
 			currPixel = null;
@@ -252,11 +252,11 @@ public class SegmentorNew
 			
 			prevCurrDist = prevPixel.distance(currPixel);
 			prevCurrAngle = GlobalMethods.angle(prevPixel, currPixel);
-			// System.out.println(prevCurrAngle);
+			// ///System.out.println(prevCurrAngle);
 			// no need to check for divide by zero error points are not sampled until the mouse moves 
 			// and when the mouse moves time will be different due to the sampling rate.
 			double speed = prevCurrDist / (currPixel.getTime() - prevPixel.getTime());
-			//System.out.println("speed: "+ speed);
+			/////System.out.println("speed: "+ speed);
 			currPixel.setSpeed(speed);
 		}
 
@@ -267,12 +267,12 @@ public class SegmentorNew
 			// calculate curvature at this pixel
 			double currNextDist = currPixel.distance(nextPixel);
 			double currNextAngle = GlobalMethods.angle(currPixel, nextPixel);
-			// System.out.println(currNextAngle);
+			// ///System.out.println(currNextAngle);
 			
 			// no need to check for divide by zero error points are not sampled until the mouse moves 
 			// and when the mouse moves time will be different due to the sampling rate.
 			double speed = currNextDist / (nextPixel.getTime() - currPixel.getTime());
-			//System.out.println("speed: "+ speed);
+			/////System.out.println("speed: "+ speed);
 			nextPixel.setSpeed(speed);
 			
 			// curvature is the change of slope divided by change of distance 
@@ -295,7 +295,7 @@ public class SegmentorNew
 		for(int i=0;i<ptList.size();i++)
 		{
 			PixelInfo pi = (PixelInfo)ptList.get(i);
-//ISHWAR			System.out.println(i + ". (" + pi.x + "," + pi.y + ") " +pi.getCurvature() + " " + pi.getTime() + " " + pi.getSpeed());
+//ISHWAR			///System.out.println(i + ". (" + pi.x + "," + pi.y + ") " +pi.getCurvature() + " " + pi.getTime() + " " + pi.getSpeed());
 		}
 	}
 	
@@ -339,7 +339,7 @@ public class SegmentorNew
 		}
 
 		// get the common segment points
-		System.out.println("common segment points");
+		///System.out.println("common segment points");
 		Vector selectedSegPos = detectCommonSegPt(segVectorList, theStroke);
 
 		// TODO: remove this code, This is just to print the common segments points
@@ -349,10 +349,10 @@ public class SegmentorNew
 		{
 			 Integer index = (Integer) iter.next();
 			 PixelInfo pixel = (PixelInfo)ptList.get(index.intValue());
-			 System.out.println("Index: "+index+", "+pixel);
+			 ///System.out.println("Index: "+index+", "+pixel);
 		}
 		
-		System.out.println("\n\n");
+		///System.out.println("\n\n");
 		return selectedSegPos;
 	}
 

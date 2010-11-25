@@ -57,7 +57,7 @@ public class CurvatureBasedDetection extends SegmentPtDetectionScheme
 			}
 		}
 		mean /= m_data.length;
-		System.out.println("\ncurvature Mean :"+mean);
+		///System.out.println("\ncurvature Mean :"+mean);
 		return mean;
 	}
 	
@@ -66,7 +66,7 @@ public class CurvatureBasedDetection extends SegmentPtDetectionScheme
 		for (int i = 0; i < m_data.length; i++)
 		{
 			m_data[i] -= threshold;
-			//System.out.println(m_data[i]);
+			/////System.out.println(m_data[i]);
 			// reduce the value to 0 is more than 0
 			// if(m_curvatureData[i] > 0) m_curvatureData[i] = 0;
 		}
@@ -80,7 +80,7 @@ public class CurvatureBasedDetection extends SegmentPtDetectionScheme
 		double threshold = getThreshold();
 		// 18-09-09
 		int index = 0;
-//ISHWAR		System.out.println("Threshold: "+threshold);
+//ISHWAR		///System.out.println("Threshold: "+threshold);
 		// normalize to perform avg based filtering
 		//normalize(mean);
 		
@@ -101,8 +101,8 @@ public class CurvatureBasedDetection extends SegmentPtDetectionScheme
 
 		while(i < limit)
 		{
-//			System.out.println(m_data[i]);
-			//System.out.println(i+": "+m_data[i]+", "+regionStart);
+//			///System.out.println(m_data[i]);
+			/////System.out.println(i+": "+m_data[i]+", "+regionStart);
 			if(m_data[i] > threshold)
 			{
 				regionStart = true;
@@ -122,7 +122,7 @@ public class CurvatureBasedDetection extends SegmentPtDetectionScheme
 						segPts.add(new Integer(maxIndex));
 						CurvatureData[index][0] = maxIndex;
 						CurvatureData[index++][1] = m_data[maxIndex];
-						System.out.println("CURVATURE Segment Point detected: "+maxIndex+",  "+GMethods.formatNum(maxima));
+						///System.out.println("CURVATURE Segment Point detected: "+maxIndex+",  "+GMethods.formatNum(maxima));
 					}
 					maxima = threshold;
 					maxIndex = 0;
@@ -140,7 +140,7 @@ public class CurvatureBasedDetection extends SegmentPtDetectionScheme
 		sort.bubbleSort(CurvatureData,index);
 		setIndex(index);
 		for (index=0; index< getIndex(); index++){
-			System.out.println("index = " + CurvatureData[index][0] + "value =" + CurvatureData[index][1] + "");
+			///System.out.println("index = " + CurvatureData[index][0] + "value =" + CurvatureData[index][1] + "");
 		}
 		return segPts;
 	}

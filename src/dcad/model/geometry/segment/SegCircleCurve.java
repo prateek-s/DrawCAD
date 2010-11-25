@@ -54,9 +54,9 @@ public class SegCircleCurve extends SegCurve
 			Point2D endPt = (Point2D) m_points.get(1);
 			Point2D centerPt = (Point2D) m_points.get(2);
 
-			// System.out.println("start: "+startPt+", end: "+endPt+", center: "+centerPt);
+			// ///System.out.println("start: "+startPt+", end: "+endPt+", center: "+centerPt);
 			double radius = ((Point2D) m_points.get(3)).getX();
-			// System.out.println("Radius: "+radius);
+			// ///System.out.println("Radius: "+radius);
 
 			Vector rawPts = getRawPoints();
 			// set the translator
@@ -73,8 +73,8 @@ public class SegCircleCurve extends SegCurve
 				startAngle += 360;
 			if (endAngle < 0)
 				endAngle += 360;
-			// System.out.println("-----------: "+newStartPt+" , Angle: "+startAngle);
-			// System.out.println("-----------: "+newEndPt+" , Angle: "+endAngle);
+			// ///System.out.println("-----------: "+newStartPt+" , Angle: "+startAngle);
+			// ///System.out.println("-----------: "+newEndPt+" , Angle: "+endAngle);
 
 			double arcAngle = 0.0;
 			Iterator iter = rawPts.iterator();
@@ -99,7 +99,7 @@ public class SegCircleCurve extends SegCurve
 
 				arcAngle += getCurveAngle(thisAngle, nextAngle);
 				thisAngle = nextAngle;
-				// System.out.println("++++++++++"+arcAngle+", "+newNextPt);
+				// ///System.out.println("++++++++++"+arcAngle+", "+newNextPt);
 			}
 
 			
@@ -122,15 +122,15 @@ public class SegCircleCurve extends SegCurve
 			
 			
 			// here we have the total angle
-//ISHWAR			System.out.println("Angles are: " + (startAngle) + " , " + (endAngle) + " , "+ (arcAngle));
+//ISHWAR			///System.out.println("Angles are: " + (startAngle) + " , " + (endAngle) + " , "+ (arcAngle));
 
 			// set the member variables
-/*ISHWAR			System.out.println("START:  "
+/*ISHWAR			///System.out.println("START:  "
 					+ newStartPt
 					+ ", "
 					+ GMethods.getPointOnCircle(Math.atan2(startPt.getY() - centerPt.getY(),
 							startPt.getX() - centerPt.getX()), centerPt, radius));
-			System.out.println("END:  "
+			///System.out.println("END:  "
 					+ newEndPt
 					+ ", "
 					+ GMethods.getPointOnCircle(Math.atan2(endPt.getY() - centerPt.getY(), endPt
@@ -348,14 +348,14 @@ public class SegCircleCurve extends SegCurve
 		
 		
 		double sAngle,eAngle,aAngle=0,radius;
-		System.out.println("\n\n\n");
-		System.out.println("**************************************************************");
-		System.out.println("radius : "+m_start.getM_point().distance(m_center.getM_point()));
-		//System.out.println(m_start.getM_point().);
-		System.out.println( ("start angle : " + Maths.angleInDegrees(m_start.getM_point(), m_center.getM_point())) );
-		System.out.println( ("end angle : " +Maths.angleInDegrees(m_end.getM_point(), m_center.getM_point())) );
-		System.out.println("**************************************************************");
-		System.out.println("\n\n\n");
+		///System.out.println("\n\n\n");
+		///System.out.println("**************************************************************");
+		///System.out.println("radius : "+m_start.getM_point().distance(m_center.getM_point()));
+		/////System.out.println(m_start.getM_point().);
+		///System.out.println( ("start angle : " + Maths.angleInDegrees(m_start.getM_point(), m_center.getM_point())) );
+		///System.out.println( ("end angle : " +Maths.angleInDegrees(m_end.getM_point(), m_center.getM_point())) );
+		///System.out.println("**************************************************************");
+		///System.out.println("\n\n\n");
 		radius = m_start.getM_point().distance(m_center.getM_point());
 		sAngle=Maths.angleInDegrees(m_start.getM_point(), m_center.getM_point());
 		eAngle=Maths.angleInDegrees(m_end.getM_point(), m_center.getM_point());
@@ -385,7 +385,7 @@ public class SegCircleCurve extends SegCurve
 		else if(sAngle>0 && eAngle>0 && sAngle>eAngle)
 			aAngle=360+eAngle-sAngle;
 		else
-			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%   PROBLEM   %%%%%%%%%%%%%%%%%%%%%%%");
+			///System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%   PROBLEM   %%%%%%%%%%%%%%%%%%%%%%%");
 			
 //		Arc2D arc = (Arc2D) m_shape;
 		arc.setArc((m_center.getX() - m_radius), (m_center.getY() - m_radius),
@@ -401,8 +401,8 @@ public class SegCircleCurve extends SegCurve
 	public void movePt(ImpPoint ap, Point2D pt)
 	{
 		
-		// System.out.println("SegCircleCurve.movePt()");
-		// System.out.println(m_center+" :"+ap.getM_point());
+		// ///System.out.println("SegCircleCurve.movePt()");
+		// ///System.out.println(m_center+" :"+ap.getM_point());
 		if (m_center.equals(ap))
 		{
 			// center is been moved, .. so move the whole arc
@@ -529,7 +529,7 @@ public class SegCircleCurve extends SegCurve
 
 	private void moveSegThruCen(ImpPoint ap, Point2D pt)
 	{
-		// System.out.println("SegCircleCurve.moveSegThruCen()");
+		// ///System.out.println("SegCircleCurve.moveSegThruCen()");
 		Point2D newPt = (Point2D) ap.getM_point().clone();
 		ap.getM_point().setLocation(pt);
 		move(pt, newPt);
@@ -599,9 +599,9 @@ public class SegCircleCurve extends SegCurve
 			if (m_startAngle > 360)
 				m_startAngle -= 360;
 		}
-		// System.out.println("START: "+m_startAngle);
-		// System.out.println("ARC: "+m_arcAngle);
-		// System.out.println("DUMMY ARC: "+dummyArcAngle);
+		// ///System.out.println("START: "+m_startAngle);
+		// ///System.out.println("ARC: "+m_arcAngle);
+		// ///System.out.println("DUMMY ARC: "+dummyArcAngle);
 	}
 
 	private void movePtCenterFree(ImpPoint ap, Point2D pt)
@@ -685,7 +685,7 @@ public class SegCircleCurve extends SegCurve
 		Vector centers = null;
 		Line2D seLine = null;
 
-		// System.out.println(m_start+" "+m_end+" "+m_center+" "+ap);
+		// ///System.out.println(m_start+" "+m_end+" "+m_center+" "+ap);
 		if (m_start.equals(ap))
 		{
 			centers = GMethods.CircleCircleIntersections(newEndPt.getX(), newEndPt.getY(), newRad,
@@ -794,7 +794,7 @@ public class SegCircleCurve extends SegCurve
 
 	public void move(int x1, int y1, int x2, int y2)
 	{
-		// System.out.println("SegCircleCurve.move()");
+		// ///System.out.println("SegCircleCurve.move()");
 		boolean canMove = true;
 		Iterator iter = m_impPoints.iterator();
 		while (iter.hasNext())
@@ -921,7 +921,7 @@ public class SegCircleCurve extends SegCurve
 			m_startAngle += 360;
 		if (m_startAngle > 360)
 			m_startAngle -= 360;
-		// System.out.println(m_startAngle);
+		// ///System.out.println(m_startAngle);
 	}
 
 	private void setDetails()
@@ -972,11 +972,11 @@ public class SegCircleCurve extends SegCurve
 
 	public Vector intersects(Segment seg)
 	{
-		// System.out.println("------------SegCircleCurve.intersects()");
+		// ///System.out.println("------------SegCircleCurve.intersects()");
 		Vector intersects = new Vector();
 		if (seg instanceof SegPoint)
 		{
-			// System.out.println("Curve and Point");
+			// ///System.out.println("Curve and Point");
 			// find the intersection of a point with the Circular curve. Check
 			// if point lies on the circular curve
 			// check the distance from the radius and check the angle(to check
@@ -994,13 +994,13 @@ public class SegCircleCurve extends SegCurve
 					if ((containsPt(pt)) && (seg.containsPt(pt)))
 					{
 						intersects.add(pt);
-						System.out.println("Intersection Point: " + pt);
+						///System.out.println("Intersection Point: " + pt);
 					}
 				}
 			}
 		} else if (seg instanceof SegLine)
 		{
-			// System.out.println("Curve and Line");
+			// ///System.out.println("Curve and Line");
 			// finds the intersection point between a line and a Circular arc
 			SegLine segLine = (SegLine) seg;
 			Line2D line = (Line2D) segLine.getM_shape();
@@ -1020,45 +1020,45 @@ public class SegCircleCurve extends SegCurve
 						Point2D inter_p1 = (Point2D) intersections.get(0);
 						Point2D inter_p2 = (Point2D) intersections.get(1);
 
-//						System.out.println("Circle Intersection Points Found at: " + inter_p1
+//						///System.out.println("Circle Intersection Points Found at: " + inter_p1
 	//							+ ", " + inter_p2);
 						// find if its inside the angular extent
 						if ((containsPt(inter_p1)) && (seg.containsPt(inter_p1)))
 						{
 							intersects.add(inter_p1);
-							// System.out.println("Point Selected: "+inter_p1);
+							// ///System.out.println("Point Selected: "+inter_p1);
 						}
 
 						if ((containsPt(inter_p2)) && (seg.containsPt(inter_p2)))
 						{
 							intersects.add(inter_p2);
-							// System.out.println("Point Selected: "+inter_p2);
+							// ///System.out.println("Point Selected: "+inter_p2);
 						}
 					}
 				}
 			}
 		} else if (seg instanceof SegCircleCurve)
 		{
-			// System.out.println("Circle and Circle");
+			// ///System.out.println("Circle and Circle");
 			Vector intersections = cCurveIntersections((SegCircleCurve) seg);
 			if (intersections != null)
 			{
 				Point2D inter_p1 = (Point2D) intersections.get(0);
 				Point2D inter_p2 = (Point2D) intersections.get(1);
 
-				// System.out.println("Circle Intersection Points Found at:
+				// ///System.out.println("Circle Intersection Points Found at:
 				// "+inter_p1+", "+inter_p2);
 				// find if its inside the angular extent
 				if ((containsPt(inter_p1)) && (seg.containsPt(inter_p1)))
 				{
 					intersects.add(inter_p1);
-					// System.out.println("Point Selected : "+inter_p1);
+					// ///System.out.println("Point Selected : "+inter_p1);
 				}
 
 				if ((containsPt(inter_p2)) && (seg.containsPt(inter_p2)))
 				{
 					intersects.add(inter_p2);
-					// System.out.println("Point Selected: "+inter_p2);
+					// ///System.out.println("Point Selected: "+inter_p2);
 				}
 			}
 		} else
@@ -1072,7 +1072,7 @@ public class SegCircleCurve extends SegCurve
 	{
 		// find the intersection between the two circular arcs
 		// finds the intersection point between a line and a Circular arc
-		// System.out.println("Circular segment detected");
+		// ///System.out.println("Circular segment detected");
 		SegCircleCurve segCCurve = (SegCircleCurve) seg;
 		Arc2D arc = (Arc2D) segCCurve.getM_shape();
 		if ((arc.intersects(m_shape.getBounds2D())) || (arc.contains(m_shape.getBounds2D())))
@@ -1174,42 +1174,42 @@ public class SegCircleCurve extends SegCurve
 					Point2D inter_p1 = (Point2D) intersections.get(0);
 					Point2D inter_p2 = (Point2D) intersections.get(1);
 
-					// System.out.println("Circle Intersection Points Found at:
+					// ///System.out.println("Circle Intersection Points Found at:
 					// "+inter_p1+", "+inter_p2);
 					// find if its inside the angular extent
 					if ((!containsPt(inter_p1)) && (seg.containsPt(inter_p1)))
 					{
-						// System.out.println("######2222###");
+						// ///System.out.println("######2222###");
 						// this segment constaints this intersection point but
 						// the line does not
 						// check if the end points of the line are close to the
 						// intersection point
 						if (m_start.distance(inter_p1) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("#####7777####");
+							// ///System.out.println("#####7777####");
 							touches.add(m_start.getM_point());
 							touches.add(inter_p1);
 						} else if (m_end.distance(inter_p1) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("#####8888####");
+							// ///System.out.println("#####8888####");
 							touches.add(m_end.getM_point());
 							touches.add(inter_p1);
 						}
 					} else if ((containsPt(inter_p1)) && (!seg.containsPt(inter_p1)))
 					{
-						// System.out.println("####11111#####");
+						// ///System.out.println("####11111#####");
 						// this segment constaints this intersection point but
 						// the line does not
 						// check if the end points of the line are close to the
 						// intersection point
 						if (line.getP1().distance(inter_p1) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("###5555######");
+							// ///System.out.println("###5555######");
 							touches.add(inter_p1);
 							touches.add(line.getP1());
 						} else if (line.getP2().distance(inter_p1) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("######6666###");
+							// ///System.out.println("######6666###");
 							touches.add(inter_p1);
 							touches.add(line.getP2());
 						}
@@ -1218,37 +1218,37 @@ public class SegCircleCurve extends SegCurve
 					// find if its inside the angular extent
 					if ((!containsPt(inter_p2)) && (seg.containsPt(inter_p2)))
 					{
-						// System.out.println("######4444###");
+						// ///System.out.println("######4444###");
 						// this segment constaints this intersection point but
 						// the line does not
 						// check if the end points of the line are close to the
 						// intersection point
 						if (m_start.distance(inter_p2) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("#####tttt####");
+							// ///System.out.println("#####tttt####");
 							touches.add(m_start.getM_point());
 							touches.add(inter_p2);
 						} else if (m_end.distance(inter_p2) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("####rrrr#####");
+							// ///System.out.println("####rrrr#####");
 							touches.add(m_end.getM_point());
 							touches.add(inter_p2);
 						}
 					} else if ((containsPt(inter_p2)) && (!seg.containsPt(inter_p2)))
 					{
-						// System.out.println("#######3333##");
+						// ///System.out.println("#######3333##");
 						// this segment constaints this intersection point but
 						// the line does not
 						// check if the end points of the line are close to the
 						// intersection point
 						if (line.getP1().distance(inter_p2) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("#####9999####");
+							// ///System.out.println("#####9999####");
 							touches.add(inter_p2);
 							touches.add(line.getP1());
 						} else if (line.getP2().distance(inter_p2) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 						{
-							// System.out.println("######yyyy###");
+							// ///System.out.println("######yyyy###");
 							touches.add(inter_p2);
 							touches.add(line.getP2());
 						}
@@ -1338,7 +1338,7 @@ public class SegCircleCurve extends SegCurve
 				{
 					touches.add(nearPt_1);
 					touches.add(nearPt_2);
-					// System.out.println("Points: "+nearPt_2+", "+nearPt_1);
+					// ///System.out.println("Points: "+nearPt_2+", "+nearPt_1);
 				}
 			} else
 			{
@@ -1347,14 +1347,14 @@ public class SegCircleCurve extends SegCurve
 				// check for all the end points of the segment
 				if (m_start.distance(segCCurve.m_start) < Constraint.MAX_ALLOWED_CONNECT_GAP)
 				{
-					// System.out.println("1111");
+					// ///System.out.println("1111");
 					touches.add(m_start.getM_point());
 					touches.add(segCCurve.m_start.getM_point());
 					s1Done = true;
 					s2Done = true;
 				} else if (m_start.distance(segCCurve.m_end) < Constraint.MAX_ALLOWED_CONNECT_GAP)
 				{
-					// System.out.println("2222");
+					// ///System.out.println("2222");
 					touches.add(m_start.getM_point());
 					touches.add(segCCurve.m_end.getM_point());
 					s1Done = true;
@@ -1366,7 +1366,7 @@ public class SegCircleCurve extends SegCurve
 							&& (m_start.distance(nearPt_2) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 							&& (m_start.distance(nearPt_2) > Constraint.MIN_ALLOWED_CONNECT_GAP))
 					{
-						// System.out.println("3333");
+						// ///System.out.println("3333");
 						touches.add(m_start.getM_point());
 						touches.add(nearPt_2);
 						s1Done = true;
@@ -1376,7 +1376,7 @@ public class SegCircleCurve extends SegCurve
 				if ((!s2Done)
 						&& (m_end.distance(segCCurve.m_start) < Constraint.MAX_ALLOWED_CONNECT_GAP))
 				{
-					// System.out.println("4444");
+					// ///System.out.println("4444");
 					touches.add(m_end.getM_point());
 					touches.add(segCCurve.m_start.getM_point());
 					e1Done = true;
@@ -1384,7 +1384,7 @@ public class SegCircleCurve extends SegCurve
 				} else if ((!e2Done)
 						&& (m_end.distance(segCCurve.m_end) < Constraint.MAX_ALLOWED_CONNECT_GAP))
 				{
-					// System.out.println("5555");
+					// ///System.out.println("5555");
 					touches.add(m_end.getM_point());
 					touches.add(segCCurve.m_end.getM_point());
 					e1Done = true;
@@ -1396,7 +1396,7 @@ public class SegCircleCurve extends SegCurve
 							&& (m_end.distance(nearPt_2) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 							&& (m_end.distance(nearPt_2) > Constraint.MIN_ALLOWED_CONNECT_GAP))
 					{
-						// System.out.println("6666");
+						// ///System.out.println("6666");
 						touches.add(m_end.getM_point());
 						touches.add(nearPt_2);
 						e1Done = true;
@@ -1410,7 +1410,7 @@ public class SegCircleCurve extends SegCurve
 							&& (segCCurve.m_start.distance(nearPt_1) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 							&& (segCCurve.m_start.distance(nearPt_1) > Constraint.MIN_ALLOWED_CONNECT_GAP))
 					{
-						// System.out.println("7777");
+						// ///System.out.println("7777");
 						touches.add(nearPt_1);
 						touches.add(segCCurve.m_start.getM_point());
 						s2Done = true;
@@ -1424,7 +1424,7 @@ public class SegCircleCurve extends SegCurve
 							&& (segCCurve.m_end.distance(nearPt_1) <= Constraint.MAX_ALLOWED_CONNECT_GAP)
 							&& (segCCurve.m_end.distance(nearPt_1) <= Constraint.MIN_ALLOWED_CONNECT_GAP))
 					{
-						// System.out.println("8888");
+						// ///System.out.println("8888");
 						touches.add(nearPt_1);
 						touches.add(segCCurve.m_end.getM_point());
 						e2Done = true;
@@ -1443,7 +1443,7 @@ public class SegCircleCurve extends SegCurve
 
 	public Point2D getNearestPointOnSeg(Point2D pt)
 	{
-		// System.out.println("SegCircleCurve.getNearestPointOnSeg()");
+		// ///System.out.println("SegCircleCurve.getNearestPointOnSeg()");
 		// none of hte end points are near the point
 		double dist = m_center.distance(pt);
 		double extra_dist = dist - m_radius;
@@ -1520,15 +1520,15 @@ public class SegCircleCurve extends SegCurve
 		// check if the point is NEAR the Curve and not ON the line.
 		if (Math.abs(extra_dist) <= Constraint.MIN_ALLOWED_CONNECT_GAP)
 		{// TODO Auto-generated method stub
-		// System.out.println("******************************");
-		// System.out.println("Start Angle: "+m_startAngle);
-		// System.out.println("Arc Angle: "+m_arcAngle);
-		// System.out.println("Dummy Arc: "+dummyArcAngle);
+		// ///System.out.println("******************************");
+		// ///System.out.println("Start Angle: "+m_startAngle);
+		// ///System.out.println("Arc Angle: "+m_arcAngle);
+		// ///System.out.println("Dummy Arc: "+dummyArcAngle);
 			double angle = -Maths.angleInDegrees(m_center.getM_point(), pt);
-			// System.out.println("Angle: "+angle);
+			// ///System.out.println("Angle: "+angle);
 			if (angle < 0)
 				angle += 360;
-			// System.out.println("Angle: "+angle);
+			// ///System.out.println("Angle: "+angle);
 			if (Math.abs(m_arcAngle) >= 360)
 			{
 				return true;
@@ -1590,7 +1590,7 @@ public class SegCircleCurve extends SegCurve
 			Point2D.Double inter_p1 = new Point2D.Double(inter_x1, inter_y1);
 			Point2D.Double inter_p2 = new Point2D.Double(inter_x2, inter_y2);
 
-//			System.out.println("$$$$$$$$$$$ THE INTERSECTION POINTS FOR CIRCLE AND A LINE "+inter_p1+", "+inter_p2);
+//			///System.out.println("$$$$$$$$$$$ THE INTERSECTION POINTS FOR CIRCLE AND A LINE "+inter_p1+", "+inter_p2);
 			Vector intersections = new Vector();
 			intersections.add(inter_p1);
 			intersections.add(inter_p2);

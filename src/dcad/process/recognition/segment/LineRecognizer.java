@@ -34,12 +34,12 @@ public class LineRecognizer extends SegmentRecognitionScheme
 		double y1 = 0.0;
 		double x2 = 0.0;
 		double y2 = 0.0;
-//		System.out.println("+++++++++++++++");
+//		///System.out.println("+++++++++++++++");
 //		for (int i = 0; i < regression.length; i++)
 //		{
-//			System.out.println(regression[i]);
+//			///System.out.println(regression[i]);
 //		}
-//		System.out.println("+++++++++++++++");
+//		///System.out.println("+++++++++++++++");
 		if((regression[0] == Double.NEGATIVE_INFINITY)||(regression[0] == Double.POSITIVE_INFINITY)||(regression[0] == Double.NaN))
 		{
 			// The line is most probably parallel to the y axis. 

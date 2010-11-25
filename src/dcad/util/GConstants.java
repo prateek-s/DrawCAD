@@ -19,7 +19,7 @@ public class GConstants
 	public static final String IMAGE_SRC = "src/images/icons/";
 	
 	// constants for decoration of basepoints
-	public static final int DEF_AP_SIZE = 2;
+	public static final int DEF_AP_SIZE = 5;
 	public static final int DEF_MP_SIZE = 3;
 	public static final int DEF_MP_TYPE = 3;
 	
@@ -43,7 +43,7 @@ public class GConstants
 	public static final int SHOW_SOFT_ON_HL_AND_HARD_CONSTRAINTS = 6;
 	public static final int SHOW_NO_CONSTRAINTS = 7;
 	
-	public static final int DEF_MARKER_SIZE = 50;
+	public static final int DEF_MARKER_SIZE = 70;
 
 	public static final int CALC_SOFT_CONSTRAINTS_ON_MOUSE_RELEASE = 0;
 	public static final int CALC_SOFT_CONSTRAINTS_ON_FLY = 1;

@@ -39,7 +39,7 @@ public class TimeBasedDetection extends SegmentPtDetectionScheme
 			mean += m_data[i];
 		}
 		mean /= m_data.length;
-		//System.out.println("\ntime Mean :"+mean);
+		/////System.out.println("\ntime Mean :"+mean);
 		return mean;
 	}
 	
@@ -48,7 +48,7 @@ public class TimeBasedDetection extends SegmentPtDetectionScheme
 		for (int i = 0; i < m_data.length; i++)
 		{
 			m_data[i] -= threshold;
-//			System.out.println(m_data[i]);
+//			///System.out.println(m_data[i]);
 			// reduce the value to 0 is more than 0
 			// if(m_timeData[i] > 0) m_timeData[i] = 0;
 		}
@@ -64,7 +64,7 @@ public class TimeBasedDetection extends SegmentPtDetectionScheme
 		segPts.add(new Integer(0));
 
 		double threshold = getThreshold();
-		System.out.println("\nThreshold: "+threshold);
+		///System.out.println("\nThreshold: "+threshold);
 		// normalize to perform avg based filtering
 		//normalize(mean);
 		
@@ -93,7 +93,7 @@ public class TimeBasedDetection extends SegmentPtDetectionScheme
 					{
 						// the pixel just before this is the segment point
 						segPts.add(new Integer(maxIndex-1));
-						System.out.println("TIME Segment Point detected: "+(maxIndex)+",  "+GMethods.formatNum(m_data[maxIndex]));
+						///System.out.println("TIME Segment Point detected: "+(maxIndex)+",  "+GMethods.formatNum(m_data[maxIndex]));
 					}
 					maxima = threshold;
 					maxIndex = 0;
@@ -120,7 +120,7 @@ public class TimeBasedDetection extends SegmentPtDetectionScheme
 		}
 		sd /= m_data.length;
 		sd = Math.sqrt(sd);
-		//System.out.println("\ntime SD :"+sd);
+		/////System.out.println("\ntime SD :"+sd);
 		return (sd+mean)/mean;
 	}
 	
@@ -131,15 +131,15 @@ public class TimeBasedDetection extends SegmentPtDetectionScheme
 		double th = mean*getScalingFactor();
 		double t1 = mean*Prefs.getMinTimeScalingFactor();
 		double t2 = mean*Prefs.getMaxTimeScalingFactor();
-//		System.out.println("Time: LOW water mark: "+ t1);
-//		System.out.println("Time: HIGH water mark: "+ t2);
-//		System.out.println("Time: Threshold: "+ th);
+//		///System.out.println("Time: LOW water mark: "+ t1);
+//		///System.out.println("Time: HIGH water mark: "+ t2);
+//		///System.out.println("Time: Threshold: "+ th);
 		
 		// check if threshold is within range.
 		double returnTh = th;
 		if(returnTh<t1) returnTh = t1;
 		else if(returnTh>t2) returnTh = t2;
-		//System.out.println("Final threshold: "+returnTh);
+		/////System.out.println("Final threshold: "+returnTh);
 		return returnTh;
 	}
 }

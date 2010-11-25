@@ -37,7 +37,7 @@ public class EqualRelLengthConstraint extends RelLengthConstraint
 
 	public String toString()
 	{
-		return addPrefix()+" Equal line lengths : "+m_seg1.getM_label()+" , "+m_seg2.getM_label();
+		return addPrefix()+" Equal line lengths : "+m_seg1.getM_label()+" , "+m_seg2.getM_label() + "POINTS"+ m_seg1.getSegStart().toString()+m_seg1.getSegEnd()+m_seg2.getSegStart()+m_seg2.getSegEnd();
 	}
 
 
@@ -117,7 +117,7 @@ public class EqualRelLengthConstraint extends RelLengthConstraint
 		SegLine l2=(SegLine)m_seg2;
 		if(constraintsHelper.areLengthsEqual(l1.getM_start(),l1.getM_end(),l2.getM_start(),l2.getM_end(),true))
 			return true;
-		System.out.println("Equal relative length constraint failed...");
+		///System.out.println("Equal relative length constraint failed...");
 		return false;
 	}
 	

@@ -65,7 +65,7 @@ public class RelLengthConstraint extends RelativeConstraint
 			Line2D line = (Line2D)seg.getM_shape();
 			double distance = line.getP1().distance(line.getP2());
 			double rad = Math.sqrt((distance/2)*(distance/2) + (SIZE/2)*(SIZE/2));
-			//System.out.println(distance+" asdasdas: "+rad);
+			/////System.out.println(distance+" asdasdas: "+rad);
 			Vector centers = GMethods.CircleCircleIntersections(line.getX1(), line.getY1(), rad, line.getX2(), line.getY2(), rad);
 			Line2D cons = new Line2D.Double((Point2D)centers.get(0), (Point2D)centers.get(1)); 
 			g.draw(cons);

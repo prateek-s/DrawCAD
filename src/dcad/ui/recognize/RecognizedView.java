@@ -222,7 +222,7 @@ KeyEventDispatcher
 		Constraint cons = relAngleRecog.getParallelSegmentsConstraint(seg1, seg2, Constraint.HARD,true);
 		
 		if(cons != null){
-			System.out.println("constraint returned");
+			///System.out.println("constraint returned");
 		}
 	
 		
@@ -235,7 +235,7 @@ KeyEventDispatcher
 			
 			// also in the list of constraint window or recognize view
 			//addConstraint(cons);
-			System.out.println("Constraint added");	
+			///System.out.println("Constraint added");	
 		}
 		/*
 			Vector constraints = new Vector();
@@ -243,10 +243,10 @@ KeyEventDispatcher
 			
 			if ((constraints != null) && (constraints.size() > 0))
 			{
-				System.out.println("Constraint is not null");
+				///System.out.println("Constraint is not null");
 				if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null){
 					dv.setJustAddedConstraints(constraints);
-					System.out.println("Constraint added after drawing");
+					///System.out.println("Constraint added after drawing");
 				}
 			}*/
 			//dv.snapIPsAndRecalculateConstraints();
@@ -267,7 +267,7 @@ KeyEventDispatcher
 		// if constraint is collinear lines then need to add parallel lines 
 		// constraint between the two
 		if(isThisCollinearLinesCons(c)){
-			System.out.println("This is collinear lines constraint");
+			///System.out.println("This is collinear lines constraint");
 			// get both the line segments
 			RelativeConstraint rc=(RelativeConstraint)c;
 			

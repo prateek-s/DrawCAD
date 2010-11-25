@@ -24,7 +24,7 @@ public class pointOnLineConstraint extends PointSegmentConstraint
 	{
 		if(constraintsHelper.onLineOrNot((AnchorPoint)points.get(2),(AnchorPoint)points.get(0),(AnchorPoint)points.get(1),true))
 			return true;
-		System.out.println("Point on line constraint failed...");
+		///System.out.println("Point on line constraint failed...");
 		return false;
 	}
 	

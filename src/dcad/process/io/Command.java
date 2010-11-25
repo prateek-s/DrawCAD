@@ -80,9 +80,9 @@ public class Command
 			dv.getCircArcWindow().performCancelActionCirArcParam();
 		}
 		else{
-		//System.out.println("*******************"+m_methodName);
+		/////System.out.println("*******************"+m_methodName);
 		str = str.substring(str.indexOf("(")+1, str.lastIndexOf(")"));
-		//System.out.println("*******************"+str);
+		/////System.out.println("*******************"+str);
 
 		m_methodParams = null;
 		m_params = null;
@@ -91,13 +91,13 @@ public class Command
 			String strArr[] = str.split(",");
 			m_methodParams = new Class[strArr.length];
 			m_params = new Object[strArr.length];
-			//System.out.println("+++++++"+strArr.length);
+			/////System.out.println("+++++++"+strArr.length);
 			for (int i = 0; i < strArr.length; i++)
 			{
-				//System.out.println("**** "+strArr[i]);
+				/////System.out.println("**** "+strArr[i]);
 				String type = strArr[i].substring(strArr[i].indexOf("{")+1, strArr[i].lastIndexOf("}")).trim();
 				String value = strArr[i].substring(strArr[i].lastIndexOf("}")+1).trim();
-				//System.out.println("**** "+strArr[i]+"**** "+type+"**** "+value);
+				/////System.out.println("**** "+strArr[i]+"**** "+type+"**** "+value);
 				try
 				{
 					if(type.equals("int"))
@@ -121,7 +121,7 @@ public class Command
 						m_params[i] = value;
 					}
  
-					//System.out.println("---"+m_methodParams[i].getName());
+					/////System.out.println("---"+m_methodParams[i].getName());
 				} 
 				catch (ClassNotFoundException e)
 				{
@@ -136,10 +136,10 @@ public class Command
 		{
 //			for(int i=0; i<m_class.getClass().getMethods().length; i++)
 //			{
-//				System.out.println("METHODS"+m_class.getClass().getMethods()[i]);
+//				///System.out.println("METHODS"+m_class.getClass().getMethods()[i]);
 //			}
 			m_method = m_class.getClass().getMethod(m_methodName, m_methodParams);
-//			System.out.println("****************** "+m_method);
+//			///System.out.println("****************** "+m_method);
 			m_method.invoke(m_class, m_params);
 		} 
 		catch (Exception e)
@@ -181,9 +181,9 @@ public class Command
 		
 		//RecognizedView|deleteConstraint({int}0);
 		m_methodName = str.substring(0, str.indexOf("("));
-		//System.out.println("*******************"+m_methodName);
+		/////System.out.println("*******************"+m_methodName);
 		str = str.substring(str.indexOf("(")+1, str.lastIndexOf(")"));
-		//System.out.println("*******************"+str);
+		/////System.out.println("*******************"+str);
 
 		m_methodParams = null;
 		m_params = null;
@@ -192,13 +192,13 @@ public class Command
 			String strArr[] = str.split(",");
 			m_methodParams = new Class[strArr.length];
 			m_params = new Object[strArr.length];
-			//System.out.println("+++++++"+strArr.length);
+			/////System.out.println("+++++++"+strArr.length);
 			for (int i = 0; i < strArr.length; i++)
 			{
-				//System.out.println("**** "+strArr[i]);
+				/////System.out.println("**** "+strArr[i]);
 				String type = strArr[i].substring(strArr[i].indexOf("{")+1, strArr[i].lastIndexOf("}")).trim();
 				String value = strArr[i].substring(strArr[i].lastIndexOf("}")+1).trim();
-				//System.out.println("**** "+strArr[i]+"**** "+type+"**** "+value);
+				/////System.out.println("**** "+strArr[i]+"**** "+type+"**** "+value);
 				try
 				{
 					if(type.equals("int"))
@@ -230,7 +230,7 @@ public class Command
 						m_params[i] = value;
 					}
  
-					//System.out.println("---"+m_methodParams[i].getName());
+					/////System.out.println("---"+m_methodParams[i].getName());
 				} 
 				catch (ClassNotFoundException e)
 				{
@@ -244,10 +244,10 @@ public class Command
 		{
 //			for(int i=0; i<m_class.getClass().getMethods().length; i++)
 //			{
-//				System.out.println("METHODS"+m_class.getClass().getMethods()[i]);
+//				///System.out.println("METHODS"+m_class.getClass().getMethods()[i]);
 //			}
 			m_method = m_class.getClass().getMethod(m_methodName, m_methodParams);
-//			System.out.println("****************** "+m_method);
+//			///System.out.println("****************** "+m_method);
 			m_method.invoke(m_class, m_params);
 		} 
 		catch (Exception e)

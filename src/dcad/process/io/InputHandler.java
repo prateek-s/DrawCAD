@@ -26,7 +26,7 @@ public class InputHandler
 	 */
 	public CommandQueue loadFile(String dir, String filename) throws IOException
 	{
-//		System.out.println("InputHandler.loadFile()");
+//		///System.out.println("InputHandler.loadFile()");
 		if(filename == null) return null;
 		m_commandQ.clear();
 		m_commParser.reset();
@@ -43,10 +43,10 @@ public class InputHandler
 			line_num++;
 			// trim to remove the trailing and leading white spaces.
 			line = line.trim();
-//			System.out.println(line);
+//			///System.out.println(line);
 			if(!line.equals(Command.PAUSE))
 			{
-				//System.out.println("NOT PAUSE");
+				/////System.out.println("NOT PAUSE");
 				isPause = false;
 				// this is a normal command
 				Command comm = m_commParser.Parse(line);
@@ -55,7 +55,7 @@ public class InputHandler
 			}
 			else if(!isPause)
 			{
-//				System.out.println("PAUSE");
+//				///System.out.println("PAUSE");
 				// its a blank line .. so just insert a blank line, only one blank line is to be inserted for all the blank lines. 
 				isPause = true;
 				// this is a normal command

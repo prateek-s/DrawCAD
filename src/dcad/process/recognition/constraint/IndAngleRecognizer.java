@@ -52,7 +52,7 @@ public class IndAngleRecognizer extends IndConstraintRecognitionScheme
 			
 			addConstraint(cons,new Segment[]{m_seg});
 		}
-	//	System.out.println("FROM RECOGNIZE CONSTRAINTS"+m_constraints);
+	//	///System.out.println("FROM RECOGNIZE CONSTRAINTS"+m_constraints);
 		return m_constraints;
 	}			
 

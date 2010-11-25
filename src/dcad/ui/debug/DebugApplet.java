@@ -74,7 +74,7 @@ public class DebugApplet extends JApplet implements ActionListener{
 				str = in.readLine();
 				if(str==null)
 					break;
-				System.out.println(str);
+				///System.out.println(str);
 				if(str.split("#").length!=1)
 				{
 					iterationIndex++;

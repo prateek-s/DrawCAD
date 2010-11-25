@@ -70,7 +70,7 @@ public class Stroke extends GeometryElement
 	private Vector m_ptList;
 	
 	/** Stroke is a aggregation of segement. every segment is a part of some stroke. */
-	private Vector m_segList = new Vector();
+	private Vector<Segment> m_segList = new Vector();
 
 	/** indexes of the segment points detected in the stroke after preprocessing */
 	private Vector m_segPtList = new Vector();
@@ -187,7 +187,7 @@ public class Stroke extends GeometryElement
 	 * Recognizes all the segments of this stroke. 
 	 */
 	
-		public Vector<Segment> recognizeSegments(SegmentRecognizer segRecog) throws Exception
+		public Vector<Segment> recognizeSegments(SegmentRecognizer segRecog,Vector segptlist) throws Exception
 		{
 
 		deleteSegments();
@@ -196,7 +196,7 @@ public class Stroke extends GeometryElement
 		
 		// Stroke segmentation already performed.
 	
-		Iterator iter = m_segPtList.iterator();
+		Iterator iter = segptlist.iterator();
 
 		// get the first segment point. There will be atleast one point in every stroke (in the case of a point)
 		SegmentPoint start = null;
@@ -212,7 +212,7 @@ public class Stroke extends GeometryElement
 			{
 				// only one point detected, The stroke is a point
 				addSegment(detectSeg(segRecog, start.getM_point(), start.getM_point()));
-				//System.out.println("******** "+m_prevEnd);
+				/////System.out.println("******** "+m_prevEnd);
 			}
 			else
 			{
@@ -223,7 +223,7 @@ public class Stroke extends GeometryElement
 					SegmentPoint end = (SegmentPoint)iter.next();
 					
 					addSegment(detectSeg(segRecog, start.getM_point(), end.getM_point()));
-					//System.out.println("******** "+m_prevEnd);
+					/////System.out.println("******** "+m_prevEnd);
 
 					// make pointB as the start of the new segment
 					start = end;
@@ -237,7 +237,56 @@ public class Stroke extends GeometryElement
  		
 	}
 
+		public Vector<Segment> temp_recognizeSegments(SegmentRecognizer segRecog,Vector segptlist) throws Exception
+		{
+		Vector<Segment> segments = new Vector() ;
+		
+		m_prevEnd = 0;
+		
+		// Stroke segmentation already performed.
 	
+		Iterator iter = segptlist.iterator();
+
+		// get the first segment point. There will be atleast one point in every stroke (in the case of a point)
+		SegmentPoint start = null;
+		if(iter.hasNext())
+		{
+			start = (SegmentPoint)iter.next();
+		}
+
+ 		if(start != null)
+		{
+			// check if there is only one segment point in the segment point list.
+			if(!iter.hasNext())
+			{
+				// only one point detected, The stroke is a point
+				segments.add(detectSeg(segRecog, start.getM_point(), start.getM_point()));
+				/////System.out.println("******** "+m_prevEnd);
+			}
+			else
+			{
+				// find segments. NOTE that segment points are repeated for the adjacent segments
+				while (iter.hasNext())
+				{
+					// get the index in the segmentPoint list.
+					SegmentPoint end = (SegmentPoint)iter.next();
+					
+					Segment seg = detectSeg(segRecog , start.getM_point(), end.getM_point());
+					segments.add(seg);
+					/////System.out.println("******** "+m_prevEnd);
+
+					// make pointB as the start of the new segment
+					start = end;
+				}
+			}
+		}
+
+	//	}
+ 		
+ 		return segments ;
+ 		
+	}
+		
 	
 	private Segment detectSeg(SegmentRecognizer segRecog, Point2D startPt, Point2D endPt) throws Exception
 	{
@@ -571,8 +620,8 @@ public class Stroke extends GeometryElement
 		int size = rowPoints.size();
 		for(int i=0;i<size;i++)
 		{
-			System.out.println(ap.distance((Point2D)rowPoints.get(i)));
-			System.out.println((Point2D)rowPoints.get(i));
+			///System.out.println(ap.distance((Point2D)rowPoints.get(i)));
+			///System.out.println((Point2D)rowPoints.get(i));
 			if(ap.distance((Point2D)rowPoints.get(i)) < Constraint.MAX_ALLOWED_CONNECT_GAP)
 				return true;
 		}
@@ -582,7 +631,7 @@ public class Stroke extends GeometryElement
 	
 	public Vector recognizeAllConstraints(Vector strokeList)
 	{
-//		System.out.println("Stroke.recognizeAllConstraints()");
+//		///System.out.println("Stroke.recognizeAllConstraints()");
 		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 		ConstraintRecogManager consRecogMan = recogMan.getConstraintRecogManager();
 		RelConstraintRecognizer relConsRecog = consRecogMan.getRelConsRecog();
@@ -649,7 +698,7 @@ public class Stroke extends GeometryElement
 				if(maxPositiveDist < dist)
 					maxPositiveDist = dist;
 			}
-//			System.out.println("Index : " + i + " Distance : " + distances[i]);
+//			///System.out.println("Index : " + i + " Distance : " + distances[i]);
 		}
 		
 		//The arc is mostly on one side of the line
@@ -668,7 +717,7 @@ public class Stroke extends GeometryElement
 				AnchorPoint ap1=null,ap2=null,ap3=null,ap4=null,ap5=null;
 				
 /*				double curvature = ((PixelInfo)m_ptList.get(minDistIndex)).getCurvature();
-				System.out.println("Curvature is : " + curvature + " Curve angle is : " + Math.toDegrees(curvature) + " Line angle is : " + l.getM_angle() + "\n\n\n\n\n" );*/
+				///System.out.println("Curvature is : " + curvature + " Curve angle is : " + Math.toDegrees(curvature) + " Line angle is : " + l.getM_angle() + "\n\n\n\n\n" );*/
 				
 				ap1 = new AnchorPoint(points[minDistIndex].getX(),points[minDistIndex].getY());
 				if(minDistIndex < rowPoints .size()-1)
@@ -682,7 +731,7 @@ public class Stroke extends GeometryElement
 				
 				if(ap2 == null || ap3 == null)
 				{
-/*					System.out.println("\n\n!!!!! One of the anchor points is null !!!!!\n\n");
+/*					///System.out.println("\n\n!!!!! One of the anchor points is null !!!!!\n\n");
 					AnchorPoint ap = l.getM_start();
 					if( ap1.distance(l.getM_start().getM_point()) > ap1.distance(l.getM_end().getM_point()) )
 							ap = l.getM_end();
@@ -693,7 +742,7 @@ public class Stroke extends GeometryElement
 					//Still, if it's not added, we should add it. Will do this later.
 					if(constraintsHelper.doesConstraintAlreadyExist(ap,lineCircularCurveTangencyConstraint.class,new AnchorPoint[]{l.getM_start(),c.getM_start(),c.getM_end(),c.getM_center()}) == null)
 					{
-						System.out.println("Constraint does not already exit \n\n\n\n\n");
+						///System.out.println("Constraint does not already exit \n\n\n\n\n");
 						Constraint cons = new lineCircularCurveTangencyConstraint(l,c,ap,Constraint.HARD,false);
 						constraintsHelper.addCons2SegsAndRecogview(cons,new Segment[]{l,c});
 						return cons;
@@ -712,17 +761,17 @@ public class Stroke extends GeometryElement
 				}
 			}
 /*			else
-				System.out.println("\n\n !!!The minimum distance is not small enough\n\n");*/
+				///System.out.println("\n\n !!!The minimum distance is not small enough\n\n");*/
 		}
 /*		else
-			System.out.println("\n\n !!!The maximum distance is not small enough\n\n");*/
+			///System.out.println("\n\n !!!The maximum distance is not small enough\n\n");*/
 		
 		return null;	
 	}
 	
 	public void removeConstraints()
 	{
-//		System.out.println("Stroke.removeConstraints()");
+//		///System.out.println("Stroke.removeConstraints()");
 		Iterator iterator = m_segList.iterator();
 		while (iterator.hasNext())
 		{
@@ -844,7 +893,7 @@ public class Stroke extends GeometryElement
 	
 	public boolean containsPt(double x, double y)
 	{
-//		System.out.println("Stroke.containsPt()");
+//		///System.out.println("Stroke.containsPt()");
 		PixelInfo prevPt = null;
 		Iterator iter = m_ptList.iterator();
 		if(iter.hasNext())
@@ -1017,7 +1066,7 @@ public class Stroke extends GeometryElement
 		m_segPtList = ptList;
 	}
 	
-	public Vector getM_segList()
+	public Vector<Segment> getM_segList()
 	{
 		return m_segList;
 	}

@@ -45,7 +45,7 @@ public class IOManager
 
 	public static String getLast_dir()
 	{
-		System.out.println(last_dir);
+		///System.out.println(last_dir);
 		return last_dir;
 	}
 

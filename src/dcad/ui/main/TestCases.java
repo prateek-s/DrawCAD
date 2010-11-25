@@ -48,7 +48,7 @@ class TestCases{
 			 String file = files[index].toString().trim();
 			 String arr[] = file.split("\\/");
 			 file = arr[arr.length -1];
-		    System.out.println(file);  
+		    ///System.out.println(file);  
 		    openFile(file);	
 	}
 	
@@ -87,7 +87,7 @@ class Filter implements FileFilter
    public boolean accept(File file)  
    {  
       if(file.getName().endsWith("~") || file.getName().endsWith(".exe")){
-   	return false;   
+    	  return false;   
       }
       else{
    	return true;   

@@ -85,7 +85,7 @@ import dcad.ui.main.ToolBar;
 import dcad.ui.drawing.*;
 
 import dcad.ui.main.ActionInterface ;
-import dcad.ui.main.ActionHelper; 
+
 
 /**
  * Top-Level class. Sets off the Stroke->Segment->Constraint->Draw chain on mouse-press/release events.
@@ -96,32 +96,42 @@ import dcad.ui.main.ActionHelper;
 public class DrawingView extends JPanel implements MouseListener, MouseMotionListener, KeyListener,
 		KeyEventDispatcher, Serializable
 		
-	{
-	
+{	
 	public ActionInterface A ;
 	
 	public ProcessManager m_processManager;
 	/**
-	 * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily)
+	 * Strokes, constraints, markets, anchors, text etc added by recognizeSegmentsAndConstraints (primarily).
+	 * Action interface's data is used.
 	 */
 	private DrawingData m_drawData;
 
+	/**
+	 * Current stroke being drawn, recently drawn stroke.
+	 */
 	private Stroke m_currStroke;
 
 	private Point m_prevPt;
 
+	/**
+	 * Current mouse position, updated by mouse methods
+	 */
 	private Point m_mousePos;
 
 	public Point getM_mousePos() {
 		return m_mousePos;
 	}
-
+	
 	public void setM_mousePos(Point mMousePos) {
 		m_mousePos = mMousePos;
 	}
 
+	// Skip to the next section which deals with the mouse listeners
 	/********************* UI STATE *********************/
 
+	/**
+	 * Length of the stroke being drawn
+	 */
 	private double m_length;
 
 	private Rectangle m_bBox;
@@ -150,6 +160,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 	private Vector m_movedElementsOldPos = null;
 
+	/**
+	 * Only the marker stroke should not be shown. 
+	 * This can be eliminated?
+	 */
 	private boolean m_showLastStroke = true;
 
 	private boolean m_keyPressedLogged = false;
@@ -210,17 +224,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		DrawingView.strokeConvertedTo = strokeConvertedTo;
 	}
 	
-	/** to check whether a new window to set parameters is open or not */
-	private static boolean parameterWinBitSet = false;
-	
-	public boolean isParameterWinBitSet() {
-		return parameterWinBitSet;
-	}
-
-	public void setParameterWinBitSet(boolean parameterWinBitSet) {
-		DrawingView.parameterWinBitSet = parameterWinBitSet;
-	}
-
 	// 22-02-10 
 	private boolean isEnterKeyClicked = false;
 	public boolean isEnterKeyClicked() {
@@ -283,29 +286,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 	
 	Point pt1 = null;  //needed for collinearity
-	Point pt2 = null;
-	
-	// for line parameter window
-	LineParameterWindow lineWindow = null;
-	public LineParameterWindow getLineWindow() {
-		return lineWindow;
-	}
+	Point pt2 = null;  //needed for collinearity
 
-	public void setLineWindow(LineParameterWindow lineWindow) {
-		this.lineWindow = lineWindow;
-	}
-
-	// for circular arc parameter window
-	CircularArcParameterWindow circArcWindow = null;
-	
-	public CircularArcParameterWindow getCircArcWindow() {
-		return circArcWindow;
-	}
-
-	public void setCircArcWindow(CircularArcParameterWindow circArcWindow) {
-		this.circArcWindow = circArcWindow;
-	}
-
+	/**
+	 * Initializes everything.
+	 */
 	public DrawingView()
 	{
 		super();
@@ -318,10 +303,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		if(tb==null){
 			tb = MainWindow.getM_toolBar();
 		}
-		parameterWinBitSet = false;
-		//tb.setConvertActiveBit(false);
 	}
 
+	/**
+	 * Set up UI listeners, layout UI components etc.
+	 */
 	public void init()
 	{
 		A = new ActionInterface () ;
@@ -394,331 +380,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_length = 0.0;
 	}
 	
-	/********************************************************************/
-	/********************* DRAWING ON SCREEN ***************************/
-
-	/**
-	 * This draws the component on-screen. AND repaints the entire screen - the grid,segments,text,markers etc. 
-	 * Is there any other way??
-	 */
-	public void paintComponent(Graphics gc)
-	{
-		super.paintComponent(gc);
-		//super.paint(gc);
-		//this.setBackground(GVariables.BACKGROUND_COLOR);
-		int drViewHeight = getHeight();
-		int drViewWidth = getWidth();
-		 // if lines are collinear draw a line 
-		// 10 - 05 -10
-		
-		/* handle collinear line cue 'dashed-line' here */
-		if(isM_AreLinesCollinear())
-		{
-			drawCollinearLine(gc, GVariables.SELECTED_FIXED_COLOR);
-		}
-		/*When does this happen? get rid? */
-		else if(pt1 !=null && pt2!=null)
-		{
-			drawCollinearLine(gc, GVariables.BACKGROUND_COLOR);
-		}
-		
-		// to draw grid
-		// is the grid repainted on every stroke?
-		 if(drGrid == null)
-		 {
-			 drGrid = new DrawGrid();
-		 }
-		
-		 if(isM_gridActive() == true)
-		 {  
-			 drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.GRID_COLOR);
-		 }
-		 else
-		 {
-			 drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.BACKGROUND_COLOR);
-		 }
-		 	 
-		// Draw last stroke as Raw segment First
-		Stroke lastStroke = m_drawData.getLastStroke(true);
-		if ((lastStroke != null) && (m_showLastStroke))
-			lastStroke.drawRaw(gc);
-		
-		
-		drawStrokes(gc, m_drawData.getStrokeList());
-
-		drawMarkers(gc, m_drawData.getM_markers());
-
-		drawTextElements(gc, m_drawData.getM_textElements());		
-	}
-
-
-	/**
-	 * Draws a collinear line between point pt1 and pt2, which are global, and set 
-	 * somewhere else
-	 */
-	public void drawCollinearLine(Graphics g, Paint color)
-	{
-		Graphics2D g2 = (Graphics2D)g;
-		g2.setPaint(color);
-		
-		g2.drawLine(pt1.x,pt1.y,pt2.x,pt2.y);
-		
-	}
-
-	/** draw all the strokes, segments and segment ponints */
-	private void drawStrokes(Graphics gc, Vector strokes)
-	{
-		Iterator iter = strokes.iterator();
-		while (iter.hasNext())
-		{
-			Stroke aStroke = (Stroke) iter.next();
-			aStroke.draw(gc);
-		}
-	}
-
-	/** draw all the markers */
-	public void drawMarkers(Graphics gc, Vector markers)
-	{
-		//Graphics2D g2 = (Graphics2D)gc;
-		//g2.setPaint(color);
-		// if last drawn stroke is a marker, change the colour
-		Iterator iter;
-		iter = markers.iterator();
-		while (iter.hasNext())
-		{
-			Marker gEle = (Marker) iter.next();
-			gEle.draw(gc);
-		}
-	}
-
-	/** draw all the text elments */
-	private void drawTextElements(Graphics gc, Vector textElements)
-	{
-		Iterator iter;
-		iter = textElements.iterator();
-		while (iter.hasNext())
-		{
-			Text txt = (Text) iter.next();
-			if (!txt.isM_used())
-				txt.draw(gc);
-		}
-	}
-
-	/********************************************************************************/
-	/************************ STROKE ADD ******************************************/
-	/**
-	 * REPLACES public void track(int x, int y, long time)
-	 * Called on mouse released and pressed(left) events. 
-	 * @param pt
-	 * @return
-	 */
-	public int paint_point(Point pt) 
-	{
-		int x = pt.x ;
-		int y = pt.y ;
-		Graphics gc = this.getGraphics();
-		if (isM_trackFlag())
-		{
-			if (m_prevPt == null)
-			{
-				if (!GVariables.undoing)
-					gc.drawLine(x, y, x, y);
-				m_prevPt = new Point(x, y);
-				m_bBox = new Rectangle(x, y, x, y);
-			}
-			else
-			{
-				if (!GVariables.undoing)
-					gc.drawLine(m_prevPt.x, m_prevPt.y, x, y);
-				m_length += Point.distance(m_prevPt.x, m_prevPt.y, x, y);
-				m_prevPt.x = x;
-				m_prevPt.y = y;
-				if (x < m_bBox.x)
-					m_bBox.x = x;
-				if (x > m_bBox.width)
-					m_bBox.width = x;
-				if (y < m_bBox.y)
-					m_bBox.y = y;
-				if (y > m_bBox.height)
-					m_bBox.height = y;
-			}
-			gc.dispose();		
-		}
-		
-		// Display the mouse position to the status bar
-		String statusStr = "";
-		if (m_mouseOverPanel)
-			statusStr = x + ", " + y;
-
-		updateStatusBar(x, y, " ( Drag ) " + statusStr, "");
-		
-		return 1 ;
-	}
-
-	/**
-	 * Adds point to given stroke. Usually preceeded by paintpoint
-	 * @param pt
-	 * @param time
-	 */
-	public void addPointToStroke(Stroke m_currStroke, Point pt, long time)
-	{
-		int x = pt.x ;
-		int y = pt.y ;
-		// store current pixle position with timing information
-		m_currStroke.addPoint(x, y, time);
-	}
-
-	/**
-	 * Called by ProcessStroke. Detects Segment Points and does recognition.
-	 * @param theStroke
-	 * @return Constraints Vector.
-	 */
-	public Vector addStroke(Stroke theStroke)
-	{
-		A.A_draw_Stroke(theStroke) ;
-		
-		Vector constraints = A.new_constraints ;
-		
-		if (!GVariables.undoing)
-			theStroke.drawSegments(getGraphics());
-	
-		repaint() ;	
-		UpdateUI(1,m_drawData.getM_constraints());
-		
-		return constraints ;
-	}
-
-	/**
-	 *  The UI part of the code when adding a stroke to a drawing. 
-	 * @param strk
-	 * @return
-	 */
-	public Vector ProcessStroke(Stroke strk)
-	{
-		UI_log(getMethod()) ;
-		Vector constraints = null ;
-		if (strk != null )
-		{			
-			constraints = addStroke(strk); //Does all the work
-
-			constraints = A.Refresh_Drawing(strk,constraints) ;
-			
-			//show the last stroke
-			m_showLastStroke = true;
-			//TODO: Semantics of undo
-			addToUndoVector();
-			repaint();	
-		}
-		return constraints ;
-	}
-	
-	/********************************************************************************/
-
-	/***************************** SNAPPING **************************************/
-	
-	
-
-/**function snap the ips
- * if a new stroke is drawn, check for if end points of this 
- * stroke needs to be snapped.	
- * In drawing mode, if a circular arc is drawn, then do not merge 
- * center of circle with any other point.
- * Merge it only in Edit mode(when an element is being dragged)
- */
-	public void snapIPs()
-	{
-		// found on 22-02-10 when we type a text then also the tool is in Drawing mode.
-		// so checked here whether the Enter key is clicked do not do this
-		if(!isEnterKeyClicked())
-		{
-			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE && m_drawData.getStrokeList().size()>=1)
-			{
-				A.Snap_IPs_new(m_currStroke) ;
-			}
-			//else, not draw mode, or no strokes.
-			else	
-			{
-				if (isM_elementDragged() && (A.m_highlightedElements.size() > 0))
-				{
-					A.Snap_IP_drag(A.m_highlightedElements) ; 
-				}
-			}
-		}
-	}
-
-
-	
-	/**Function to highlight table rows in Help table
-	 * @author Sunil Kumar
-	 */
-	public void highlightTableRowsSelectedElems()
-	{
-		if(A.m_selectedElements != null){
-		int size = A.m_selectedElements.size();
-		if(size!=0){
-			if(size == 1){
-				GeometryElement g1 = (GeometryElement)A.m_selectedElements.get(0);
-					if((g1 instanceof SegLine)){
-						helpDrawView.selectRows(GConstants.SELECT_LINE);
-					}
-					else if(g1 instanceof SegCircleCurve){
-						//System.out.println("Highlight Point");
-						helpDrawView.selectRows(GConstants.SELECT_ARC);
-					}
-					else if(g1 instanceof AnchorPoint){
-						helpDrawView.selectRows(GConstants.SELECT_POINT);
-					}
-			}
-			else if(size == 2){
-				GeometryElement g1 = (GeometryElement)A.m_selectedElements.get(0);
-				GeometryElement g2 = (GeometryElement)A.m_selectedElements.get(1);
-				
-				if(g1 instanceof AnchorPoint){
-					if(g2 instanceof AnchorPoint){
-						helpDrawView.selectRows(GConstants.SELECT_POINTS);
-					}
-					if(g2 instanceof SegCircleCurve){
-						helpDrawView.selectRows(GConstants.SELECT_POINT_ARC);
-					}
-					if(g2 instanceof SegLine){
-						helpDrawView.selectRows(GConstants.SELECT_POINT_LINE);
-					}
-				}
-				
-				else if(g1 instanceof SegLine){
-					if(g2 instanceof AnchorPoint){
-						helpDrawView.selectRows(GConstants.SELECT_POINT_LINE);
-					}
-					if(g2 instanceof SegCircleCurve){
-						helpDrawView.selectRows(GConstants.SELECT_LINE_ARC);
-					}
-					if(g2 instanceof SegLine){
-						helpDrawView.selectRows(GConstants.MOVE_DELETE_ELEMENTS);
-					}
-				}
-				
-				else if(g1 instanceof SegCircleCurve){
-					if(g2 instanceof AnchorPoint){
-						helpDrawView.selectRows(GConstants.SELECT_POINT_ARC);
-					}
-					if(g2 instanceof SegCircleCurve){
-						helpDrawView.selectRows(GConstants.MOVE_DELETE_ELEMENTS);
-					}
-					if(g2 instanceof SegLine){
-						helpDrawView.selectRows(GConstants.SELECT_LINE_ARC);
-					}
-				}
-				
-				
-			}
-		}
-		}
-	}
-	
-	
-	
-	/***************************************************************************/
-	/************************ MOUSE EVENTS *************************************/
+/***************************************************************************/
+/************************ MOUSE EVENTS *************************************/
 	
 	/**
 	 * Disable all event listening when mouse exits area. Unselect all help rows
@@ -734,74 +397,72 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = e.getY();
 	}
 
-
+	public void mouseReleased(MouseEvent e)
+	{
+		mouseReleased(e.getX(), e.getY(),e.getButton());
+	}
 	
 	public void mousePressed(MouseEvent e)
 	{
-	//	if(!isParameterWinBitSet()){
-			mousePressed(e.getButton(), e.getClickCount(), e.getX(), e.getY(), e.getWhen());
-	//	}
-	//	else{
-	//		 JOptionPane.showMessageDialog(MainWindow.getDv(),"Please close the properties window first");
-	//	}
-			
+		mousePressed(e.getButton(), e.getClickCount(), e.getX(), e.getY(), e.getWhen());
 	}
-
 	
 	public void mousePressed(int buttontype, int clickcount, int x, int y, long time)
 	{
 		repaint();
+		
+		m_mousePos.x = x;
+		m_mousePos.y = y;
+		
 		setM_button_type(buttontype);
 		if (buttontype == MouseEvent.BUTTON1)
 		{			
-		helpDrawView.selectRows(GConstants.LEFT_CLICK);
-			
+			helpDrawView.selectRows(GConstants.LEFT_CLICK);	
 			if (clickcount == 1)
 			{
 				mouseButton1Pressed(x, y, time);
 			}
 		}
-		
 		else if (buttontype == MouseEvent.BUTTON2) 
 		{
-			// 04-10-09 to highlight rows in HELP table
-		if(A.m_highlightedElements.size() != 0 ) {
-			helpDrawView.selectRows(GConstants.MIDDLE_CLICK);
-			}
-		
+			if(A.something_highlighted() ) {
+				helpDrawView.selectRows(GConstants.MIDDLE_CLICK);
+				}
+			
 			mouseButton2Pressed(x, y);
 		}
-		
 		else if (buttontype == MouseEvent.BUTTON3) 
 		{
-			// 04-10-09 to highlight rows in HELP table
-			if(A.m_highlightedElements.size() != 0 ) {
+			//highlight rows in HELP table
+			if(A.something_highlighted()) 
+			{
 				if(m_keyEventCode == KeyEvent.VK_SHIFT)
 				{
-				// SHIFT+RIGHT-CLICK => Separate anchor points.
-					if(A.m_highlightedElements.size() == 1) 
-					{
+				// SHIFT+RIGHT-CLICK => Separate anchor points. 
+					// Need something highlighted for that first.
+					//if(A.m_highlightedElements.size() == 1)
+					if(A.something_highlighted()) {
 						GeometryElement ge = (GeometryElement) A.m_highlightedElements.get(0);
-						if(ge instanceof ImpPoint){
+						if(ge instanceof ImpPoint) {
 							ImpPoint ip = (ImpPoint)ge;
-							if(ip.getAllParents().size() > 1){
+							if(ip.getAllParents().size() > 1) {
 								helpDrawView.unselectRows();
 								helpDrawView.selectRow(5);
 							}
 						}
 					}
 				}
-				else{
+				else {	
 					helpDrawView.selectRows(GConstants.RIGHT_CLICK);
 				}
+
 			}
 			
 			mouseButton3Pressed(x, y);
 		}
-		m_mousePos.x = x;
-		m_mousePos.y = y;
+		// Update the mouse position AFTER the complete event has been processed. 
+		//Moved to the top of the function.
 	}
-
 
 	/**
 	 * Middle click
@@ -825,6 +486,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
 			/**
 			 * Look for markers and apply the constraints that they can enforce.
+			 * This is not needed here, really.
 			 */
 			addConstraintsForMarkers();
 		}
@@ -846,10 +508,10 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 
 		if (m_keyEventCode == -1)
 		{
-			UI_log(getMethod()+"NEW STROKE BEGIN") ;
+			UI_log(A.getMethod()+"NEW STROKE BEGIN") ;
 			/**
 			 * @UI: Left-button press
-			 * @Action: Beginning of a stroke. Paint stroke on screen-++-
+			 * @Action: Beginning of a stroke. Paint stroke on screen
 			 * DrawingState: Segmentation and constraints added/modified
 			 */
 			setM_trackFlag(true);
@@ -860,9 +522,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			paint_point(pt) ;
 			addPointToStroke(m_currStroke,pt, time) ;
 			
-		//	track(x, y, time) ;
 			clearSelection() ;
-		} else 
+		}
+		else 
 		{
 			if (m_keyEventCode == KeyEvent.VK_CONTROL)
 			{
@@ -885,11 +547,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 					 */
 					Vector constraints = A.performSegRecycling(x, y);
 					repaint() ;
-					if ((constraints != null) && (constraints.size() > 0)){
-						if (ConstraintSolver.addConstraintsAfterDrawing(constraints) != null)
-							newConstraints.addAll(constraints);
-					}
-					snapIPsAndRecalculateConstraints(newConstraints);
+					A.post_anchor_ops(constraints) ;
 					repaint() ;
 				}
 			} 
@@ -899,8 +557,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
-	
-	
 	/**
 	 * Right-click
 	 * @param x
@@ -920,23 +576,6 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		// Note that selected elements may or may not be connected.
 		if (A.m_highlightedElements.size() > 0)
 		{
-			// added on 08-05-10
-			// to put highlighted element if it is a line in a segment 
-//			if(A.m_highlightedElements.size() == 1)
-//			{
-//				System.out.println("Element Selected : " + A.m_highlightedElements.get(0).getClass());
-//				String parsedCons[];
-//				
-//				parsedCons = A.m_highlightedElements.get(0).getClass().toString().split("[ ]+");
-//				
-//				if(parsedCons[1].compareToIgnoreCase("dcad.model.geometry.segment.SegLine") == 0)
-//				{
-//					System.out.println("Equal");
-//					Segment segm = (Segment)A.m_highlightedElements.get(0);
-//				}
-//			}
-			//commented out because it seems there is no use for it
-			//***************************************************
 			if ((m_keyEventCode == KeyEvent.VK_SHIFT))
 			{
 				/**
@@ -964,189 +603,27 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		} 
 	}
 	
-	
-	
-
-	/***********************************************************************/
-	
-	
-	private void addConstraintsForMarkers()
-	{
-		newConstraints = new Vector();
-
-		// check if new markers are added.
-		if ((m_drawData.isUnusedMarker()) || (m_drawData.isUnusedText()))
-		{
-			setM_mousePressedLogged(true);
-			// dont show the last stroke
-			m_showLastStroke = false;
-
-			// recognize markers
-			RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
-			MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
-			MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
-
-			// check if there are new markers related to the text objects
-			Vector newMarkers = converter.recognizeTextAsMarkers(m_drawData.getM_markers(),
-					m_drawData.getM_textElements(), m_drawData.getAllSegments(),
-					A.m_selectedElements, A.m_highlightedElements);
-
-			// add the newly obtained markers, if any
-			m_drawData.getM_markers().addAll(newMarkers);
-
-			// recognize the set of markers as constraints
-			Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
-					m_drawData.getM_textElements(), m_drawData.getAllSegments());
-
-			if (constraints != null && constraints.size() > 0)
-			{
-				Cursor prevCursorType = this.getCursor();
-				this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-				
-				
-				if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
-				{
-					m_drawData.addConstraints(constraints);
-					newConstraints.addAll(constraints);
-					//GMethods.getHelpView().initialize(HelpView.afterDrawing);
-					snapIPsAndRecalculateConstraints(newConstraints);
-				}
-				//*************************************************************
-				else
-				{
-					JOptionPane.showMessageDialog(this,"The constraint could not be added");
-					A.updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
-					//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
-				}
-
-				resizePanel();
-				repaint();
-				this.setCursor(prevCursorType);
-
-//				snapIPsAndRecalculateConstraints();
-			}
-
-		}
-
-	}
-
-	
-	private void fixElements(int x, int y)
-	{
-		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
-		if (!A.smartMergeSelectedEleToHighLightedEle())
-		{
-			clearSelection();
-		}
-
-		logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
-		setM_mousePressedLogged(true);
-
-		A.A_fix_elements() ;
-	}
-
-
 	/**
-	 * Resets the selected elements.
-	 * DrawingState: element selected flag unset
-	 * RecognizedView : cleared
+	 * 
+	 * @param x
+	 * @param y
+	 * @param buttonType
 	 */
-	private void clearSelection()
-	{
-		A.A_clear_selection() ;
-		GMethods.getRecognizedView().updateSelection(A.m_selectedElements);
-	}
-	
-	
-	// added on 19-04-10
-	// checks whether the point is an child of how many elements 
-
-	public void mouseReleased(MouseEvent e)
-	{
-		mouseReleased(e.getX(), e.getY(),e.getButton());
-	}
-
-	
-	// This contains all constraints added after drawing or movement.
-	// They will be shown in the recognized view. And user can remove some of
-	// them if required.
-	Vector newConstraints = new Vector();
-//***************************************************************
-	//19-04-10
-	//functions to get mouse click's point location
-	public void setMousePointerLocation(Point pt1)
-	{
-		if(pt == null){
-			pt = new Point(); 
-		}
-		System.out.println("setmousepointer");
-		pt.setLocation(pt1);
-	}
-	
-	public Point getMousePointerLocation(){
-		return pt;
-	}
-	
-	public void setGeoElementClicked(Segment segSelected){
-		seg = segSelected;
-	}
-	
-	public Segment getGeoElementClicked(){
-		return seg;
-	}
-	
-//*******************************************************************	
-	/**Function to check whether Mouse_Button 3 is clicked on any element
-	 * If yes then show appropriate parameter window
-	 * @author Sunil Kumar
-	 */
-	public void showElementPropertiesWindow(int x, int y,int buttonType)
-	{
-		if((m_currStroke==null || 
-				(m_currStroke.getLength()==0 )) 
-				&&  buttonType == MouseEvent.BUTTON1 
-				&&  m_keyEventCode!= KeyEvent.VK_SHIFT
-				&& this.hasFocus()){
-			Point pt = new Point();
-			pt.setLocation(x, y);
-			
-			setMousePointerLocation(pt) ;
-			
-			Segment seg = null;
-			// check whether the point is on any segment
-			seg = A.isPtOnAnySegment((Point2D)pt); 
-			this.segUnderCursor = seg ;
-			int count = A.ptOnSegments(pt);
-			//System.out.println("Count =" +count);
-			// count <2 
-			// count = 0 means that the point is not an anchor point
-			// count >=1 means that the anchor point is a child of # elements
-			if((seg)!=null && count < 2 && m_keyEventCode!= KeyEvent.VK_CONTROL  ){
-				//System.out.println("Control key not pressed");
-				setGeoElementClicked (seg);
-				UpdateUI(2, null) ;
-			}
-		}
-	}
-	
-	
 	public void mouseReleased(int x, int y,int buttonType)
 	{
 		boolean extraClick = false;
 		
-		//System.out.println("mouse released ");
+		/////System.out.println("mouse released ");
 		
 		Point pt1 = new Point(x,y) ;
 		setMousePointerLocation(pt1) ;
 
 		//added on 19-04-10 for showing GUI to set properties of an element
-		if(!isParameterWinBitSet()) //not already open
-		{
-			System.out.println("Enter show elements properties ");
-			showElementPropertiesWindow(x, y, buttonType);
-		}
+
+		///System.out.println("Enter show elements properties ");
+		showElementPropertiesWindow(x, y, buttonType);
+
 		
-	//*******************************************	
 		//If the user is clicking in the blank area of the screen, do nothing. Don't show the point
 		//If user clicks twice at the same place, 2nd time, m_currStroke is set to null. So, the condition checking it for null is required 
 		if( m_keyEventCode == -1 && m_currStroke!=null && m_currStroke.getLength() < Prefs.getAnchorPtSize() )
@@ -1173,14 +650,14 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			{
 				//added on 25-02-10
 				//if (m_currStroke != null
-				Vector constraints = ProcessStroke(m_currStroke) ;
+				Vector constraints = Process_Stroke(m_currStroke) ;
 			}
 		}
 		else //edit mode
 		{
 			/**
 			 * Move an element
-			 * DRAG is a transient operation.
+			 * Dragging is a transient operation.
 			 * 
 			 */
 			boolean dragged = handleMouseDragEditMode(x, y); 
@@ -1193,7 +670,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			//added on 11-05-10
 			// check to add whether dragged element was collinear
 			if(isM_AreLinesCollinear()){
-				System.out.println("mouse released unsetting bit ");
+				///System.out.println("mouse released unsetting bit ");
 				setM_AreLinesCollinear(false);
 				repaint();
 			}		
@@ -1214,7 +691,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		setM_elementDragged(false);
 		// so that the current element is selected
 		mouseMoved(x, y);
-		removeElementsWithStartEndPtMerged();
+		//removeElementsWithStartEndPtMerged();
 		repaint(); 
 	
 		// if converted bit now set to false
@@ -1226,177 +703,11 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	
-	
-	
-	// added on 18-05-10
-	// to remove segment lines and their respective constraints
-	// if start point and end point of the segment are merged
-	// or the distance between two points is negligible
-	/**Function to remove segment lines and their respective constraints
-	 * if start point and end point of the segment are merged
-	 * or the distance between two points is negligible
-	 * @author Sunil Kumar
-	 */
-	
-	void removeElementsWithStartEndPtMerged()
-	{
-		
-			Vector segList = m_drawData.getAllSegments();
-			if(segList != null ){
-				Iterator segIter = segList.iterator();
-				while(segIter.hasNext()){
-					Segment segment  = (Segment)segIter.next();
-					if(segment instanceof SegLine){
-						
-						if(segment.getSegStart().distance(segment.getSegEnd()) < THRESHOLD){
-							System.out.println("segment removed");
-							segment.clearConstraints(Constraint.SOFT);
-							segment.clearConstraints(Constraint.HARD);
-							segment.delete();
-						}
-					}
-				}
-			}
-		
-	//	repaint();
-	}
-
-
-	
-	// added on 10-05-10
-	// find the end point and starting point of other line according to orientation
-	/**function to find the Middle points i.e, end point of first segment and 
-	 * starting point of other, between whom we have to draw a line 
-	 * @author Sunil Kumar
-	 */
-	public double[][] findMiddlePtsWhileMoving(Segment seg1, Segment seg2){
-		int sortByX = 0;
-		int sortByY = 1;
-		
-		// get seg points
-	    double x1 = seg1.getSegStart().getX();
-	    double y1 = seg1.getSegStart().getY();
-	    double x2 = seg1.getSegEnd().getX();
-	    double y2 = seg1.getSegEnd().getY();
-	    
-	    double x3 = seg2.getSegStart().getX();
-	    double y3 = seg2.getSegStart().getY();
-	    double x4 = seg2.getSegEnd().getX();
-	    double y4 = seg2.getSegEnd().getY();
-		
-	    
-		double [][] segPoints = new double[][] {{x1, y1},
-											{x2, y2},
-											{x3, y3},
-											{x4, y4}
-											};
-		
-		// get angle of these seg lines  with origin
-		double angle1 = Math.abs(Maths.AngleInDegrees(x1, y1, x2, y2));
-		double angle2 = Math.abs(Maths.AngleInDegrees(x3, y3, x4, y4));
-		// if lines are horizontal
-		if(A.isLineHorizontal(angle1) && A.isLineHorizontal(angle2)){
-			A.sortAnchorPoints(segPoints, sortByX);
-		}
-		// if lines are vertical
-		else if(A.isLineVertical(angle1) && A.isLineVertical(angle2)){
-				A.sortAnchorPoints(segPoints, sortByY);
-		}
-		else{
-			A.sortAnchorPoints(segPoints, sortByX);
-		}
-	int n= segPoints.length;
-			if(n > 0){
-	/*		 System.out.println("Sorted Points returned");
-			    for(int i = 0; i < n; i++){
-			    	System.out.println("Points  X: " + segPoints[i][0] + "Y: " + segPoints[i][1]);
-			    }
-		*/	    
-			
-			    if(pt1 == null){
-			    	pt1 = new Point();
-			    }
-			    
-			    if(pt2 == null){
-			    	pt2 = new Point();
-			    }
-			    pt1.x = (int)segPoints[1][0];
-			    pt1.y = (int)segPoints[1][1];
-			    pt2.x = (int)(segPoints[2][0]);
-			    pt2.y = (int)(segPoints[2][1]);
-			    
-			}
-		else{
-			//System.out.println("size of array is" + segPoints.length);
-		}
-			return segPoints;
-	}
-	
-	// added on 08-05-10
-	// to show line while two line become collinear while dragging the element
-	/**function to to show a line connecting two lines, when they become collinear while dragging
-	 * one of them
-	 * @author Sunil Kumar
-	 */
-	public boolean checkForCollinearLines()
-	{
-		boolean are_collinear = false ;
-		//System.out.println("Entered  collinear lines ");
-		
-		// to put highlighted element if it is a line in a segment 
-		if(A.m_highlightedElements.size() == 1 && m_button_type == MouseEvent.BUTTON3) 
-		{
-			are_collinear = A.Check_for_Collinearity((GeometryElement)A.m_highlightedElements.get(0)) ;
-		}
-		return are_collinear ;
-	}
-	
-
 	public void mouseDragged(MouseEvent e)
 	{
-		//System.out.println("Mouse dragged");
+		/////System.out.println("Mouse dragged");
 		mouseDragged(e.getX(), e.getY(), e.getWhen());
 	}
-
-	private boolean handleMouseDragEditMode(int x, int y)
-	{
-		UI_log(getMethod()) ;
-		boolean result = true ;
-		// check for collinearity while dragging the line
-		boolean are_collinear = checkForCollinearLines() ;
-		setM_AreLinesCollinear(are_collinear) ;  
-		repaint() ;
-		
-		if (A.m_highlightedElements.size() > 0)
-		{
-			System.out.println("Mouse drag highlighted elements : " + A.m_highlightedElements.size());
-			Vector elementsToMove = new Vector();
-
-			// find all elements to move
-			Iterator iter = A.m_highlightedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement element = (GeometryElement) iter.next();
-				if (!element.isFixed())
-				{
-					if (!(elementsToMove.contains(element)))
-						elementsToMove.add(element);
-				}
-			}
-
-			// In case there are element to move, go in
-			if (elementsToMove.size() > 0)
-			{
-			A.A_move_Elements( elementsToMove,m_mousePos,new Point(x,y),0) ;
-
-			repaint();
-			}
-		}
-			
-		 //return result;
-			return true ;
-	}
-
 	
 	public void mouseDragged(int x, int y, long time)
 	{
@@ -1411,6 +722,9 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				logEvent("mouseDragged({int}" + x + ", {int}" + y + ", {long}" + time + ");");
 			Point pt = new Point(x,y) ;
 			paint_point(pt) ;
+			if(m_currStroke==null) {
+				return ;
+			}
 			addPointToStroke(m_currStroke, pt, time) ;
 			//track(x, y, time); WAS HERE
 		}
@@ -1418,57 +732,179 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		m_mousePos.y = y;
 	}
 
-	
-	/**
-	 * not needed.
-	 * @param elements
-	 */
-	private void copyMovedElements(Vector elements)
-	{
-		Iterator iterator = elements.iterator();
-		while (iterator.hasNext())
-		{
-			GeometryElement ele = (GeometryElement) iterator.next();
-			if (ele instanceof AnchorPoint)
-			{
-				AnchorPoint ap = (AnchorPoint) ele;
-				// to avoid duplicates
-				if (!m_movedElementsOldPos.contains(ap))
-					m_movedElementsOldPos.add(ap.copy());
-			} else if (ele instanceof Segment)
-			{
-				Segment seg = (Segment) ele;
-				Iterator iter = seg.getM_impPoints().iterator();
-
-				while (iter.hasNext())
-				{
-					AnchorPoint ap = (AnchorPoint) iter.next();
-					// to avoid duplicates
-					if (!m_movedElementsOldPos.contains(ap))
-						m_movedElementsOldPos.add(ap.copy());
-				}
-			}
-		}
-	}
-
 	public void mouseMoved(MouseEvent e)
 	{
 		mouseMoved(e.getX(), e.getY());
 	}
+	
+	/**
+	 * Highlight segments and help rows.
+	 * @param x
+	 * @param y
+	 */
+	public void mouseMoved(int x, int y)
+	{	
+		m_mousePos.x = x;
+		m_mousePos.y = y;
+		
+		A.Highlight(m_mousePos, 0) ;
+		repaint() ;
+		
+		HELP_UPDATE("default");
 
-	void addToUndoVector()
-	{
-		winAct = WindowActions.getInstance();
-		if(winAct.getUndoVector() != null){
-			
-			if(winAct.getUndoIndex() < (winAct.getUndoVector().size()-1)){
-				winAct.removeUndoVectorElements();
+		if (A.something_highlighted())
+		{
+			int repaintReq = A.Highlight(m_mousePos,0);
+			if (repaintReq!=0) {
+				repaint();
+				// mouse is still on the same object.. no need to do anything.
+				return;
 			}
 		}
-		winAct.addElementToUndoVector();
+
+		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT))
+			if (m_showLastStroke)
+				A.Highlight(m_mousePos, m_keyEventCode) ;
+			
+		else
+		{
+			// check if the mouse is close to any other geometry element
+			Vector gEles = A.isPtOnGeometryElement(m_mousePos);
+
+			//Ctrl+click is select, so when close to something, the appropriate
+			//things, equal segments etc should get highlighted.
+			if (m_keyEventCode == KeyEvent.VK_CONTROL)
+			{
+				A.Highlight(m_mousePos, KeyEvent.VK_CONTROL) ;
+			}
+		}
+		
+		//mostly help stuff
+		String label = "";
+		if (A.something_highlighted())
+		{
+			// 04-10-09 to highlight rows in HELP table
+			HELP_UPDATE("moved") ;
+	
+			for (Object ele: A.m_highlightedElements) {
+				if(ele==null) break; 
+				GeometryElement element = (GeometryElement) ele ;
+			//	element.setHighlighted(true); //need this really?
+				label += element.getM_label() + "  ";
+			}
+			//repaint if something higlighted.
+			repaint();
+		}
+		updateStatusBar(x, y, "( Move )", label);
 	}
 	
+/***********************************************************************/
+/**
+ * Update all the help rows etc 
+ */
+public void HELP_UPDATE(String type) {
+if(type=="default"){
+	if(!A.something_highlighted())
+	{
+		//highlight help for different markers.
+		if(m_drawData.isUnusedMarker())
+		{
+			Vector markers = m_drawData.getUnusedMarkers();
+			
+			Marker mark = (Marker)(markers.get(markers.size()-1));
+			
+			if(mark instanceof MarkerAngle){
+				helpDrawView.selectRows(GConstants.MARKER_ANGLE);
+			}
+			else if(mark instanceof MarkerEquality){
+				helpDrawView.selectRows(GConstants.MARKER_EQUALITY);
+			}
+			else if(mark instanceof MarkerParallel){
+				MarkerParallel markParallel = (MarkerParallel) mark;
+				Segment seg = markParallel.getM_seg();
+				if(seg instanceof SegCircleCurve){
+					helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_ARC);
+				}
+				else if(seg instanceof SegLine){
+					helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_LINE);
+				}
+			}
+			else if(mark instanceof MarkerPerpendicular){
+				helpDrawView.selectRows(GConstants.MARKER_PERP);
+			}
+		}
+		else if(m_keyEventCode == KeyEvent.VK_SHIFT){
+			helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT);
+		}
+		else if(m_keyEventCode == KeyEvent.VK_CONTROL){
+			helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
+		}
+		else{
+		helpDrawView.selectRows(GConstants.LEFT_CLICK);
+		}
+	} //end outer-if
+}
 
+if(type=="moved") 
+{
+	GeometryElement g1 = (GeometryElement)A.m_highlightedElements.get(0);
+	if(A.m_selectedElements.size() == 0)
+	{
+		if((g1 instanceof SegLine) || (g1 instanceof SegCircleCurve)){
+			if(m_keyEventCode == KeyEvent.VK_CONTROL){
+				helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
+			}
+			else if(m_keyEventCode == KeyEvent.VK_SHIFT){
+				helpDrawView.unselectRows();
+			}
+			else{
+				helpDrawView.selectRows(GConstants.HIGHLIGHT_ELEMENTS);
+			}
+		}
+		else if(g1 instanceof ImpPoint){
+			/////System.out.println("Highlight Point");
+			ImpPoint ip = (ImpPoint)g1;
+			
+			if(m_keyEventCode == KeyEvent.VK_SHIFT)
+			{
+				helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT); // unselect row 7
+				if(ip.getAllParents().size() < 2){
+					//helpDrawView.unselectRows();
+					helpDrawView.unselectRow(5);
+				}
+				helpDrawView.unselectRow(4);
+			}
+			else if(m_keyEventCode == KeyEvent.VK_CONTROL){
+				helpDrawView.unselectRow(3); // unselect row 4
+			}
+			else{
+				helpDrawView.selectRows(GConstants.HIGHLIGHT_POINT);
+				if(ip.getAllParents().size() < 2)
+					helpDrawView.unselectRow(5);
+			}	
+		}
+		else if(g1 instanceof Stroke){
+			helpDrawView.selectRows(GConstants.ADD_AP);
+		}
+	}	
+}
+
+}
+	
+	
+	public void setM_button_type(int m_button_type) {
+		this.m_button_type = m_button_type;
+	}
+
+	public int getM_button_type() {
+		return m_button_type;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	public void mouseEntered(MouseEvent e)
@@ -1485,242 +921,26 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	}
 	
 	
-	
-	
-	
-	public void mouseMoved(int x, int y)
-	{		
-		if(A.m_highlightedElements.size() == 0 && A.m_selectedElements.size()==0)
-		{
-			if(m_drawData.isUnusedMarker() ){
-				Vector marker = m_drawData.getUnusedMarkers();
-				
-				Marker mark = (Marker)(marker.get(marker.size()-1));
-				
-				if(mark instanceof MarkerAngle){
-					helpDrawView.selectRows(GConstants.MARKER_ANGLE);
-				}
-				else if(mark instanceof MarkerEquality){
-					helpDrawView.selectRows(GConstants.MARKER_EQUALITY);
-				}
-				else if(mark instanceof MarkerParallel){
-					MarkerParallel markParallel = (MarkerParallel) mark;
-					Segment seg = markParallel.getM_seg();
-					if(seg instanceof SegCircleCurve){
-						helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_ARC);
-					}
-					else if(seg instanceof SegLine){
-						helpDrawView.selectRows(GConstants.MARKER_PARALLEL_ON_LINE);
-					}
-				}
-				else if(mark instanceof MarkerPerpendicular){
-					helpDrawView.selectRows(GConstants.MARKER_PERP);
-				}
-			}
-			else if(m_keyEventCode == KeyEvent.VK_SHIFT){
-				helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT);
-			}
-			else if(m_keyEventCode == KeyEvent.VK_CONTROL){
-				helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
-			}
-			else{
-			helpDrawView.selectRows(GConstants.LEFT_CLICK);
-			}
-		} //end outer-if
-		
-		m_mousePos.x = x;
-		m_mousePos.y = y;
-		
-		if(!isParameterWinBitSet())
-		{
-			if (A.m_highlightedElements.size() > 0)
-			{System.out.println("MOUSE POS"+A.m_highlightedElements.size()) ;
-
-				boolean repaintReq = false;
-				Iterator iter = A.m_highlightedElements.iterator();
-				while (iter.hasNext())
-				{
-					GeometryElement ele = (GeometryElement) iter.next();
-					if(ele==null) {
-						System.out.println("********ACHTUNG");
-						break ;
-					}
-					System.out.println("MOUSE POS"+m_mousePos.toString()) ;
-
-					if (!ele.containsPt(m_mousePos))
-					{
-						repaintReq = true;
-						ele.setHighlighted(false);
-						iter.remove();
-					}
-				}
-				if (!repaintReq)
-					// mouse is still on the same object.. no need to do anything.
-					return;
-				else{
-					//addToUndoVector();
-					repaint();
-				}
-			}
-			
-		if ((m_keyEventCode != -1) && (m_keyEventCode == KeyEvent.VK_SHIFT))
-		{
-			if (m_showLastStroke)
-			{
-				Stroke lastStroke = m_drawData.getLastStroke(true);
-				if ((lastStroke != null) && (lastStroke.containsPt(m_mousePos)))
-					A.addHighLightedElement(lastStroke);
-				
-				else
-				{
-					Vector aps = A.isPtOnAnyAnchorPoint(m_mousePos);
-					
-					if ((aps != null) && (aps.size() > 0))
-						A.addHighlightedElements(aps);
-					else
-					{
-						Vector gEles = A.isPtOnGeometryElement(m_mousePos);
-						if (gEles != null)
-							A.addHighlightedElements(gEles);
-					}
-				}
-			}
-		} 
-		else{
-			// check if the mouse is close to any other geometry element
-			Vector gEles = A.isPtOnGeometryElement(m_mousePos);
-			
-			if (m_keyEventCode == KeyEvent.VK_CONTROL)
-			{
-				for (int i = 0; i < gEles.size(); i++)
-				{
-					if (gEles.get(i) instanceof SegLine)
-					{
-						SegLine seg = (SegLine) gEles.get(i);
-						Vector equalRelativeLengthConstraints = seg
-								.getConstraintByType(EqualRelLengthConstraint.class);
-						for (int j = 0; j < equalRelativeLengthConstraints.size(); j++)
-						{
-							EqualRelLengthConstraint eq = (EqualRelLengthConstraint) equalRelativeLengthConstraints
-									.get(j);
-							if (eq.getM_seg1() == seg)
-								A.addHighLightedElement(eq.getM_seg2());
-							// A.m_highlightedElements.add(eq.getM_seg2());
-							else
-								A.addHighLightedElement(eq.getM_seg1());
-							// A.m_highlightedElements.add(eq.getM_seg1());
-
-						}
-					}
-				}
-			}
-
-			if (gEles != null){
-				A.addHighlightedElements(gEles);
-			}
-		}
-
-		
-		String label = "";
-		if (A.m_highlightedElements.size() > 0)
-		{
-			// 04-10-09 to highlight rows in HELP table
-			GeometryElement g1 = (GeometryElement)A.m_highlightedElements.get(0);
-			if(A.m_selectedElements.size() == 0){
-				if((g1 instanceof SegLine) || (g1 instanceof SegCircleCurve)){
-					if(m_keyEventCode == KeyEvent.VK_CONTROL){
-						helpDrawView.selectRows(GConstants.SELECT_ELEMENT);
-					}
-					else if(m_keyEventCode == KeyEvent.VK_SHIFT){
-						helpDrawView.unselectRows();
-					}
-					else{
-						helpDrawView.selectRows(GConstants.HIGHLIGHT_ELEMENTS);
-					}
-				}
-				else if(g1 instanceof ImpPoint){
-					//System.out.println("Highlight Point");
-					ImpPoint ip = (ImpPoint)g1;
-					if(m_keyEventCode == KeyEvent.VK_SHIFT){
-						helpDrawView.selectRows(GConstants.REMOVE_ANCHOR_POINT); // unselect row 7
-							if(ip.getAllParents().size() < 2){
-								//helpDrawView.unselectRows();
-								helpDrawView.unselectRow(5);
-							}
-							helpDrawView.unselectRow(4);
-					}
-					else if(m_keyEventCode == KeyEvent.VK_CONTROL){
-						helpDrawView.unselectRow(3); // unselect row 4
-					}
-					else{
-						helpDrawView.selectRows(GConstants.HIGHLIGHT_POINT);
-						if(ip.getAllParents().size() < 2)
-							helpDrawView.unselectRow(5);
-					}	
-				}
-				else if(g1 instanceof Stroke){
-					helpDrawView.selectRows(GConstants.ADD_AP);
-				}
-			}
-			////////////////////////////////////////
-			
-			Iterator iter = A.m_highlightedElements.iterator();
-			while (iter.hasNext()){
-				GeometryElement element = (GeometryElement) iter.next();
-				// select the element if its enabled
-				element.setHighlighted(true);
-				label += element.getM_label() + "  ";
-			}
-			repaint();
-		}
-		/*else{
-			helpDrawView.unselectRows();
-		}*/
-		updateStatusBar(x, y, "( Move )", label);
-		}
-		else{
-		//	System.out.println("mouse moved Parameter window bit set");
-		}
-			
-	}
-
-public void UI_log(String s) 
-{
-	System.out.println(s) ;
-}
-
-
-	/**
-	 * check if the mouse is close to any other geometry element
-	 * @param x
-	 * @param y
-	 */
-	public void performSelection(int x, int y)
+	//19-04-10
+	//functions to get mouse click's point location
+	public void setMousePointerLocation(Point pt1)
 	{
-		UI_log(getMethod()+ "CTRL " + " SELECT") ;
-		Point pt = new Point (x,y) ;
-		A.m_selectedElements = A.A_elements_selected(pt,A.m_selectedElements) ;
-		
-		Iterator iter = A.m_selectedElements.iterator() ;
-
-		String label = "";
-		if (A.m_selectedElements != null)
-		{
-			// 04-10-09 to show select rows in Help Table
-			highlightTableRowsSelectedElems();
-			iter = A.m_selectedElements.iterator();
-			while (iter.hasNext())
-			{
-				GeometryElement element = (GeometryElement) iter.next();
-				label += ", " + element.getM_label();
-			}
-			
-			repaint();
+		if(pt == null){
+			pt = new Point(); 
 		}
-		updateStatusBar(x, y, "( Move )", label);
-		GMethods.getRecognizedView().updateSelection(A.m_selectedElements);
+		///System.out.println("setmousepointer");
+		pt.setLocation(pt1);
 	}
+	
+	public Point getMousePointerLocation(){
+		return pt;
+	}
+	
 
+/*************************************************************************/
+	
+/******************************** KEY EVENTS ****************************/
+	
 	public void keyPressed(KeyEvent e)
 	{
 		keyPressed(e.getKeyCode());
@@ -1836,7 +1056,7 @@ public void UI_log(String s)
 				deleteKeyPressed();
 				break;
 			case KeyEvent.VK_ENTER:
-				System.out.println("Enter key pressed");
+				///System.out.println("Enter key pressed");
 				setEnterKeyClicked(true);
 				if (typedText.length() > 0)
 				{
@@ -1851,7 +1071,7 @@ public void UI_log(String s)
 				}
 				setEnterKeyClicked(false);
 				typedText = "";
-				System.out.println("*************************"+"typed text "+ typedText);
+				///System.out.println("*************************"+"typed text "+ typedText);
 				break;
 			default:
 				break;
@@ -1906,6 +1126,479 @@ public void UI_log(String s)
 	}
 
 
+/********************* DRAWING ON SCREEN ***************************/
+
+	/**
+	 * This draws the component on-screen. AND repaints the entire screen - the grid,segments,text,markers etc. 
+	 * Is there any other way??
+	 */
+	public void paintComponent(Graphics gc)
+	{
+		super.paintComponent(gc);
+		//super.paint(gc);
+		//this.setBackground(GVariables.BACKGROUND_COLOR);
+		int drViewHeight = getHeight();
+		int drViewWidth = getWidth();
+		 // if lines are collinear draw a line 
+		// 10 - 05 -10
+		
+		/* handle collinear line cue 'dashed-line' here */
+		if(isM_AreLinesCollinear())
+		{
+			drawCollinearLine(gc, GVariables.SELECTED_FIXED_COLOR);
+		}
+		/*When does this happen? get rid? */
+		else if(pt1 !=null && pt2!=null)
+		{
+			drawCollinearLine(gc, GVariables.BACKGROUND_COLOR);
+		}
+		
+		// to draw grid
+		// is the grid repainted on every stroke?
+		 if(drGrid == null)
+		 {
+			 drGrid = new DrawGrid();
+		 }
+		
+		 if(isM_gridActive() == true)
+		 {  
+			 drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.GRID_COLOR);
+		 }
+		 else
+		 {
+			 drGrid.drawGrid(gc, drViewHeight, drViewWidth, GVariables.BACKGROUND_COLOR);
+		 }
+		 	 
+		// Draw last stroke as Raw segment First
+		Stroke lastStroke = m_drawData.getLastStroke(true);
+		if ((lastStroke != null) && (m_showLastStroke))
+			lastStroke.drawRaw(gc);
+		
+		
+		drawStrokes(gc, m_drawData.getStrokeList());
+
+		drawMarkers(gc, m_drawData.getM_markers());
+
+		drawTextElements(gc, m_drawData.getM_textElements());		
+	}
+
+
+	/**
+	 * Draws a collinear line between point pt1 and pt2, which are global, and set 
+	 * somewhere else
+	 */
+	public void drawCollinearLine(Graphics g, Paint color)
+	{
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setPaint(color);
+		
+		g2.drawLine(pt1.x,pt1.y,pt2.x,pt2.y);
+		
+	}
+
+	/** draw all the strokes, segments and segment ponints */
+	private void drawStrokes(Graphics gc, Vector strokes)
+	{
+		Iterator iter = strokes.iterator();
+		while (iter.hasNext())
+		{
+			Stroke aStroke = (Stroke) iter.next();
+			aStroke.draw(gc);
+		}
+	}
+
+	/** draw all the markers */
+	public void drawMarkers(Graphics gc, Vector markers)
+	{
+		//Graphics2D g2 = (Graphics2D)gc;
+		//g2.setPaint(color);
+		// if last drawn stroke is a marker, change the colour
+		Iterator iter;
+		iter = markers.iterator();
+		while (iter.hasNext())
+		{
+			Marker gEle = (Marker) iter.next();
+			gEle.draw(gc);
+		}
+	}
+
+	/** draw all the text elments */
+	private void drawTextElements(Graphics gc, Vector textElements)
+	{
+		Iterator iter;
+		iter = textElements.iterator();
+		while (iter.hasNext())
+		{
+			Text txt = (Text) iter.next();
+			if (!txt.isM_used())
+				txt.draw(gc);
+		}
+	}
+
+
+/************************ STROKE ADD ******************************************/
+	/**
+	 * REPLACES public void track(int x, int y, long time)
+	 * Called on mouse released and pressed(left) events. 
+	 * @param pt
+	 * @return
+	 */
+	public int paint_point(Point pt) 
+	{
+		int x = pt.x ;
+		int y = pt.y ;
+		Graphics gc = this.getGraphics();
+		if (isM_trackFlag())
+		{
+			if (m_prevPt == null)
+			{
+				if (!GVariables.undoing)
+					gc.drawLine(x, y, x, y);
+				m_prevPt = new Point(x, y);
+				m_bBox = new Rectangle(x, y, x, y);
+			}
+			else
+			{
+				if (!GVariables.undoing)
+					gc.drawLine(m_prevPt.x, m_prevPt.y, x, y);
+				m_length += Point.distance(m_prevPt.x, m_prevPt.y, x, y);
+				m_prevPt.x = x;
+				m_prevPt.y = y;
+				if (x < m_bBox.x)
+					m_bBox.x = x;
+				if (x > m_bBox.width)
+					m_bBox.width = x;
+				if (y < m_bBox.y)
+					m_bBox.y = y;
+				if (y > m_bBox.height)
+					m_bBox.height = y;
+			}
+			gc.dispose();		
+		}
+		
+		// Display the mouse position to the status bar
+		String statusStr = "";
+		if (m_mouseOverPanel)
+			statusStr = x + ", " + y;
+
+		updateStatusBar(x, y, " ( Drag ) " + statusStr, "");
+		
+		return 1 ;
+	}
+
+	/**
+	 * Adds point to given stroke. Usually preceeded by paintpoint
+	 * @param pt
+	 * @param time
+	 */
+	public void addPointToStroke(Stroke m_currStroke, Point pt, long time)
+	{
+		int x = pt.x ;
+		int y = pt.y ;
+		// store current pixle position with timing information
+		m_currStroke.addPoint(x, y, time);
+	}
+
+	/**
+	 * Called by ProcessStroke. Detects Segment Points and does recognition.
+	 * @param theStroke
+	 * @return Constraints Vector.
+	 */
+	public Vector Add_Stroke(Stroke theStroke)
+	{
+		A.A_draw_Stroke(theStroke) ;
+		
+		Vector constraints = A.new_constraints ;
+		
+		if (!GVariables.undoing)
+			theStroke.drawSegments(getGraphics());
+	
+		repaint() ;	
+		UpdateUI(1,m_drawData.getM_constraints());
+		
+		return constraints ;
+	}
+
+	/**
+	 *  The UI part of the code when adding a stroke to a drawing. 
+	 * @param strk
+	 * @return
+	 */
+	public Vector Process_Stroke(Stroke strk)
+	{
+		UI_log(A.getMethod()) ;
+		Vector constraints = null ;
+		if (strk != null )
+		{			
+			constraints = Add_Stroke(strk); //Does all the work
+
+			constraints = A.Refresh_Drawing(strk,constraints) ;
+			
+			//show the last stroke
+			m_showLastStroke = true;
+			//TODO: Semantics of undo
+			addToUndoVector();
+			repaint();	
+		}
+		return constraints ;
+	}
+	
+
+
+/***************************** SNAPPING **************************************/
+	
+	
+
+/**function snap the ips
+ * if a new stroke is drawn, check for if end points of this 
+ * stroke needs to be snapped.	
+ * In drawing mode, if a circular arc is drawn, then do not merge 
+ * center of circle with any other point.
+ * Merge it only in Edit mode(when an element is being dragged)
+ */
+	public void snapIPs()
+	{
+		// found on 22-02-10 when we type a text then also the tool is in Drawing mode.
+		// so checked here whether the Enter key is clicked do not do this
+		if(!isEnterKeyClicked())
+		{
+			if(GVariables.getDRAWING_MODE() == GConstants.DRAW_MODE && m_drawData.getStrokeList().size()>=1)
+			{
+				A.Snap_IPs_new(m_currStroke) ;
+			}
+			//else, not draw mode, or no strokes.
+			else	
+			{
+				if (A.m_highlightedElements.size() > 0)
+//FIXME				//if (isM_elementDragged() && (A.m_highlightedElements.size() > 0))
+				{
+					A.Snap_IP_drag(A.m_highlightedElements) ; 
+				}
+			}
+		}
+	}
+
+/***********************************************************************/
+	
+	/**
+	 * 
+	 */
+	public void addConstraintsForMarkers()
+	{
+		if ((m_drawData.isUnusedMarker()) || (m_drawData.isUnusedText()))
+		{			
+			//Do not want to show marker strokes at all
+			m_showLastStroke = false;
+		}
+		
+		Vector cons = A.A_addConstraintsForMarkers() ;
+		if (cons!=null && cons.size() >0 ) {
+			snapIPsAndRecalculateConstraints(cons);
+		}
+		
+		resizePanel();
+		repaint();
+		
+	}
+
+	/**
+	 * Fix the position of an element, so that it is not affected by
+	 * any other process (beutification etc)
+	 * @param x
+	 * @param y
+	 */
+	private void fixElements(int x, int y)
+	{
+		logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
+		if (!A.smartMergeSelectedEleToHighLightedEle())
+		{
+			clearSelection();
+		}
+
+		logEvent("mouseButton2Pressed({int}" + x + ", {int}" + y + ");");
+		setM_mousePressedLogged(true);
+
+		A.A_fix_elements() ;
+	}
+
+
+	/**
+	 * Resets the selected elements.
+	 * DrawingState: element selected flag unset
+	 * RecognizedView : cleared
+	 */
+	private void clearSelection()
+	{
+		A.A_clear_selection() ;
+		GMethods.getRecognizedView().updateSelection(A.m_selectedElements);
+	}
+	
+	
+	
+	// This contains all constraints added after drawing or movement.
+	// They will be shown in the recognized view. And user can remove some of
+	// them if required.
+	Vector newConstraints = new Vector();
+//***************************************************************
+
+	
+	public void setGeoElementClicked(Segment segSelected){
+		seg = segSelected;
+	}
+	
+	public Segment getGeoElementClicked(){
+		return seg;
+	}
+	
+//*******************************************************************	
+
+	
+
+	
+	// added on 18-05-10
+	// to remove segment lines and their respective constraints
+	// if start point and end point of the segment are merged
+	// or the distance between two points is negligible
+	/**Function to remove segment lines and their respective constraints
+	 * if start point and end point of the segment are merged
+	 * or the distance between two points is negligible
+	 * @author Sunil Kumar
+	 */
+
+	public void removeElementsWithStartEndPtMerged()
+	{
+		Vector<Segment> segList = m_drawData.getAllSegments();
+		if(segList != null )
+		{
+			for (Segment segment : segList) 
+			{
+				if(segment instanceof SegLine)
+				{
+					if(segment.getSegStart().distance(segment.getSegEnd()) < THRESHOLD){
+						///System.out.println("segment removed");
+						segment.clearConstraints(Constraint.SOFT);
+						segment.clearConstraints(Constraint.HARD);
+						segment.delete();
+					}
+				}
+			} //for
+		}
+	}
+
+	
+	// added on 08-05-10
+	// to show line while two line become collinear while dragging the element
+	/**function to to show a line connecting two lines, when they become collinear while dragging
+	 * one of them
+	 * @author Sunil Kumar
+	 */
+	public boolean checkForCollinearLines()
+	{
+		boolean are_collinear = false ;
+		/////System.out.println("Entered  collinear lines ");
+		
+		// to put highlighted element if it is a line in a segment 
+		if(A.m_highlightedElements.size() == 1 && m_button_type == MouseEvent.BUTTON3) 
+		{
+			are_collinear = A.Check_for_Collinearity((GeometryElement)A.m_highlightedElements.get(0)) ;
+		}
+		return are_collinear ;
+	}
+	
+
+	private boolean handleMouseDragEditMode(int x, int y)
+	{
+		UI_log(A.getMethod()) ;
+		boolean result = true ;
+		// check for collinearity while dragging the line
+	//	boolean are_collinear = checkForCollinearLines() ;
+	//	setM_AreLinesCollinear(are_collinear) ;  
+		repaint() ;
+		
+		if (A.something_highlighted())
+		{
+			///System.out.println("Mouse drag highlighted elements : " + A.m_highlightedElements.size());
+			Vector elementsToMove = new Vector();
+
+			// find all elements to move
+			for (Object ele : A.m_highlightedElements) {
+				if (ele == null) break ;
+				GeometryElement element = (GeometryElement) ele ;
+			
+				if (!element.isFixed())
+				{
+					if (!(elementsToMove.contains(element))) {
+						elementsToMove.add(element);
+						System.out.println("DRAG EDIT: "+element.toString());
+					}
+					
+				}
+			}
+
+			// In case there are element to move, go in
+			if (elementsToMove.size() > 0)
+			{
+			A.A_move_Elements( elementsToMove,m_mousePos,new Point(x,y),0) ;
+
+			repaint();
+			}
+		}
+			
+		 //return result;
+			return true ;
+	}
+
+
+	void addToUndoVector()
+	{
+		winAct = WindowActions.getInstance();
+		if(winAct.getUndoVector() != null){
+			
+			if(winAct.getUndoIndex() < (winAct.getUndoVector().size()-1)){
+				winAct.removeUndoVectorElements();
+			}
+		}
+		winAct.addElementToUndoVector();
+	}
+	
+
+public void UI_log(String s) 
+{
+	System.out.println(s) ;
+}
+
+
+	/**
+	 * check if the mouse is close to any other geometry element
+	 * @param x
+	 * @param y
+	 */
+	public void performSelection(int x, int y)
+	{
+		UI_log(A.getMethod()+ "CTRL " + " SELECT") ;
+		Point pt = new Point (x,y) ;
+		A.m_selectedElements = A.A_elements_selected(pt,A.m_selectedElements) ;
+		
+		Iterator iter = A.m_selectedElements.iterator() ;
+
+		String label = "";
+		if (A.m_selectedElements != null)
+		{
+			// 04-10-09 to show select rows in Help Table
+			highlightTableRowsSelectedElems();
+			iter = A.m_selectedElements.iterator();
+			while (iter.hasNext())
+			{
+				GeometryElement element = (GeometryElement) iter.next();
+				label += ", " + element.getM_label();
+			}
+			
+			repaint();
+		}
+		updateStatusBar(x, y, "( Move )", label);
+		GMethods.getRecognizedView().updateSelection(A.m_selectedElements);
+	}
+
 
 
 	public void snapIPsAndRecalculateConstraints(Vector NewConstraints)
@@ -1945,13 +1638,127 @@ public void UI_log(String s)
 		clearSelection();
 	}
 	
-/**
- * 
- * @param x
- * @param y
- * @param statusStr
- * @param label
- */
+
+	public boolean isM_trackFlag()
+	{
+		return m_trackFlag;
+	}
+
+	public void setM_trackFlag(boolean flag)
+	{
+		m_trackFlag = flag;
+	}
+
+	
+	public void clearView()
+	{
+		if (null != m_drawData)
+		{
+			m_drawData = null;
+			init();
+			//RecognizedView rv = MainWindow.getRecognizedView();
+			//rv.reset(m_drawData.getM_constraints());
+			UpdateUI(1,m_drawData.getM_constraints()) ;
+		}
+		repaint();
+		this.revalidate();
+	}
+
+	public DrawingData getM_drawData()
+	{
+		return A.m_drawData;
+	}
+
+	public void setM_drawData(DrawingData data)
+	{
+		m_drawData = data;
+		m_currStroke = null;
+	}
+
+	public boolean dispatchKeyEvent(KeyEvent e)
+	{
+		processKeyEvent(e);
+		return true;
+	}
+
+	
+/******************* PURE UI HANDLING ************************************/
+	
+	
+	/**Function to highlight table rows in Help table
+	 * @author Sunil Kumar
+	 */
+	public void highlightTableRowsSelectedElems()
+	{
+		if(A.m_selectedElements != null){
+			int size = A.m_selectedElements.size();
+			if(size!=0){
+				if(size == 1){
+					GeometryElement g1 = (GeometryElement)A.m_selectedElements.get(0);
+					if((g1 instanceof SegLine)){
+						helpDrawView.selectRows(GConstants.SELECT_LINE);
+					}
+					else if(g1 instanceof SegCircleCurve){
+						/////System.out.println("Highlight Point");
+						helpDrawView.selectRows(GConstants.SELECT_ARC);
+					}
+					else if(g1 instanceof AnchorPoint){
+						helpDrawView.selectRows(GConstants.SELECT_POINT);
+					}
+				}
+				else if(size == 2){
+					GeometryElement g1 = (GeometryElement)A.m_selectedElements.get(0);
+					GeometryElement g2 = (GeometryElement)A.m_selectedElements.get(1);
+
+					if(g1 instanceof AnchorPoint){
+						if(g2 instanceof AnchorPoint){
+							helpDrawView.selectRows(GConstants.SELECT_POINTS);
+						}
+						if(g2 instanceof SegCircleCurve){
+							helpDrawView.selectRows(GConstants.SELECT_POINT_ARC);
+						}
+						if(g2 instanceof SegLine){
+							helpDrawView.selectRows(GConstants.SELECT_POINT_LINE);
+						}
+					}
+
+					else if(g1 instanceof SegLine){
+						if(g2 instanceof AnchorPoint){
+							helpDrawView.selectRows(GConstants.SELECT_POINT_LINE);
+						}
+						if(g2 instanceof SegCircleCurve){
+							helpDrawView.selectRows(GConstants.SELECT_LINE_ARC);
+						}
+						if(g2 instanceof SegLine){
+							helpDrawView.selectRows(GConstants.MOVE_DELETE_ELEMENTS);
+						}
+					}
+
+					else if(g1 instanceof SegCircleCurve){
+						if(g2 instanceof AnchorPoint){
+							helpDrawView.selectRows(GConstants.SELECT_POINT_ARC);
+						}
+						if(g2 instanceof SegCircleCurve){
+							helpDrawView.selectRows(GConstants.MOVE_DELETE_ELEMENTS);
+						}
+						if(g2 instanceof SegLine){
+							helpDrawView.selectRows(GConstants.SELECT_LINE_ARC);
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param statusStr
+	 * @param label
+	 */
 	private void updateStatusBar(int x, int y, String statusStr, String label)
 	{
 		StatusBar sb = MainWindow.getM_statusBar();
@@ -1965,47 +1772,40 @@ public void UI_log(String s)
 		}
 	}
 	
-	private void resizePanel()
+	/**Function to check whether Mouse_Button 3 is clicked on any element
+	 * If yes then show appropriate parameter window
+	 * @author Sunil Kumar
+	 */
+	public void showElementPropertiesWindow(int x, int y,int buttonType)
 	{
-		Vector v = m_drawData.getAllAnchorPoints();
-		Stroke stk = m_drawData.getLastStroke(true);
-		// change canvas's width and height in case of draw and drag mode
-		for(int i=0;i<v.size();i++)
-		{		
-			AnchorPoint p = (AnchorPoint) v.get(i);
-			//AnchorPoint p = (AnchorPoint)v.get(i);
-			if(p.getX() > m_canvasUsed.width)
-				m_canvasUsed.width = (int)p.getX() + ((int)GConstants.cmScaleDrawingRatio*3);
-			if(p.getY() > m_canvasUsed.height)
-				m_canvasUsed.height = (int)p.getY() + ((int)GConstants.cmScaleDrawingRatio*3);
-		}
-		boolean changed = false;
-		Dimension drawArea = new Dimension();
-		changed = true;
-		if (m_canvasUsed.width > getSize().width)
-		{
-			drawArea.width = m_canvasUsed.width;	
-			changed = true;
-		}
-		else
-			drawArea.width = getSize().width;
-		
-		if (m_canvasUsed.height > getSize().height)
-		{
-			drawArea.height = m_canvasUsed.height;
-			changed = true;
-		}
-		else
-			drawArea.height = getSize().height;
-
-		if (changed)
-		{
-			// adjust the area to the new dimensions.
-			this.setPreferredSize(drawArea);
-			this.revalidate();
+		if((m_currStroke==null || 
+				(m_currStroke.getLength()==0 )) 
+				&&  buttonType == MouseEvent.BUTTON1 
+				&&  m_keyEventCode!= KeyEvent.VK_SHIFT
+				&& this.hasFocus()){
+			Point pt = new Point();
+			pt.setLocation(x, y);
+			
+			setMousePointerLocation(pt) ;
+			
+			Segment seg = null;
+			// check whether the point is on any segment
+			seg = A.isPtOnAnySegment((Point2D)pt); 
+			this.segUnderCursor = seg ;
+			int count = A.ptOnSegments(pt);
+			/////System.out.println("Count =" +count);
+			// count <2 
+			// count = 0 means that the point is not an anchor point
+			// count >=1 means that the anchor point is a child of # elements
+			if((seg)!=null && count < 2 && m_keyEventCode!= KeyEvent.VK_CONTROL  ){
+				/////System.out.println("Control key not pressed");
+				setGeoElementClicked (seg);
+				UpdateUI(2, null) ;
+			}
 		}
 	}
-
+		
+	
 	/**
 	 * Update the recognized view constraint list and the edit pane. 
 	 * TODO: Fix point null problem. 
@@ -2049,7 +1849,7 @@ public void UI_log(String s)
 				
 				Point pt3 = getLocationOnScreen() ;
 				Point pt4 = getLocation() ;
-				System.out.println("BEGIN POINT CO_ORDINATES......................") ;
+				///System.out.println("BEGIN POINT CO_ORDINATES......................") ;
 				
 				ev.displayOptions(segm,pt2) ;
 			}
@@ -2058,48 +1858,51 @@ public void UI_log(String s)
 	}
 	
 	
-	public boolean isM_trackFlag()
-	{
-		return m_trackFlag;
-	}
 
-	public void setM_trackFlag(boolean flag)
-	{
-		m_trackFlag = flag;
-	}
-
-	
-	public void clearView()
-	{
-		if (null != m_drawData)
+	private void resizePanel()
 		{
-			m_drawData = null;
-			init();
-			//RecognizedView rv = MainWindow.getRecognizedView();
-			//rv.reset(m_drawData.getM_constraints());
-			UpdateUI(1,m_drawData.getM_constraints()) ;
+			Vector v = m_drawData.getAllAnchorPoints();
+			Stroke stk = m_drawData.getLastStroke(true);
+			// change canvas's width and height in case of draw and drag mode
+			for(int i=0;i<v.size();i++)
+			{		
+				AnchorPoint p = (AnchorPoint) v.get(i);
+				//AnchorPoint p = (AnchorPoint)v.get(i);
+				if(p.getX() > m_canvasUsed.width)
+					m_canvasUsed.width = (int)p.getX() + ((int)GConstants.cmScaleDrawingRatio*3);
+				if(p.getY() > m_canvasUsed.height)
+					m_canvasUsed.height = (int)p.getY() + ((int)GConstants.cmScaleDrawingRatio*3);
+			}
+			boolean changed = false;
+			Dimension drawArea = new Dimension();
+			changed = true;
+			if (m_canvasUsed.width > getSize().width)
+			{
+				drawArea.width = m_canvasUsed.width;	
+				changed = true;
+			}
+			else
+				drawArea.width = getSize().width;
+			
+			if (m_canvasUsed.height > getSize().height)
+			{
+				drawArea.height = m_canvasUsed.height;
+				changed = true;
+			}
+			else
+				drawArea.height = getSize().height;
+
+			if (changed)
+			{
+				// adjust the area to the new dimensions.
+				this.setPreferredSize(drawArea);
+				this.revalidate();
+			}
 		}
-		repaint();
-		this.revalidate();
-	}
-
-	public DrawingData getM_drawData()
-	{
-		return A.m_drawData;
-	}
-
-	public void setM_drawData(DrawingData data)
-	{
-		m_drawData = data;
-		m_currStroke = null;
-	}
-
-	public boolean dispatchKeyEvent(KeyEvent e)
-	{
-		processKeyEvent(e);
-		return true;
-	}
-
+	
+	
+/************************* EVENT LOGGING FOR REPLAY **********************/
+	
 	public void logEvent(String str)
 	{
 		Command comm = new Command(str);
@@ -2113,7 +1916,8 @@ public void UI_log(String s)
 		setM_logBetweenKeyPress(true);
 		setM_saved(false);
 	}
-
+	
+/************************************************************************/
 	public boolean isM_saved()
 	{
 		return m_saved;
@@ -2217,24 +2021,16 @@ public void UI_log(String s)
 		m_showLastStroke = true;
 	}
 
-	public void setM_button_type(int m_button_type) {
-		this.m_button_type = m_button_type;
-	}
-
-	public int getM_button_type() {
-		return m_button_type;
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public String getMethod() {
-	     StackTraceElement stackTraceElements[] =
-	             (new Throwable()).getStackTrace();
-	     return stackTraceElements[1].toString();
-	}
-	
+//	
+//	/** Get the method name from which this function is called .
+//	 * Might have some good use in logging/debugging.
+//	 * @return
+//	 */
+//	public String getMethod()
+//	{
+//	     StackTraceElement stackTraceElements[] =
+//	             (new Throwable()).getStackTrace();
+//	     return stackTraceElements[1].toString();
+//	}
+//	
 }

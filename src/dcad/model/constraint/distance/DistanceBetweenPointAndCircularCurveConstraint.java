@@ -81,7 +81,7 @@ public class DistanceBetweenPointAndCircularCurveConstraint extends PointSegment
 				&& constraintsHelper.areSlopesEqual((AnchorPoint)points.get(0),(AnchorPoint)points.get(3),(AnchorPoint)points.get(0),(AnchorPoint)points.get(4),true)
 		)
 			return true;
-		System.out.println("Point - circular curve Distance constraint failed...");
+		///System.out.println("Point - circular curve Distance constraint failed...");
 		return false;
 	}
 	

@@ -320,8 +320,8 @@ public class HelpDrawingView extends JPanel  //implements ActionListener
 		
 		double changeInHeight = winHeight - tableHeight;
 		changeInHeight = changeInHeight/GConstants.cmScaleDrawingRatio;
-		//System.out.println("Window Height = " + winHeight + "Table Height = " + tableHeight );
-		//System.out.println("ChangeInHeight = " + changeInHeight);
+		/////System.out.println("Window Height = " + winHeight + "Table Height = " + tableHeight );
+		/////System.out.println("ChangeInHeight = " + changeInHeight);
 		double index;
 		String appendString = "";
 		
@@ -426,14 +426,14 @@ public class HelpDrawingView extends JPanel  //implements ActionListener
 		  public void valueChanged(ListSelectionEvent e) {
 		   
 		    if (e.getValueIsAdjusting()) {
-		      //System.out.println("The mouse button has not yet been released");
+		      /////System.out.println("The mouse button has not yet been released");
 		    }
 		    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
             if (lsm.isSelectionEmpty()) {
-               // System.out.println("No rows are selected.");
+               // ///System.out.println("No rows are selected.");
             } else {
                 int selectedRow = lsm.getMinSelectionIndex();
-                //System.out.println("Row " + selectedRow + " is now selected.");
+                /////System.out.println("Row " + selectedRow + " is now selected.");
                 
                 setText(selectedRow);
             }

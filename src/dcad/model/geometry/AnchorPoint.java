@@ -237,7 +237,7 @@ public class AnchorPoint extends ImpPoint
 
 	public void print()
 	{
-		System.out.println("\t(" + getX() + "," + getY() + ")");
+		///System.out.println("\t(" + getX() + "," + getY() + ")");
 	}
 	
 	public Vector getConstraintsByType(Class classname)
@@ -260,6 +260,15 @@ public class AnchorPoint extends ImpPoint
 	{
 		for(;constraints.size()!=0;)
 			constraints.remove(0);
+	}
+	
+	public boolean equals(AnchorPoint ap2) {
+		boolean def = false ;
+		if(this.m_point.distance(ap2.m_point) < 5.0)
+			return true ;
+		
+		return def ;
+		
 	}
 	
 	public void delete()

@@ -94,7 +94,7 @@ public class twoCircularCurveTangencyConstraint extends TangentConstraint
 				&& constraintsHelper.onCircularCurveOrNot((AnchorPoint)points.get(4),(AnchorPoint)points.get(5),(AnchorPoint)points.get(6),(AnchorPoint)points.get(0),true)
 			)
 			return true;
-		System.out.println("Two curves tangency failed...");
+		///System.out.println("Two curves tangency failed...");
 		return false;
 	}
 }

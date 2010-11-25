@@ -68,15 +68,15 @@ public class CircleFitter
 					new DecimalFormatSymbols(Locale.US));
 
 			initialize(points);
-/*			System.out.println("initial circle: "
+/*			///System.out.println("initial circle: "
 					+ format.format(getCenter().x) + " "
 					+ format.format(getCenter().y) + " "
 					+ format.format(getRadius()));*/
 
 			// minimize the residuals
 			int iter = minimize(1000, 0.02, 1.0e-4);
-/*			System.out.println("converged after " + iter + " iterations");
-			System.out.println("final circle: "
+/*			///System.out.println("converged after " + iter + " iterations");
+			///System.out.println("final circle: "
 					+ format.format(getCenter().x) + " "
 					+ format.format(getCenter().y) + " "
 					+ format.format(getRadius()));*/
@@ -334,7 +334,7 @@ public class CircleFitter
 	 */
 	public Point2D.Double getCenter()
 	{
-//		System.out.println("Center : " + center.getX() + " " + center.getY());
+//		///System.out.println("Center : " + center.getX() + " " + center.getY());
 		return center;
 	}
 
@@ -343,7 +343,7 @@ public class CircleFitter
 	 */
 	public double getRadius()
 	{
-//		System.out.println("Radius : " + rHat);
+//		///System.out.println("Radius : " + rHat);
 		return rHat;
 	}
 

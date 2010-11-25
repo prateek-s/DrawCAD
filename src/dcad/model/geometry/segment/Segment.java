@@ -85,6 +85,7 @@ public abstract class Segment extends GeometryElement
 	 * To store the constraints related to this segment
 	 */
 	protected Vector m_constraints = null;
+
 	
 	/**
 	 * Store the shape object
@@ -335,8 +336,8 @@ public abstract class Segment extends GeometryElement
 	// 22-01-10
 	public void removeAllConstraints(){
 		m_constraints.removeAllElements();
-		if(m_constraints.size() == 0)
-			System.out.println("Vector is null");
+		if(m_constraints.size() == 0);
+			///System.out.println("Vector is null");
 	}
 	
 
@@ -352,13 +353,19 @@ public abstract class Segment extends GeometryElement
 
 	public String toString()
 	{
-		return ("*********************m_points were removed from the segment... This msg. is being displayed from tostring function of segment************************");
+		String strld = "<ID:> "+ this.m_strId;
+		String type = " <TYPE>: " + this.m_type ;
+		String label = " <LABEL:> " + this.m_label ;
+		String start = " <START:> " +this.getSegStart() ;
+		String foo = " <CONSTRAINTS:> " + this.m_constraints.toString() ;
+		return strld+type+label+start+foo ;
+		//return ("*********************m_points were removed from the segment... This msg. is being displayed from tostring function of segment************************");
 		//return m_points.get(0).toString()+"----"+m_points.get(m_points.size()-1).toString();
 	}
 	
 	public void clearConstraints(int catagory)
 	{
-//		System.out.println("Segment.clearConstraints()"+getM_strId());
+//		///System.out.println("Segment.clearConstraints()"+getM_strId());
 		// remove all the constarints
 		//ISHWAR Changed "SOFT" to catagory
 		Vector constraints = getConstraintsByCatagory(catagory);
@@ -366,13 +373,13 @@ public abstract class Segment extends GeometryElement
 		while (iter.hasNext())
 		{
 			Constraint cons = (Constraint) iter.next();
-//			System.out.println(cons);
+//			///System.out.println(cons);
 			
 			// remove only constraints of the given catagory
 			if(cons.getM_category() == catagory)
 			{
 				cons.remove();
-//				System.out.println("Constraint Removed: "+cons);
+//				///System.out.println("Constraint Removed: "+cons);
 			}
 			iter.remove();
 		}
@@ -554,7 +561,7 @@ public abstract class Segment extends GeometryElement
 	
 	public Vector findConstraints(Segment seg, RelConstraintRecognizer relConsRecog)
 	{
-//		System.out.println("Segment.findConstraints()");
+//		///System.out.println("Segment.findConstraints()");
 		Vector cons = new Vector();
 		if(!seg.equals(this))
 		{

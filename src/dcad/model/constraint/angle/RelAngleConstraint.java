@@ -36,7 +36,7 @@ public class RelAngleConstraint extends RelativeConstraint
 	{
 		this(seg1, seg2,category,promoted);
 		setM_angleDiff(diff);
-		System.out.println("Angle between lines " + diff);
+	//////System.out.println("Angle between lines " + diff);
 		Vector uniquePoints=new Vector();
 		uniquePoints= constraintsHelper.getUniquePointsForConnectedLines((SegLine)seg1,(SegLine)seg2);
 		if(uniquePoints.size()>0)
@@ -57,7 +57,7 @@ public class RelAngleConstraint extends RelativeConstraint
 
 	public void setM_angleDiff(double diff)
 	{
-//		System.out.println("Angle given is  : "+ diff);
+//		///System.out.println("Angle given is  : "+ diff);
 		m_angleDiff = diff;
 		
 		// set the angle within the range.
@@ -152,7 +152,7 @@ public class RelAngleConstraint extends RelativeConstraint
 	public boolean isConstraintSolved()
 	{
 		this.update();
-		System.out.println("The marker arc angle is : " + m_arc.getAngleExtent());
+		///System.out.println("The marker arc angle is : " + m_arc.getAngleExtent());
 		
 /*		double angle1=((SegLine)m_seg1).getM_angle();
 		double angle2=((SegLine)m_seg2).getM_angle();
@@ -162,12 +162,12 @@ public class RelAngleConstraint extends RelativeConstraint
 		if(angle2<0)
 			angle2+=180;
 		
-		System.out.println("angles : " + angle1 + "  " + angle2  +"  "+ this.getM_angleDiff());*/
-		System.out.println(this.getM_angleDiff() + " This was the difference");
+		///System.out.println("angles : " + angle1 + "  " + angle2  +"  "+ this.getM_angleDiff());*/
+		///System.out.println(this.getM_angleDiff() + " This was the difference");
 		if(Math.abs( Math.abs(m_arc.getAngleExtent()) - getM_angleDiff() )<=constraintsHelper.relativeAngleErrorThreshold)
 			return true;
 		
-		System.out.println("Relative angle constraint failed...");
+		///System.out.println("Relative angle constraint failed...");
 		return false;
 	}
 

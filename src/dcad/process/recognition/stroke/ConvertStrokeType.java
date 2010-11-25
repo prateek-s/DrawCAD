@@ -62,84 +62,66 @@ public class ConvertStrokeType {
 		}
 	}
 	
-	public void ConvertLastDrawnStroke(){
-		Vector stkList = dv.getM_drawData().getStrokeList();
-		Stroke stk = null;
-		if(stkList != null){
-			
-			// get the last stroke
-			stk = (Stroke)stkList.get(stkList.size()-1);
-			//stk = dv.getM_drawData().getLastStroke(true);
-			// create a new stroke
-			//dv.getCurrentStroke();
-			
-			int x = 0;
-			int y = 0;
-			long time = 0; 
-			int count = 0;
-			int buttonType = 1;
-			// get the list of raw points
-			Vector rawptList = stk.getM_ptList();
-			
-			// find the stroke type of current stroke
-		
-			int strokeType = stk.getM_type();
-			
-			//delete the earlier stroke
-			dv.setStrokeConverted(true);
-			boolean converted = true;
-			GMethods.getCurrentView().logEvent("setStrokeConverted({boolean}" + converted + ");");
-			if(strokeType == MARKER){
-				// change to normal stroke
-				Vector markerList = dv.getM_drawData().getM_markers();
-				Marker marker = (Marker)markerList.get(markerList.size()-1);
-				
-				// add to transcript
-				GMethods.getCurrentView().logEvent("DrawingData|removeMarker({Marker}" + marker + ");");
-				//GMethods.getCurrentView().logEvent(Command.PAUSE);
-				
-				dv.getM_drawData().removeMarker(marker);
-				dv.setStrokeConvertedTo(NORMAL_STROKE);
-				GMethods.getCurrentView().logEvent("setStrokeConvertedTo({int}" + NORMAL_STROKE + ");");
-			}
-			else if(strokeType == NORMAL_STROKE){
-				dv.setStrokeConvertedTo(MARKER);
-				GMethods.getCurrentView().logEvent("setStrokeConvertedTo({int}" + MARKER + ");");
-				// set bit to marker
-			}
-			
+	public void ConvertStroke(Stroke stk) 
+	{
+		int x = 0;
+		int y = 0;
+		long time = 0; 
+		int count = 0;
+		int buttonType = 1;
+		// get the list of raw points
+		Vector rawptList = stk.getM_ptList();
+		int strokeType = stk.getM_type();
+		dv.setStrokeConverted(true);
+		boolean converted = true;
+		GMethods.getCurrentView().logEvent("setStrokeConverted({boolean}" + converted + ");");
+		if(strokeType == MARKER){
+			// change to normal stroke
+			Vector markerList = dv.getM_drawData().getM_markers();
+			Marker marker = (Marker)markerList.get(markerList.size()-1);
+
 			// add to transcript
-			GMethods.getCurrentView().logEvent("Stroke|delete();");
+			GMethods.getCurrentView().logEvent("DrawingData|removeMarker({Marker}" + marker + ");");
 			//GMethods.getCurrentView().logEvent(Command.PAUSE);
-			
-			stk.delete();
-			
-			Iterator iter = rawptList.iterator();
-			while(iter.hasNext()){
-				PixelInfo pi = (PixelInfo)iter.next();
-				x = (int)pi.getX();
-				y = (int)pi.getY();
-				time = pi.getTime();
-				// add them to current stroke
-				//dv.addPointToStroke(x, y, time);
-				
-				// add to transcript
-				if(count == 0){
-					dv.mouseButton1Pressed(x, y, time);
-					//dv.logEvent("mouseMoved({int}" + x + ", {int}" + y + ");");
-					//dv.logEvent("mouseButton1Pressed({int}" + x + ", {int}" + y + ", {long}" + time + ");");
-				}
-				else{
-					dv.mouseDragged(x, y, time);
-					//dv.logEvent("mouseDragged({int}" + x + ", {int}" + y + ", {long}" + time + ");");
-				}
-				count ++;
-			}
-			//dv.logEvent("mouseReleased({int}" + x + ", {int}" + y + ", {int}" + buttonType + ");");
-		//	dv.getCurrentStroke().setM_ptList(rawptList);
-			//dv.getM_drawData().removeUnusedMarker();
-			dv.mouseReleased(x, y, buttonType);
+
+			dv.getM_drawData().removeMarker(marker);
+			dv.setStrokeConvertedTo(NORMAL_STROKE);
+			GMethods.getCurrentView().logEvent("setStrokeConvertedTo({int}" + NORMAL_STROKE + ");");
 		}
+		else if(strokeType == NORMAL_STROKE){
+			dv.setStrokeConvertedTo(MARKER);
+			GMethods.getCurrentView().logEvent("setStrokeConvertedTo({int}" + MARKER + ");");
+			// set bit to marker
+		}
+		GMethods.getCurrentView().logEvent("Stroke|delete();");		
+		stk.delete();			
+		Iterator iter = rawptList.iterator();
+		while(iter.hasNext()){
+			PixelInfo pi = (PixelInfo)iter.next();
+			x = (int)pi.getX();
+			y = (int)pi.getY();
+			time = pi.getTime();
+			if(count == 0){
+				dv.mouseButton1Pressed(x, y, time);;
+			}
+			else{
+				dv.mouseDragged(x, y, time);
+			}
+			count ++;
+		}
+		dv.mouseReleased(x, y, buttonType);
+
+
+	}		
 	
-	}
+	
+	public void ConvertLastDrawnStroke()
+	{
+		Vector stkList = dv.getM_drawData().getStrokeList();
+		Stroke stk = (Stroke)stkList.get(stkList.size()-1);
+		ConvertStroke(stk) ;
+
+		}
+
+	
 }

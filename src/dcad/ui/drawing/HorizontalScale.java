@@ -102,7 +102,7 @@ public class HorizontalScale extends JPanel{
 		double cms = pixelsMoved/DEPTH_PER_CM;
 		index = (int)(cms*10);
 		countCm=(int)Math.ceil(index/10.0);
-        //System.out.println("Debug-- (pixelsMoved,cms,index,countCm)= ("+pixelsMoved+","+cms+","+index+","+countCm+")");
+        /////System.out.println("Debug-- (pixelsMoved,cms,index,countCm)= ("+pixelsMoved+","+cms+","+index+","+countCm+")");
 		repaint();
 	}
 	public void paint(Graphics gc)

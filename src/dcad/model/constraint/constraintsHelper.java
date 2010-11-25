@@ -83,25 +83,25 @@ public class constraintsHelper
 	public static Vector getUniquePointsForConnectedLines(SegLine seg1, SegLine seg2)
 	{
 		Vector v= new Vector();
-		if (seg1.getM_start() == seg2.getM_start() && seg1.getM_end() != seg2.getM_end())
+		if (seg1.getM_start().equals(seg2.getM_start()) && !seg1.getM_end().equals(seg2.getM_end()))
 		{
 			v.add(seg1.getM_end());
 			v.add(seg2.getM_end());
 			v.add(seg1.getM_start());
 		} 
-		else if (seg1.getM_start() == seg2.getM_end() && seg1.getM_end() != seg2.getM_start())
+		else if (seg1.getM_start().equals(seg2.getM_end()) && !seg1.getM_end().equals(seg2.getM_start()))
 		{
 			v.add(seg1.getM_end());
 			v.add(seg2.getM_start());
 			v.add(seg1.getM_start());
 		}
-		else if (seg1.getM_end() == seg2.getM_start() && seg1.getM_start() != seg2.getM_end())
+		else if (seg1.getM_end().equals(seg2.getM_start()) && !seg1.getM_start().equals(seg2.getM_end()))
 		{
 			v.add(seg1.getM_start());
 			v.add(seg2.getM_end());
 			v.add(seg1.getM_end());
 		}
-		else if (seg1.getM_end() == seg2.getM_end() && seg1.getM_start() != seg2.getM_start())
+		else if (seg1.getM_end().equals(seg2.getM_end()) && !seg1.getM_start().equals(seg2.getM_start()))
 		{
 			v.add(seg1.getM_start());
 			v.add(seg2.getM_start());
@@ -286,12 +286,12 @@ public class constraintsHelper
 	{
 		double angle1=Maths.newAngleInDegrees(p1.getM_point(),p2.getM_point());
 		double angle2=Maths.newAngleInDegrees(p3.getM_point(),p4.getM_point());
-	//	System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
+	//	///System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
 		/*if(angle1<0)
 			angle1 += 180;
 		if(angle2<0)
 			angle2 += 180;
-		System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
+		///System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
 		if(Math.abs(angle1-angle2)<equalAnglesErrorThreshold || Math.abs(angle1-angle2) > 180 - equalAnglesErrorThreshold)
 			return true;
 		printConstraintSolvingFailure("constraintsHelper.areSlopesEqual" , "Angles : " + angle1 + "  " + angle2  +"  ", doPrint);
@@ -404,10 +404,10 @@ public class constraintsHelper
 			}
 		}
 		
-	//	System.out.println("Resultant : " + resultant);
-	//	System.out.println("Absolute Resultant : " + Math.abs(resultant) + "Threshold" + equalAnglesErrorThreshold);
+	//	///System.out.println("Resultant : " + resultant);
+	//	///System.out.println("Absolute Resultant : " + Math.abs(resultant) + "Threshold" + equalAnglesErrorThreshold);
 		if(Math.abs(resultant)<equalAnglesErrorThreshold){
-			System.out.println("true");
+			///System.out.println("true");
 			return true;
 		}
 			
@@ -427,12 +427,12 @@ public class constraintsHelper
 										double x3,double y3,double x4,double y4, boolean doPrint){
 		double angle1=Maths.AngleInDegrees(x1, y1, x2, y2);
 		double angle2=Maths.AngleInDegrees(x3, y3, x4, y4);
-		System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
+		///System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
 		/*if(angle1<0)
 			angle1 += 180;
 		if(angle2<0)
 			angle2 += 180;
-		System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
+		///System.out.println(" \n\n\n Angles : " + angle1 + "  " + angle2);
 		if(Math.abs(angle1-angle2)<equalAnglesErrorThreshold || Math.abs(angle1-angle2) > 180 - equalAnglesErrorThreshold)
 			return true;
 		printConstraintSolvingFailure("constraintsHelper.areSlopesEqual" , "Angles : " + angle1 + "  " + angle2  +"  ", doPrint);
@@ -545,10 +545,10 @@ public class constraintsHelper
 			}
 		}
 		
-		System.out.println("Resultant : " + resultant);
-		System.out.println("Absolute Resultant : " + Math.abs(resultant) + "Threshold" + equalAnglesErrorThreshold);
+		///System.out.println("Resultant : " + resultant);
+		///System.out.println("Absolute Resultant : " + Math.abs(resultant) + "Threshold" + equalAnglesErrorThreshold);
 		if(Math.abs(resultant)<equalAnglesErrorThreshold){
-			System.out.println("true");
+			///System.out.println("true");
 			return true;
 		}
 			
@@ -569,7 +569,7 @@ public class constraintsHelper
 		if(errorThreshold == -1)
 			errorThreshold = perpendicularSegmentsAnglesErrorThreshold;
 		
-//		System.out.println("constraintsHelper.areLinesPerpendicular. Angles : " + angle1 + "  " + angle2  +"  ");
+//		///System.out.println("constraintsHelper.areLinesPerpendicular. Angles : " + angle1 + "  " + angle2  +"  ");
 		if(constraintsHelper.withinRange(Math.abs(angle1-angle2),90,errorThreshold))//<=GConstants.parallelSegmentsAnglesErrorThreshold)
 			return true;
 		printConstraintSolvingFailure("constraintsHelper.areLinesPerpendicular","Angles : " + angle1 + "  " + angle2  +"  ",doPrint);
@@ -685,8 +685,8 @@ public class constraintsHelper
 	{
 		if(doPrint)
 		{
-			System.out.println("CONSTRAINT SOLVING FAILURE!!! in <" + functionName + "> : " + str);
-			System.out.println("");
+			///System.out.println("CONSTRAINT SOLVING FAILURE!!! in <" + functionName + "> : " + str);
+			///System.out.println("");
 		}
 	}
 
@@ -772,9 +772,12 @@ public class constraintsHelper
 	public static Vector getAllAnchorPointsOfConstraints(Vector constraints)
 	{
 		Vector result = new Vector();
-		Iterator iter = constraints.iterator();
-		while (iter.hasNext())
-			addAllIgnoreDuplicates(  result  ,  ( (Constraint)iter.next() ).getPoints()  );
+		
+		for (Object o : constraints) {
+			Constraint co = (Constraint)o ;
+			Vector points = co.getPoints() ;
+			addAllIgnoreDuplicates(  result  , points );
+		}
 		return result;
 	}
 	
@@ -893,7 +896,7 @@ public class constraintsHelper
 		}
 		else
 		{
-			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Segment is corrupted !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			///System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Segment is corrupted !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			return null;
 		}
 	}
@@ -918,7 +921,7 @@ public class constraintsHelper
 		}
 		else
 		{
-			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Segment is corrupted !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			///System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Segment is corrupted !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			return null;
 		}
 	}

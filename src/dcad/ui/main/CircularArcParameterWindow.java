@@ -161,10 +161,10 @@ public class CircularArcParameterWindow implements ActionListener{
 		if((Double.compare(angle,textAngle) == 0)  
 				|| ((Double.compare(textAngle, TEXT_BOX_NULL) == 0 ) 
 						&& (Double.compare(angle,0.0) ==0))){
-			System.out.println("Angle is same");
+			///System.out.println("Angle is same");
 		}
 		else if((Double.compare(textAngle, TEXT_BOX_NULL)==0) && (Double.compare(angle,0.0) !=0)){
-			System.out.println("remove angle constraint");
+			///System.out.println("remove angle constraint");
 			cons = LineParameterWindow.getSegmentConstraint("arc", "angle",seg);
 			// find the index of constraint in recognize view constraint list
 			listIndex = LineParameterWindow.getListConstraintIndex(cons);
@@ -176,7 +176,7 @@ public class CircularArcParameterWindow implements ActionListener{
 			//dv.writeText((int)seg.getSegStart().getX(), (int)seg.getSegStart().getY(), angleString);
 			dv.writeText((int)pt.getX(),(int) pt.getY(), angleString);
 			dv.repaint();
-			System.out.println("Angle is changed to " +  angleString);
+			///System.out.println("Angle is changed to " +  angleString);
 			parameterChanged = true;
 		}
 		
@@ -205,19 +205,19 @@ public class CircularArcParameterWindow implements ActionListener{
 		if((Double.compare(radius,textradius) == 0)  
 				|| ((Double.compare(textradius, TEXT_BOX_NULL) == 0 ) 
 						&& (Double.compare(radius,0.0) ==0))){
-			System.out.println("Radius is same");
+			///System.out.println("Radius is same");
 		}
 		// if textbox is currently null and previously it had some length
 		// then we need to remove that length constraint
 		else if((Double.compare(textradius, TEXT_BOX_NULL)==0) && (Double.compare(radius,0.0) !=0)){
-			System.out.println("remove constraint");
+			///System.out.println("remove constraint");
 				// get the actual constraint
 				cons = LineParameterWindow.getSegmentConstraint("arc", "radius",seg);
 				// find the index of constraint in recognize view constraint list
 				listIndex = LineParameterWindow.getListConstraintIndex(cons);
 				MainWindow.getRecognizedView().deleteConstraint(listIndex);
 				dv.repaint();
-				System.out.println("constraint removed ");
+				///System.out.println("constraint removed ");
 			
 		}
 		// simply add the constraint and remove if any previous length constraint added
@@ -226,12 +226,12 @@ public class CircularArcParameterWindow implements ActionListener{
 			//dv.writeText((int)seg.getSegStart().getX(), (int)seg.getSegStart().getY(), radiusString);
 			dv.writeText((int)pt.getX(),(int) pt.getY(), radiusString);
 			dv.repaint();
-			System.out.println("radius is changed to " +  radiusString);
+			///System.out.println("radius is changed to " +  radiusString);
 		}
 		
 	
 		//dv.logEvent(Command.PAUSE);
-		System.out.println("Submit Clicked");
+		///System.out.println("Submit Clicked");
 		jf.dispose();
 		jf = null;
 		
@@ -258,7 +258,7 @@ public class CircularArcParameterWindow implements ActionListener{
 		}
 		else if(cmd.compareToIgnoreCase("Cancel") == 0){
 			//dv.logEvent("closeParamsCircularArc();");
-			System.out.println("Cancel Clicked");
+			///System.out.println("Cancel Clicked");
 			performCancelActionCirArcParam();
 			dv.setParameterWinBitSet(false);
 		}
@@ -280,7 +280,7 @@ public class CircularArcParameterWindow implements ActionListener{
 			
 			parsedCons = cons.split("[ ]+");
 			for(int i =0; i < parsedCons.length ; i++){
-				System.out.println(parsedCons[i]);
+				///System.out.println(parsedCons[i]);
 				if((parsedCons[1].compareToIgnoreCase("HARD") == 0) && (parsedCons[3].compareToIgnoreCase("Arc") == 0) && (parsedCons[4].compareToIgnoreCase("Radius") == 0)){
 					radius = Double.parseDouble(parsedCons[5]);
 				}

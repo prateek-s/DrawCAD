@@ -9,6 +9,7 @@ import dcad.process.recognition.RecognitionManager;
 import dcad.process.recognition.marker.MarkerRecognizer;
 import dcad.process.recognition.segment.SegmentRecognitionScheme;
 import dcad.ui.main.MainWindow;
+import dcad.util.GConstants;
 
 public class StrokeRecognizer
 {
@@ -27,35 +28,37 @@ public class StrokeRecognizer
 		m_markerRecog = null;
 	}
 	
-	public int findType(Stroke stroke)
+	public int findType(Stroke stroke, int user_given)
 	{
 		reset();
 		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 		m_markerRecog = recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
 		m_stroke = stroke;
-		System.out.println(stroke.isSmallSize()+"  :"+stroke.getLength());
-		
-		// added on 29-05-10
-		// if stroke is to be converted
-		if(stroke.isStrokeConverted()){
-			if(stroke.getStrokeConvertedTo() == NORMAL_STROKE){
+
+		if(stroke.isStrokeConverted()) {
+			if(stroke.getStrokeConvertedTo() == NORMAL_STROKE) {
 				return Stroke.TYPE_NORMAL;
 			}
 			else{
 				int type = m_markerRecog.checkForMarker(stroke);
-				if(type == Marker.TYPE_NONE){ 
+				if(type == Marker.TYPE_NONE) { 
 					 JOptionPane.showMessageDialog(MainWindow.getDv(),"Given stroke does not match any marker");
 					return Stroke.TYPE_NORMAL;
 				}
 				else {
-					System.out.println("Converted to marker");
+					///System.out.println("Converted to marker");
 					return Stroke.TYPE_MARKER;
 				}
 			}
 		}
 		else{
-			if(stroke.isSmallSize() && (stroke.getLength() >= SegmentRecognitionScheme.PT_WINDOW)){
-				int type = m_markerRecog.checkForMarker(stroke);
+			if(stroke.isSmallSize() && (stroke.getLength() >= SegmentRecognitionScheme.PT_WINDOW))
+			{
+				int type ;
+				if( dcad.Prefs.getSegScheme() == GConstants.SEG_SCHEME_SIMPLE  )
+						type = m_markerRecog.simple_checkForMarker(stroke);
+				else type = m_markerRecog.checkForMarker(stroke) ;
+				
 				if(type == Marker.TYPE_NONE){ 
 					return Stroke.TYPE_NORMAL;
 				}

@@ -25,7 +25,7 @@ public class DrawingData
 	/**
 	 * Stroke List. Accessed for..
 	 */
-	private static Vector m_stkList;
+	private static Vector<Stroke> m_stkList;
 	//private Vector m_geoElements;
 	private static Vector m_textElements;
 	private static Vector m_markers;
@@ -46,6 +46,21 @@ public class DrawingData
 		m_inputFileCommands = null;
 	}
 	
+	public String toString()
+	{
+		String drawing = "BEGIN: \n" ;
+		for (Stroke strk: this.m_stkList) {
+			for (Segment seg: strk.getM_segList()) {
+				drawing= drawing + "\n <SEGMENT>" + seg.toString() + "</SEGMENT>" ;
+			}
+		if(strk.getM_type()==Stroke.TYPE_MARKER) {
+			drawing = drawing + "\n <MARKER> " + strk.toString() ;
+		}
+		}
+		return drawing ;
+	}
+	
+	
 	public Vector getStrokeList()
 	{
 		return m_stkList;
@@ -60,9 +75,9 @@ public class DrawingData
 	public void addStroke(Stroke stroke)
 	{
 		// Set the ID for the stroke
-//		System.out.println("**************************************************"+m_stkCounter);
+//		///System.out.println("**************************************************"+m_stkCounter);
 //		stroke.setM_strId(Integer.toString(m_stkCounter++));
-		//System.out.println(m_stkList.size()+"#######################");
+		/////System.out.println(m_stkList.size()+"#######################");
 		m_stkList.add(stroke);
 //		Command comm = new DataCommand(stroke.toXMLString());
 //		m_commands.addCommand(comm);
@@ -225,7 +240,7 @@ public class DrawingData
 
 	public Vector getAllAnchorPoints()
 	{
-		//System.out.println("DrawingData.getAllAnchorPoints()");
+		/////System.out.println("DrawingData.getAllAnchorPoints()");
 		Vector apList = new Vector();
 		Iterator iter = getStrokeList().iterator();
 		while (iter.hasNext())
@@ -248,7 +263,7 @@ public class DrawingData
 	//While editing, we want to move all connected segments to move when highlighted segment(s) are moved.
 	public Vector getAllAnchorPointsWhileEditing(Vector highlightedElements)
 	{
-		//System.out.println("DrawingData.getAllAnchorPoints()");
+		/////System.out.println("DrawingData.getAllAnchorPoints()");
 		Vector apList = new Vector();
 		Iterator iter = getStrokeList().iterator();
 		while (iter.hasNext())

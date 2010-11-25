@@ -37,7 +37,7 @@ import dcad.process.recognition.constraint.*;
 public class MarkerToConstraintConverter
 {
 	private static MarkerToConstraintConverter m_converter = null;
-	private Vector constraints;
+	private Vector constraints = new Vector() ;
 	
 	public static MarkerToConstraintConverter getInstance()
 	{
@@ -54,7 +54,81 @@ public class MarkerToConstraintConverter
 		}
 	}
 	
-	public Vector recognizeMarkersAsConstraints(Vector markers, Vector textElements, Vector segments)
+	public Constraint simple_marker_recog(int marker_type, Vector Segments) 
+	{
+	Constraint c =null;
+	if(marker_type == Marker.TYPE_EQUALITY) 
+	{
+		SegLine s1 =( SegLine)Segments.elementAt(0) ;
+		SegLine s2 = ( SegLine)Segments.elementAt(1);
+		c = (EqualRelLengthConstraint)RelLengthRecognizer.getEqualLengthConstraint(s1, s2 ,Constraint.HARD, false);
+		addConstraint(c ,new Segment[]{ s1,s2 });
+		return c;
+		
+	}
+	else if (marker_type == Marker.TYPE_RIGHT_ANGLE)
+	{
+		SegLine s1 =( SegLine)Segments.elementAt(0) ;
+		SegLine s2 = ( SegLine)Segments.elementAt(1);
+		
+		 c = (PerpendicularSegConstraint)RelAngleRecognizer.getPerpendicularSegmentsConstraint(s1, s2,Constraint.HARD, false);
+		
+		addConstraint(c ,new Segment[]{ s1,s2 });
+		return c;
+		
+	}
+	
+	else if (marker_type == Marker.TYPE_PARALLEL)
+	{
+		Segment seg1 = (Segment)Segments.elementAt(0) ;
+		Segment seg2 = (Segment)Segments.elementAt(1);
+		
+		
+		if(seg1 instanceof SegLine && seg2 instanceof SegLine)
+		{
+			ParallelSegConstraint cons = (ParallelSegConstraint)RelAngleRecognizer.getParallelSegmentsConstraint((SegLine)seg1, (SegLine)seg2,Constraint.HARD, false);
+	
+			addConstraint(cons,new Segment[]{seg1, seg2});
+			return cons; 
+
+		}
+		else if(seg1 instanceof SegLine && seg2 instanceof SegCircleCurve || seg2 instanceof SegLine && seg1 instanceof SegCircleCurve)
+		{
+			SegLine l;
+			SegCircleCurve cu;
+			if(seg1 instanceof SegLine)
+			{
+				l=(SegLine)seg1;
+				cu=(SegCircleCurve)seg2;
+			}
+			else
+			{
+				l=(SegLine)seg2;
+				cu=(SegCircleCurve)seg1;
+			}
+			lineCircularCurveTangencyConstraint cons = null;
+
+			AnchorPoint ap = constraintsHelper.getCommonPointBetweenLineAndCircularCurve(l,cu);
+			if(ap!=null && ap!=cu.getM_center())
+					cons = (lineCircularCurveTangencyConstraint) tangencyRecognizer.addLineCircleTangency(l,cu,ap.getM_point(),ap.getM_point());
+			else if(ap!=cu.getM_center())
+			{
+				Point2D p1 = l.getNearestPointOnSeg(cu.getM_center().getM_point());
+				Point2D p2 = cu.getNearestPointOnSeg(p1);
+				cons = (lineCircularCurveTangencyConstraint) tangencyRecognizer.addLineCircleTangency(l,cu,p1,p2);
+			}
+	
+			addConstraint(cons,new Segment[]{l,cu});	
+			return cons ;
+		}
+		return c;
+	}
+	
+	else return c ;
+
+	}
+	
+	public Vector recognizeMarkersAsConstraints(Vector markers, Vector textElements, Vector SEG)
 	{
 		constraints = new Vector();
 		
@@ -106,7 +180,7 @@ public class MarkerToConstraintConverter
 					case Marker.TYPE_ANGLE: 
 					{
 						MarkerAngle eMarker1 = (MarkerAngle)mark;
-						System.out.println("enter angle ");
+						///System.out.println("enter angle ");
 						// check if this marker has Text value set, if yes add a Relative angle constraint
 						if(eMarker1.getM_text() != null)
 						{
@@ -487,7 +561,7 @@ public class MarkerToConstraintConverter
 							marker=new MarkerDistance(new Segment[] { (Segment)selectedLines.get(0), (Segment)selectedLines.get(1)}, new AnchorPoint[]{}, text,Marker.TYPE_LINE_DISTANCE);
 						}
 						else if(selectedCircularCurves.size() == 2){
-							System.out.println("Curve Distance");
+							///System.out.println("Curve Distance");
 							//Double.parseDouble(text.getM_text());
 							//marker=new MarkerDistance(new Segment[] { (Segment)selectedCircularCurves.get(0), (Segment)selectedCircularCurves.get(1)}, new AnchorPoint[]{}, text,Marker.TYPE_CURVE_DISTANCE);
 						}

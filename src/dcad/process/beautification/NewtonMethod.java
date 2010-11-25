@@ -68,6 +68,7 @@ public class NewtonMethod
 		int no_of_columns = 2 * points.length; // no of variables
 		
 		Vector nodesErrTemp=getNodesErr(conVector,fixedPoints);
+		System.out.println("SOLVE:"+ nodesErrTemp.elementAt(0).toString()) ;
 		int no_of_rows=nodesErrTemp.size();
 		
 		// JX = b ?????????
@@ -243,7 +244,7 @@ public class NewtonMethod
 			
 				
 			double d = b.normF();
-			System.out.println("Norm : " + d);
+			///System.out.println("Norm : " + d);
 			if(d==java.lang.Double.NaN)
 			{
 				solutionStatus=unsolvable;
@@ -336,7 +337,7 @@ public class NewtonMethod
 			System.out.println("");
 			
 	
-//			System.out.println(" Prev norm. : " + prevNorm + "   Curr. norm : " + d);
+			System.out.println(" Prev norm. : " + prevNorm + "   Curr. norm : " + d);
 			
 			//Reinitialize the same norm count
 			if(prevNorm - d > (prevNorm / 20))
@@ -393,7 +394,7 @@ public class NewtonMethod
 							solutionStatus=unsolvable;
 						if(solutionStatus == unsolvable)
 						{
-//							System.out.println("-----------------------------Called for dropping constraints-----------------------------");
+							System.out.println("-----------------------------Called for dropping constraints-----------------------------");
 							break;
 						}
 					}
@@ -434,7 +435,7 @@ public class NewtonMethod
 			if(critical < revisedCriticalIndex && revisedCriticalIndex <= s.getRowDimension() )
 				critical = revisedCriticalIndex;
 				
-			System.out.println("\n\n\nCritical Index : " + critical);
+			///System.out.println("\n\n\nCritical Index : " + critical);
 
 			for(int l=0;l<critical;l++)
 				if(s.get(l,l)!=0 && s.get(l,l)>0.001) // If value is greater than 0.001 then only take its reciprocal else don't take it.
@@ -457,7 +458,7 @@ public class NewtonMethod
 
 			
 			//if(k==0)
-			{
+			
 				GMethods.printMatrix(b," b ",false);
 				GMethods.printMatrix(J," J ",false);
 				GMethods.printMatrix(u,"U",false);
@@ -468,11 +469,11 @@ public class NewtonMethod
 				GMethods.printMatrix(u.transpose(), "U transpose", false);
 				GMethods.printMatrix(ainv, " A inverse ",false);
 				GMethods.printMatrix(dx, " dx ",false);
-			}
+			
 			
 			// Update the new values for the variables in X
 			System.out.print("Change in values : ");
-			for(int lk=0;lk<X.getRowDimension();lk++)
+			for(int lk=0;lk<X.getRowDimension();lk++) 
 				System.out.print(dx.get(lk,0) + "  ");
 			System.out.println("");
 			
@@ -486,7 +487,7 @@ public class NewtonMethod
 			//X.set(i, 0, X.get(i, 0) + (dx.get(i, 0) /2 ));
 
 			System.out.print("New values : ");
-			for(int lk=0;lk<X.getRowDimension();lk++)
+			for(int lk=0;lk<X.getRowDimension();lk++) 
 				System.out.print(X.get(lk,0) + "  ");
 
 			
@@ -495,7 +496,7 @@ public class NewtonMethod
 		}
 
 		//debug
-//		System.out.println("\n\n\n\n\n\n\n\nText to be written to the file : " + textForFile);
+//		///System.out.println("\n\n\n\n\n\n\n\nText to be written to the file : " + textForFile);
 		try
 		{
 			FileWriter fstream = new FileWriter("debugOutput.txt");
@@ -538,7 +539,7 @@ public class NewtonMethod
 			c.isConstraintSolved();
 			if( c.isPromoted() && !c.isConstraintSolved() )
 			{
-				System.out.println("Failed...");
+				///System.out.println("Failed...");
 				suspectedPromotedConstraints.add(new Integer(i));
 			}
 		}
@@ -578,7 +579,7 @@ public class NewtonMethod
 		if(v1==0)
 			return true;
 		double ratio=Math.log(v2);
-//		System.out.println("Values : "+ v1 + "  " + v2 + "  Ratio : " + ratio);
+//		///System.out.println("Values : "+ v1 + "  " + v2 + "  Ratio : " + ratio);
 		
 		//6-5-2008
 /*		if(ratio>3)
@@ -588,10 +589,10 @@ public class NewtonMethod
 		ratio = Math.pow(ratio,powerForRatio);
 		if(v1<v2/ratio)
 		{
-//			System.out.println("Returning true");
+			System.out.println("Returning true");
 			return true;
 		}
-//		System.out.println("Returning false");
+		System.out.println("Returning false");
 		return false;
 	}
 		
@@ -632,7 +633,7 @@ public class NewtonMethod
 		for (int j = 0; j < initialVariables.length; j++)
 		{
 			initialVariables[j].move4Constraints(initialPositions.get(2 * j, 0), initialPositions.get(2 * j + 1, 0));
-//			System.out.println(initialPositions.get(2*j,0) + "  " + initialPositions.get(2*j+1,0));
+			System.out.println(initialPositions.get(2*j,0) + "  " + initialPositions.get(2*j+1,0));
 		}
 
 
