@@ -43,6 +43,8 @@ import dcad.model.geometry.segment.Segment;
 import dcad.model.marker.Marker;
 import dcad.model.marker.MarkerEquality;
 import dcad.model.marker.MarkerLineAngle;
+import dcad.model.marker.MarkerParallel;
+import dcad.model.marker.MarkerPerpendicular;
 import dcad.process.ProcessManager;
 import dcad.process.io.Command;
 import dcad.process.recognition.RecognitionManager;
@@ -583,6 +585,118 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		return 1;
 	}
 	
+	
+	public int set_as_marker3(int type,Vector markers)
+	{
+		Stroke strk = seg.getM_parentStk() ;
+		Marker marker = null ;
+		strk.deleteSegments() ;
+		strk.setM_type(Stroke.TYPE_MARKER);
+		
+		for (Object o: markers) {
+			Marker m = (Marker)o ;
+			if(m.getM_type() == type) {
+				marker  = m ;
+			}
+		}
+		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+		MarkerRecognizer mrkrecog =  recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
+		mrkrecog.choose_marker(marker, markers); //sets m_marker.
+		
+		Vector c = dv.A.Recognize_Constraints(strk , marker.getM_type()) ;
+		 // dv.A.Refresh_Drawing(stroke, markers) ;
+		dv.repaint();
+		dv.A.Refresh_Drawing(strk, c);
+		dv.repaint() ;
+		return 1;
+	}
+	
+	Segment markerSeg1 =null;
+	Segment markerSeg2 = null ;
+	int MarkerType = 0;
+	
+	
+	public int set_as_marker2(int type,Vector markers)
+	{
+		if(MarkerType==0)
+			MarkerType = type ;
+		
+		else if (type!=MarkerType) return 0;
+		
+		Stroke strk = seg.getM_parentStk() ;
+
+		//strk.deleteSegments() ;
+		dv.A.A_delete_Element(strk); 
+		
+		dv.repaint() ;
+		
+		Marker marker = null ;
+		for (Object o: markers) {
+			Marker m = (Marker)o ;
+			if(m.getM_type() == type) {
+				marker  = m ;
+			}
+		}
+		
+		Segment s1;
+		Segment s2; 
+		Vector segvec = new Vector () ;
+		
+		if(type==Marker.TYPE_EQUALITY)
+		{
+			MarkerEquality meq = (MarkerEquality)marker ;
+			s1 = meq.getM_seg();	
+			
+			int ready = fill_seg(s1) ;
+			if(ready > 0)
+			{
+				System.out.println("please work"+markerSeg1.toString()+markerSeg2.toString()) ;
+				segvec.add(markerSeg1) ; segvec.add(markerSeg2) ;
+				dv.A.A_add_markers_simple(type,segvec) ;
+			}
+		}
+		else if (type == Marker.TYPE_PARALLEL) 
+		{
+			MarkerParallel meq = (MarkerParallel)marker ;
+			s1 = meq.getM_seg();	
+			
+			int ready = fill_seg(s1) ;
+			if(ready > 0)
+			{
+				segvec.add(markerSeg1) ; segvec.add(markerSeg2) ;
+				dv.A.A_add_markers_simple(type,segvec) ;
+			}
+		}
+
+		else if(type == Marker.TYPE_RIGHT_ANGLE)
+		{
+			MarkerPerpendicular meq = (MarkerPerpendicular)marker ;
+			s1 = meq.getM_seg1() ;
+			s2 = meq.getM_seg2() ;
+
+			segvec.add(s1) ; segvec.add(s2) ;
+			dv.A.A_add_markers_simple(type,segvec) ;
+			
+		}
+		
+		dv.repaint() ;
+		return 1;
+	}
+	
+	int fill_seg(Segment s)
+	{
+		if(this.markerSeg1==null || this.markerSeg1==s){
+			markerSeg1 = s;
+			return 0;
+		}
+		else 
+		{
+			markerSeg2 = s;
+			return 1 ;
+		}
+		
+	}
+	
 	/****************************************************************************/
 	
 	public void UIUpdate() 
@@ -670,13 +784,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		}
 		
 		else if (item.endsWith("Equality")) {
-			set_as_marker(Marker.TYPE_EQUALITY, this.markers); 
+			set_as_marker3(Marker.TYPE_EQUALITY, this.markers); 
 		}
 		else if (item.endsWith("Perpendicular")) {
-			set_as_marker(Marker.TYPE_RIGHT_ANGLE, this.markers); 
+			set_as_marker2(Marker.TYPE_RIGHT_ANGLE, this.markers); 
 		}
 		else if (item.endsWith("Parallel")) {
-			set_as_marker(Marker.TYPE_PARALLEL, this.markers); 
+			set_as_marker2(Marker.TYPE_PARALLEL, this.markers); 
 		}
 
 	}

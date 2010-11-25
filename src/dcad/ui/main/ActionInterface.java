@@ -140,6 +140,7 @@ public Vector A_draw_Stroke(Stroke strk)
 	new_constraints = Recognize_Constraints(strk,0);
 	
 	DSTATE(getMethod() + "STROKE COMPLETE") ;	 
+	System.out.println(ProcessManager.dump(m_drawData, 2,null)) ;
 	return null ;
 }
 
@@ -398,15 +399,18 @@ public int A_add_markers(Vector markers)
 	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
 	// recognize the set of markers as constraints.text elements not read at all. relax
 	Vector constraints = converter.recognizeMarkersAsConstraints(markers,
-			m_drawData.getM_textElements(), m_drawData.getAllSegments());
+			m_drawData.getM_textElements(), new Vector());
 
 	if (constraints != null && constraints.size() > 0)
 	{
-		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+		Vector c = ConstraintSolver.addConstraintsAppliedUsingMarker(constraints);
+		if ( c!= null)
 		{
 			m_drawData.addConstraints(constraints);
 			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
-			A_snapIPsAndRecalculateConstraints(constraints );
+			
+			A_add_constraints(c);
+		//	A_snapIPsAndRecalculateConstraints(constraints);
 		}
 		//*************************************************************
 	}
@@ -414,6 +418,41 @@ public int A_add_markers(Vector markers)
 	return 1; 
 }
 	
+
+
+
+public int A_add_markers_simple(int type, Vector segments)
+{
+	Vector new_constraints; 
+	RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
+	MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
+	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
+	// recognize the set of markers as constraints.text elements not read at all. relax
+	
+	
+	Constraint c = converter.simple_marker_recog(type, segments);
+	System.out.println("CONSTRAINT ...."+ c.toString()) ;
+	Vector constraints = new Vector() ; constraints.add(c) ;
+	m_drawData.addConstraints(constraints);
+	if (constraints != null && constraints.size() > 0)
+	{
+		Vector r = ConstraintSolver.addConstraintsAppliedUsingMarker(constraints);
+	//	Vector r =ConstraintSolver.addConstraintsAfterDrawing(constraints) ;
+		if ( r!= null)
+		{
+			m_drawData.addConstraints(constraints);
+			//GMethods.getHelpView().initialize(HelpView.afterDrawing);
+			DSTATE("") ;
+			//A_add_constraints(r);
+		//	A_snapIPsAndRecalculateConstraints(constraints);
+		}
+		//*************************************************************
+	}
+	
+	return 1; 
+}
+	
+
 /**
  * partition line segment earlier.
  * @param pt
@@ -618,7 +657,8 @@ return 1;
  */
 public int A_add_constraints(Vector constraints) 
 {
-	ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) ;
+	Vector c = ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) ;
+	m_drawData.addConstraints(c);
 	return 1;
 	
 }
@@ -1067,6 +1107,42 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
 		}
 	}
 }
+/***************************************************************************.
+ */
+
+/**
+ * Add one constraint to the drawing. 
+ */
+public int A_Add_Constraint(Constraint c)
+{
+	System.out.println("Adding constraint"+c.toString()) ;
+
+	Vector constraints = new Vector() ;
+	constraints.add(c) ;
+	if (c != null)
+	{
+		//Cursor prevCursorType = this.getCursor();
+	//	this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		
+		
+		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
+		{
+			m_drawData.addConstraints(constraints);
+
+		}
+		//*************************************************************
+		else
+		{
+		//	JOptionPane.showMessageDialog(this,"The constraint could not be added");
+			updateConstraints(constraintsHelper.getListOfConstraints(m_drawData.getAllAnchorPoints()),Constraint.HARD);
+			//GMethods.getHelpView().initialize(HelpView.constraintAddingFailed);
+		}
+	}
+
+	return 0;
+}
+
+
 
 /**************************************************************************/
 
