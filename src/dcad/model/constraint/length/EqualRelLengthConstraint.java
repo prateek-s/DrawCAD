@@ -37,7 +37,7 @@ public class EqualRelLengthConstraint extends RelLengthConstraint
 
 	public String toString()
 	{
-		return addPrefix()+" Equal line lengths : "+m_seg1.getM_label()+" , "+m_seg2.getM_label();
+		return addPrefix()+" Equal line lengths : "+m_seg1.getM_label()+" , "+m_seg2.getM_label() + "POINTS"+ m_seg1.getSegStart().toString()+m_seg1.getSegEnd()+m_seg2.getSegStart()+m_seg2.getSegEnd();
 	}
 
 

@@ -62,6 +62,12 @@ public class ConstraintSolver
 		Vector fixedPoints = new Vector();
 		fixedPoints = getUserFixedAnchorPoints(allAffectedPoints);
 
+		System.out.println("*******$@$@$@ANCHOR POINTS.....") ;
+		System.out.println("CONSTR" + allAffectedConstraints.toString()) ;
+		System.out.println("EQUAL C"+allAffectedConstraints.elementAt(0).toString());
+		System.out.println("AFFECTED POINTS" + allAffectedPoints.toString()) ;
+
+		
 		NewtonMethod.initializeVariables(getVariableList(fixedPoints,allAffectedPoints));
 		NewtonMethod.saveInitialValues();
 		

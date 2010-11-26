@@ -620,15 +620,15 @@ public class GMethods
 		int noOfColumns=m.getColumnDimension();
 		if(print)
 		{
-			///System.out.println("Printing matrix : " + name);
+			System.out.println("Printing matrix : " + name);
 			
 			for(int i=0;i<noOfRows;i++)
 			{
 				for(int j=0;j<noOfColumns;j++)
 					System.out.print(m.get(i,j) + "  ");
-				///System.out.println("");
+				System.out.println("");
 			}
-			///System.out.println("");
+			System.out.println("");
 		}
 	}	
 	

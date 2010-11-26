@@ -139,7 +139,7 @@ public abstract class Constraint implements Serializable
 	
 	public String toString()
 	{
-		return "";
+		return points.toString();
 	}
 
 	public Color getColor()

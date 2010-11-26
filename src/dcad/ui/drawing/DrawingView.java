@@ -92,7 +92,6 @@ import dcad.ui.main.ActionInterface ;
  * 'Track' adds the points to the stroke and thus links the gui with the underlying plumbing.
  *
  */
-
 public class DrawingView extends JPanel implements MouseListener, MouseMotionListener, KeyListener,
 		KeyEventDispatcher, Serializable
 		
@@ -1549,7 +1548,7 @@ if(type=="moved")
 	}
 
 
-	void addToUndoVector()
+	public void addToUndoVector()
 	{
 		winAct = WindowActions.getInstance();
 		if(winAct.getUndoVector() != null){

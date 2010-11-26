@@ -61,29 +61,35 @@ import dcad.util.GMethods;
 /**
  * This is the pane for editing the segment properties. It's updated when:
  * 1. Stroke is drawn [Recognition etc all done]
- * 2. Segment is selected.
+ * 2. Segment is clicked. Not Selected. Selection using ctrl->click is too clumsy. Left clicking works because the stroke of 0 length is drawn
+ * and the element under it is highlighted. Note that simply highlighting wont work because that is transient. I.e when the user hovers over something
+ * and then wants to edit the properties, he will have to move mouse over to the edit pane, and in the process unhighligting it. 
+ * 
+ * The Edit view is also meant only for the simple semantics. 1 stroke==1 Segment. If this precondition is not met, the correctness is not guaranteed.
+ * 
  */
-
 public class EditView extends JPanel implements ActionListener,MouseListener,MouseMotionListener, KeyListener,KeyEventDispatcher, ItemListener
 {
 	DrawingView dv = null;
-	
-	private double ANGLE_TEXT_BOX_NULL = -1.0 ;
-	private double LENGTH_TEXT_BOX_NULL = 0.0 ;
-	private double length = LENGTH_TEXT_BOX_NULL ;
-	private double angle = ANGLE_TEXT_BOX_NULL ;
-	private String lengthString = "";
-	private String angleString = "";
 
 	private Segment seg = null;
 	private Stroke stroke = null ;
 
-	Point pt ; //needed for 'command'. 
+	Point pt ; //needed for 'command'
+	/* This is where the text is placed. Deprecated.
+	 * Previously , the properties of segments were changed by simulating the drawing of strokes all over again and then writing the text on the screen
+	 * which acted as markers. this is no longer used, and infact was the primary motivation for the entire refactoring of drawingView.
+	 */
+	
+	/**
+	 * There can be 3 levels of properties. HARD and SOFT are constraints. PROPERTY is just a property but not a constraint. 
+	 * HARD==user specified. SOFT==inferred.
+	 */
 	int changed_to = 0 ; //segment changed to what type?
 
-	int HARD=0;
-	int SOFT=1;
-	int PROPERTY=2;
+	static int HARD=0;
+	static int SOFT=1;
+	static int PROPERTY=2;
 
 	int seg_type ; //line or arc or something else?
 
@@ -91,6 +97,16 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	/**Polymorphism etc will be overkill here.
 	 */
 
+	/**
+	 * This class stores the properties of the segments.
+	 * Since we are only supporting lines and arcs at the moment, and only 2 properties for each of them, i have hard-coded this.
+	 * But it is easy to have a proper data-store which handles more properties and conditions. But that would be overkill for the current use.
+	 * label == text that appears
+	 * field == value of the field (some number)
+	 * change == set value to value present in field
+	 * reset == revert to original value of field
+	 * level == property/hard/soft (see outer class comment)
+	 */
 	class SegmentProperties 
 	{
 		int seg_type ;
@@ -118,6 +134,8 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 		EditView ev ;
 
+		/**********************************************************************************/
+		
 		public SegmentProperties(EditView ev, int type) 
 		{
 			this.ev = ev ;
@@ -158,6 +176,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 		}
 
+		
 		/**Fill in the text boxes */
 		public void update() 
 		{
@@ -201,7 +220,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		public Color get_color(int level) 
 		{
 			Color c = new Color(100,100,100) ;
-			if(level==0) {
+			if(level==EditView.HARD) {
 				c = new Color(100,0,0) ;
 			}
 			return c;
@@ -219,6 +238,9 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	private SegmentProperties seg_properties ;
 
+	/**
+	 * Constructor. Finds which segment to edit.
+	 */
 	public EditView() 
 	{
 		super();
@@ -228,11 +250,12 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	/**********************************************************************************/
 
+	
 	public void init() 
 	{
 		dv = MainWindow.getDv();
 		if (this.seg==null) { 
-			//Try to get the segment through other means. 
+			//This is the left click route
 			this.seg = dv.getGeoElementClicked();
 		}
 		this.markers = null ;
@@ -254,7 +277,8 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	/*********************************************************************************************/
 	/**
-	 * Display all the options/properties for the given segment. This method is called by drawing view.
+	 * Display all the options/properties for the given segment. This method is called by drawing view. 
+	 * WHEN: When a stroke is drawn and completely processed.
 	 * @param seg
 	 */
 	public void displayOptions(Segment seg, Point pt) 
@@ -286,38 +310,39 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		super.add(seg_properties.jlabel2) ; super.add(seg_properties.jfield2) ; super.add(seg_properties.jChange2) ; super.add(seg_properties.jReset2) ;   
 
 		/*********** UI is initialized now. FILL IN ALL PROPERTIES */
-
 		getProperties() ;
+		
 	}
 
 
 	/*************************************************************************/
+	
 	/**
 	 *  set the textboxes with the values of currently existing constraints
 	 */
-
 	public void getProperties()
 	{	
 		if (seg_type == Segment.LINE) {
-			getLineProperties() ;
+			getLineProperties(this.seg) ;
 		}
 		else if(seg_type==Segment.CIRCLE) {
 			//CIRCLE.
-			getCircleProperties() ;
+			getCircleProperties(this.seg) ;
 			
 		} 
 		updateUI();
-		dv.repaint();
+		dv.repaint();  //for debugging
 	}	
-
-
-	/******************************************************************************/
-
 
 
 	/*********************************************************************************/
 
-	public void getLineProperties() 
+	/**
+	 * Get the constraints of the line. LENGTH & ANGLE the only 2 properties that are handled.
+	 * Start/end point could also be added later. Trivial. The constraint parsing/splitting code is  used from the pop-up window's class.
+	 * This method also sets the properties it has found in segment properties object , hence the void return type.
+	 */
+	public void getLineProperties(Segment seg) 
 	{
 		Vector constraints = seg.getM_constraints();
 		Iterator itr = constraints.iterator();
@@ -392,10 +417,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 		Double dl = new Double(length);
 		Double da = new Double(angle) ;
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		DecimalFormat twoDForm = new DecimalFormat("#.##"); 	//This is important. Dont want to throw a 10-significant digit double at the user!
 		length = Double.valueOf(twoDForm.format(dl)).toString();
 		angle =  Double.valueOf(twoDForm.format(da)).toString();
 		
+		/** Finally set the properties */
 		seg_properties.set(1,length,level1); 
 		seg_properties.set(2,angle,level2) ;
 
@@ -403,7 +429,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
  	/*********************************************************************************/
 
- 	public void getCircleProperties ()
+	/**
+	 * SImilar to line properties, but slightly simpler because we dont have to take care of horizontal/vertical angles.
+	 * Sets the radius/arc angle in the seg-properties.
+	 */
+ 	public void getCircleProperties (Segment seg)
  	{
 		String radius = "" ;
 		String angle = "" ;
@@ -465,6 +495,10 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	/************************************************************************************/
 
+ 	/**
+ 	 * Change property of the current segment. The new value is taken directly from the seg_properties.
+ 	 * Calls the action interface method to do all the work.
+ 	 */
 	public void ChangeProperty2(int seg_type,String property)
 	{
 		String val="" ;
@@ -477,6 +511,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	
 
 		dv.A.A_change_Seg_property(seg, property, val) ;
+		dv.addToUndoVector() ;
 
 		UIUpdate() ;
 	}
@@ -484,22 +519,24 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
  	/*********************************************************************************/
 	
 	/**
-	 * Change to type. Processes stroke all over again, but side-steps the recognition process. 
+	 * Change to type. Processes stroke all over again, but side-steps the recognition process. Refreshes UI. 
 	 * See Stroke.recognizeSegment
 	 * @param seg
-	 * @param type
+	 * @param type : WHich segment to change to - LINE / ARC
 	 */
 	public void ChangeSegment(Segment seg , int type) 
 	{
 		Stroke strk ;
 
 		strk = seg.getM_parentStk() ;
-		strk.user_given = type ;
+		strk.user_given = type ; //This is the key flag. The stroke class checks if it is set etc.
 		/** Try processing the stroke all over again. deletes the segment currently drawn and runs the segmentation and constraint
 		 * algorithms all over again. Bypasses segmentation algorithm in Stroke.recognizesegment because user_given flag is set.
 		 */
 		dv.Process_Stroke(strk) ;
-	//	displayOptions(strk.getM_segList().elementAt(0), pt) ;
+		//Do we want to redisplay the properties? The next line does that
+		//dv.addToUndoVector() ;
+		displayOptions(strk.getM_segList().elementAt(0), pt) ;
 		UIUpdate() ;
 
 	}
@@ -507,27 +544,22 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
  	/*********************************************************************************/
  
 	/**
-	 * Change stroke to marker. Whether it really is a marker is difficult to guarantee.
+	 * Change stroke to marker. First, the possible markers this segment can legally represent is generated.
+	 * Then the checkboxes for these markers are displayed. 
 	 * @param seg
 	 * @return
 	 */
 	public int ChangeToMarker(Segment seg) 
 	{
 		Stroke strk = seg.getM_parentStk() ;
-
-//		ConvertStrokeType convStrokeType = new ConvertStrokeType();
-//		convStrokeType.ConvertLastDrawnStroke();
-//		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
-//		ConvertStrokeType convStrokeType = new ConvertStrokeType();
-//		convStrokeType.ConvertLastDrawnStroke();
-//		convStrokeType.ConvertStroke(seg.getM_parentStk()) ;
  
 		RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 		MarkerRecognizer mrkrecog =  recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
 		Vector markers = mrkrecog.user_specified_marker(strk) ;
 		System.out.println("POSSIBLE MARKERS") ;
 		
-		for (Object m: markers) { 
+		for (Object m: markers) 
+		{ 
 			Marker mm = (Marker) m;
 			System.out.println(mm.getClass().getSimpleName()) ;
 		}
@@ -538,8 +570,12 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	}
 
 	
-	
-	private void display_marker_options(Vector markers)
+	/**
+	 * Displays checkboxes etc for all the markers that the user is allowed to choose from. Uses reflection to auto-assign the labels.
+	 * Clever? But it works.
+	 * @param markers
+	 */
+	public void display_marker_options(Vector markers)
 	{
 		if (markers ==null) return;
 	CheckboxGroup markergroup = new CheckboxGroup();
@@ -560,8 +596,17 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	this.markers = markers ;
 	}
 
+	/**
+	 * Had tried to maintain list of unused markers and do the job of markerconstraintconverter here. Not used. 
+	 */
 	Vector markers = new Vector() ;
 	
+	/**
+	 * Initial attempt at setting markers. Deprecated
+	 * @param type
+	 * @param markers
+	 * @return
+	 */
 	public int set_as_marker(int type,Vector markers)
 	{
 		Stroke strk = seg.getM_parentStk() ;
@@ -581,6 +626,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		 // dv.A.Refresh_Drawing(stroke, markers) ;
 		dv.repaint();
 		dv.A.Refresh_Drawing(strk, c);
+		dv.addToUndoVector() ;
 		dv.repaint() ;
 		return 1;
 	}
@@ -590,7 +636,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	{
 		Stroke strk = seg.getM_parentStk() ;
 		Marker marker = null ;
-		strk.deleteSegments() ;
+	//	strk.deleteSegments() ;
 		strk.setM_type(Stroke.TYPE_MARKER);
 		
 		for (Object o: markers) {
@@ -616,8 +662,10 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	int MarkerType = 0;
 	
 	
+	
 	public int set_as_marker2(int type,Vector markers)
 	{
+		System.out.println("Setting as marker    "+type) ;
 		if(MarkerType==0)
 			MarkerType = type ;
 		
@@ -699,6 +747,9 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	
 	/****************************************************************************/
 	
+	/**
+	 * repaint panel and drawing.
+	 */
 	public void UIUpdate() 
 	{
 		updateUI() ;
@@ -787,10 +838,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			set_as_marker3(Marker.TYPE_EQUALITY, this.markers); 
 		}
 		else if (item.endsWith("Perpendicular")) {
-			set_as_marker2(Marker.TYPE_RIGHT_ANGLE, this.markers); 
+			set_as_marker3(Marker.TYPE_RIGHT_ANGLE, this.markers); 
 		}
 		else if (item.endsWith("Parallel")) {
-			set_as_marker2(Marker.TYPE_PARALLEL, this.markers); 
+			set_as_marker3(Marker.TYPE_PARALLEL, this.markers); 
+		}
+		else if(item.endsWith("Angle")){
+			set_as_marker3(Marker.TYPE_ANGLE, this.markers) ;
 		}
 
 	}

@@ -388,20 +388,42 @@ public class MarkerRecognizer
 		Vector temp = new Vector() ;
 		Vector markers = new Vector() ;
 		
-		for (Object o : strk.getM_ptList()) 
-		{
-			Point2D p = (Point2D) o;
+//		for (Object o : strk.getM_ptList()) 
+//		{
+//			Point2D p = (Point2D) o;
+//		
+//			for(Object some_strk:MainWindow.getDv().A.m_drawData.getStrokeList()) 
+//			{
+//				Stroke s = (Stroke)some_strk;
+//				if(s.getM_segList().elementAt(0).containsPt(p))
+//				{
+//					if(s.getM_segList().elementAt(0).equals(strk.getM_segList().elementAt(0)))
+//						System.out.println("BOO") ;
+//					else 
+//						{temp.add(s.getM_segList().elementAt(0)) ;
+//						System.out.println("ADDING");
+//						}
+//				}
+//				MainWindow.getDv().A.merge_highlighted(temp,intersecting) ;
+//			}
+//		}
 		
-			for(Object d:MainWindow.getDv().A.m_drawData.getAllSegments()) 
+		Segment seg = strk.getM_segList().elementAt(0) ;
+		
+		for (Object sego : MainWindow.getDv().A.m_drawData.getAllSegments())
+		{
+			Segment dseg = (Segment)sego ;
+			Vector r = dseg.intersects(seg) ;
+			System.out.println("USER SM"+r.toString()) ;
+			if (r.size() > 0 && !dseg.equals(seg))
 			{
-				Segment s = (Segment)d;
-				if( s.containsPt(p) )
-				{
-					temp.add(s) ;
-				}
-				MainWindow.getDv().A.merge_highlighted(temp,intersecting) ;
+				System.out.println("INTERSECTING"+dseg.toString()) ;
+				temp.add(dseg) ;
+	
 			}
 		}
+		intersecting = temp ;
+		
 		System.out.println(" INTERSECTING ") ;
 
 		for (Object o: intersecting)

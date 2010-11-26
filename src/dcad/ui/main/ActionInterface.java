@@ -54,6 +54,16 @@ import dcad.util.GMethods;
 import dcad.util.GVariables;
 import dcad.util.Maths;
 
+/**
+ * Organization of this file.
+ *  All fields/methods are statically used but not explicitly declared as such.
+ *  Names prefixed with A_ are part of the API (called by other parts of the program).
+ *  There are no calls to the UI-layer from any method in this file. This file is an interface to the back-end 
+ *  of the entire program.
+ *  The functions are grouped by categories as much as possible. [Adding stroke, moving, snapping, etc]
+ *  The original code for all these methods was in DrawingView. Code reuse was the primary metric, so a lot
+ *  of the procedures are old. But the reorganization is drastic. 
+ */
 
 /**
  * Not  an interface as the name suggests.
@@ -125,7 +135,7 @@ public void DSTATE(String s)
 }
     
 /**
- * Perform Segmentation, recognize segments, merges strokes,
+ * Perform Segmentation, recognize segments, merges segments,
  * recognizes constraints, 
  */
 public Vector A_draw_Stroke(Stroke strk) 
@@ -137,11 +147,12 @@ public Vector A_draw_Stroke(Stroke strk)
 
 	m_drawData.addStroke(strk) ;
 	last_stroke = strk; 
-	new_constraints = Recognize_Constraints(strk,0);
+	new_constraints = Recognize_Constraints(strk,0); //0 == default recognition, no user specified marker etc
 	
 	DSTATE(getMethod() + "STROKE COMPLETE") ;	 
-	System.out.println(ProcessManager.dump(m_drawData, 2,null)) ;
-	return null ;
+	System.out.println(ProcessManager.dump(m_drawData, 2,null)) ; //The dump prints values of all fields , recursively,too large!
+	
+	return null ; //no one is supposed to use the return value, really.
 }
 
 /**
@@ -357,7 +368,7 @@ return 1;
 }
 
 /**
- * Adds all the markers lying around in the drawing
+ * Adds all the markers lying around in the drawing. Called by Refresh_Drawing.
  * @return
  */
 public int A_add_all_markers()
@@ -517,8 +528,14 @@ public int A_delete_anchor_point(Point pt)
 	return 1 ;
 }
 
-	
-	
+/***************************** TEXT ****************************************/
+
+/**
+ * Text in the drawing serves as a marker.
+ * @param text : text that is added
+ * @param pt : location of text in the drawing. Location Determines which segment the text refers to!
+ * @return
+ */	
 public int A_add_text(String text, Point pt) 
 {
 	Text t = new Text(text+"" , pt.x , pt.y) ;
@@ -541,37 +558,29 @@ public int A_add_text(String text, Point pt)
 }
 
 /**
- * Clears all the selected elements. 
+ * Delete the text at location.
+ * At the moment, no special method needed, but good thing to have in the API
+ * @param location
  * @return
  */
-public int A_clear_selection() 
-{
-	int selected = m_selectedElements.size() ;
-	// some other element was clicked .. so clear all the selection
-	Iterator iter = m_selectedElements.iterator();
-	while (iter.hasNext())
-	{
-		GeometryElement element = (GeometryElement) iter.next();
-		element.setSelected(false);
-	}
-	m_selectedElements.clear();
-	return (selected-m_selectedElements.size()) ;
-	
-}
-
 public int A_delete_text(Point location)
 {
 return 1;
 }
 
-public int A_change_Segment_to(Segment seg, int seg_type) 
-{
-return 1;
-}
+/************************ CHANGE SEGMENT PROPERTIES *************************/
 
+
+
+/**
+ * Sets a new value to some property of a given segment. This is done by using markers.
+ * Properties supported are simple - length angle radius etc.
+ * @paaram seg : Segment
+ * @param type : Which property to change? length/angle/etc. Dispatch by string comparison.
+ * @param val : the new value to be set.
+ */
 public int A_change_Seg_property(Segment seg,String type, String val)
 {
-	
 	RecognitionManager recogMan = ProcessManager.getInstance().getRecogManager();
 	MarkerRecogManager markerMan = recogMan.getMarkerRecognitionMan();
 	MarkerToConstraintConverter converter = markerMan.getM_markerConverter();
@@ -608,8 +617,6 @@ public int A_change_Seg_property(Segment seg,String type, String val)
 
 	if (constraints != null && constraints.size() > 0)
 	{
-		
-	
 		if (ConstraintSolver.addConstraintsAppliedUsingMarker(constraints) != null)
 		{
 			m_drawData.addConstraints(constraints);
@@ -625,26 +632,85 @@ public int A_change_Seg_property(Segment seg,String type, String val)
 		}
 	}
 
-	
 	return 1;
 }
 
 
+/**
+ * Change Segment to a new segment type LINE<-->ARC etc. 
+ * This is done instead by setting a flag in EditView.ChangeSegment. Starts processing the stroke all over again.
+ * Current architecture prohibits a simple way to implement this without the redraw. 
+ * @param seg
+ * @param seg_type
+ * @return
+ */
+public int A_change_Segment_to(Segment seg, int seg_type) 
+{
+return 1;
+}
 
+
+public int A_fix_elements() 
+{
+    // don't TOGGLE the fixed flag of all the elements, at least on
+    // element is not fixed, first fix it
+    // else if all elements were fixed then unfix all.
+    boolean setFixed = false;
+    Iterator iter = m_highlightedElements.iterator();
+    while (iter.hasNext())
+	{
+	    GeometryElement element = (GeometryElement) iter.next();
+	    if (!element.isFixed())
+		{
+		    setFixed = true;
+		    break;
+		}
+	}
+
+    // set the fixed flag of all the elements, depending on the setFixed
+    // Flag
+    iter = m_highlightedElements.iterator();
+    while (iter.hasNext())
+	{
+	    GeometryElement element = (GeometryElement) iter.next();
+	    element.setFixed(setFixed);
+	}
+    return 1;
+}
+
+
+/************************************************************************/
+
+/*****************************************************************************/
+
+/**
+ * Clear the canvas. 
+ * Does nothing
+ */
 public int A_clear() 
 {
 return 1;
 }
 
+/**
+ * load a file. Does nothing
+ * @return
+ */
 public int A_load()
 {
 return 1;
 }
 
+/**
+ * save the drawing. Does nothing.
+ * @return
+ */
 public int A_save() 
 {
 return 1;
 }
+
+/***************************************************************************/
 
 /**
  * There are many ways in which a constraint can be added
@@ -664,6 +730,11 @@ public int A_add_constraints(Vector constraints)
 }
 
 
+/**
+ * This is currently handled by code in the constraint edit pane. 
+ * @param constraint
+ * @return
+ */
 public int A_delete_constraint(Constraint constraint) 
 {
 return 1;
@@ -735,7 +806,29 @@ public Vector<GeometryElement>  A_elements_selected (Point pt,Vector m_selectedE
     return m_selectedElements ;
 }		
 
-/****************************************************************************************/
+
+
+/**
+ * Clears all the selected elements. 
+ * @return
+ */
+public int A_clear_selection() 
+{
+	int selected = m_selectedElements.size() ;
+	// some other element was clicked .. so clear all the selection
+	Iterator iter = m_selectedElements.iterator();
+	while (iter.hasNext())
+	{
+		GeometryElement element = (GeometryElement) iter.next();
+		element.setSelected(false);
+	}
+	m_selectedElements.clear();
+	return (selected-m_selectedElements.size()) ;
+	
+}
+
+
+/************************* WHAT LIES BENEATH (THE CURSOR) ? **************************************/
 
 // added on 19-04-10
 // checks whether the point is an child of how many elements 
@@ -870,7 +963,7 @@ public Stroke isPtOnAnyStroke(Point2D pt)
 	return null;
 }
 
-/****************************** END SELECT***********************************************/
+/******************************  draw data manipulation ***********************************************/
 	
 
 public void addGeoElement(GeometryElement gEle)
@@ -895,37 +988,12 @@ public void removeGeoElement(GeometryElement gEle)
 }
 
 
-public int A_fix_elements() 
-{
-    // don't TOGGLE the fixed flag of all the elements, at least on
-    // element is not fixed, first fix it
-    // else if all elements were fixed then unfix all.
-    boolean setFixed = false;
-    Iterator iter = m_highlightedElements.iterator();
-    while (iter.hasNext())
-	{
-	    GeometryElement element = (GeometryElement) iter.next();
-	    if (!element.isFixed())
-		{
-		    setFixed = true;
-		    break;
-		}
-	}
-
-    // set the fixed flag of all the elements, depending on the setFixed
-    // Flag
-    iter = m_highlightedElements.iterator();
-    while (iter.hasNext())
-	{
-	    GeometryElement element = (GeometryElement) iter.next();
-	    element.setFixed(setFixed);
-	}
-    return 1;
-}
-
 
 /**********************************************************************************************************************/
 
+/**
+ * Constructor: Do nothing.
+ */
 public ActionInterface() {
     // TODO Auto-generated constructor stub
 }
@@ -983,9 +1051,13 @@ public Vector performSegRecycling(int x, int y)
 }
 
 
+/**
+ * Add constraints and snap
+ * @param constraints
+ * @return
+ */
 public int post_anchor_ops(Vector constraints) 
 {
-	
 	if ((constraints != null) && (constraints.size() > 0)){
 		ConstraintSolver.addConstraintsAfterDrawing(constraints) ;
 		//	newConstraints.addAll(constraints);
@@ -1111,7 +1183,9 @@ public void removeConstraintsOfType(AnchorPoint ap, Class className)
  */
 
 /**
- * Add one constraint to the drawing. 
+ * Add one constraint to the drawing.
+ * Although not used, this can be a useful building block, specially testing etc.
+ * 
  */
 public int A_Add_Constraint(Constraint c)
 {
@@ -1419,6 +1493,8 @@ public Vector  A_addConstraintsForMarkers()
 		Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
 				m_drawData.getM_textElements(), m_drawData.getAllSegments());
 
+		System.out.println("IMMEDIATE CONS"+constraints.elementAt(0).toString());
+		
 		if (constraints != null && constraints.size() > 0)
 		{
 			//Cursor prevCursorType = this.getCursor();
