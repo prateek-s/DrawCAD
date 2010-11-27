@@ -7,6 +7,8 @@ import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.DefaultKeyboardFocusManager;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.Point;
 import java.awt.Dialog.ModalExclusionType;
@@ -243,7 +245,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 */
 	public EditView() 
 	{
-		super();
+		super(new FlowLayout());
 		init();	    
 		//displayOptions(seg) ;
 	}
@@ -271,6 +273,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	    Checkbox isMarker =new Checkbox("Marker", group, false);
 	    isLine.addItemListener(this) ; isCircle.addItemListener(this) ; isMarker.addItemListener(this) ;
 	    
+	   
 	    super.add(isLine) ; super.add(isCircle) ; super.add(isMarker) ;
 	}
 

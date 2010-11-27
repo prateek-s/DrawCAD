@@ -53,8 +53,11 @@ public class PixelInfo extends Point
 		// convert to distance per second
 		this.speed = speed*1000;
 	}
-	
-	public String toString()
+
+	/**
+	 * speed, curvature etc.
+	 */
+	public String toXMLString()
 	{
 	    DecimalFormat format = new DecimalFormat();
 	    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -66,9 +69,13 @@ public class PixelInfo extends Point
 		return retStr;
 	}
 
-	public String toXMLString()
+	/**
+	 * x,y,t
+	 * @return
+	 */
+	public String toString()
 	{
-		String retStr = this.getClass().getName()+":("+x+","+y+","+time+")";
+		String retStr = "<POINT>"+": (" + x + "," + y + "," + time + ")";
 		return retStr;
 	}
 

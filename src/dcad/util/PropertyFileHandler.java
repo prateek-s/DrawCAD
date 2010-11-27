@@ -69,7 +69,7 @@ public class PropertyFileHandler
 	    }
 	    else
 	    {
-    		Prefs.setSegScheme(GConstants.SEG_SCHEME_SPEED_CURVATURE);
+    		Prefs.setSegScheme(GConstants.SEG_SCHEME_SIMPLE);
 	    }
 	    	
 

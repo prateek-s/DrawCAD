@@ -2020,6 +2020,11 @@ public void UI_log(String s)
 		m_showLastStroke = true;
 	}
 
+	public void setParameterWinBitSet(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
 //	
 //	/** Get the method name from which this function is called .
 //	 * Might have some good use in logging/debugging.

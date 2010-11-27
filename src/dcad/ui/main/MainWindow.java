@@ -174,7 +174,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		
 		recognizedTab = new JScrollPane(new RecognizedView());
 		JTabbedPane tabbedPane = new JTabbedPane() ;
-		tabbedPane.add("CONSTRAINTS", recognizedTab) ;
+		
 		
 
 		
@@ -191,6 +191,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		ev = new EditView();
 		EditTab = new JScrollPane (ev);
 		tabbedPane.add("EDIT",EditTab) ;
+		tabbedPane.add("CONSTRAINTS", recognizedTab) ;
 		// add Scrollbar adjustment listener to Drawing Window - horizontal and vertical
 		
 		final JScrollBar drawHrBar = ((JScrollPane)drawingTab).getHorizontalScrollBar();

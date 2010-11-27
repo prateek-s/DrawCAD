@@ -12,7 +12,7 @@ import dcad.util.GConstants;
 
 public class Prefs
 {
-	private static int segScheme;
+	private static int segScheme=5;
 	private static int acceptableVotes;
 	private static int anchorPtType;
 	private static int anchorPtSize;
@@ -55,7 +55,7 @@ public class Prefs
 			
 				segScheme = scheme;
 		
-		else segScheme = GConstants.SEG_SCHEME_SPEED_CURVATURE;
+		else segScheme = GConstants.SEG_SCHEME_SIMPLE;
 //		///System.out.println("scheme: "+scheme);
 	}
 

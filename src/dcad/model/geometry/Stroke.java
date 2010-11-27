@@ -186,7 +186,6 @@ public class Stroke extends GeometryElement
 	/**
 	 * Recognizes all the segments of this stroke. 
 	 */
-	
 		public Vector<Segment> recognizeSegments(SegmentRecognizer segRecog,Vector segptlist) throws Exception
 		{
 
@@ -237,6 +236,13 @@ public class Stroke extends GeometryElement
  		
 	}
 
+		/**
+		 * Used in simple marker recognition. 
+		 * @param segRecog
+		 * @param segptlist
+		 * @return
+		 * @throws Exception
+		 */
 		public Vector<Segment> temp_recognizeSegments(SegmentRecognizer segRecog,Vector segptlist) throws Exception
 		{
 		Vector<Segment> segments = new Vector() ;
@@ -287,7 +293,15 @@ public class Stroke extends GeometryElement
  		
 	}
 		
-	
+	/**
+	 * Actually recognizes the segment of the stroke. Just one segment is returned. 
+	 * Segmentation is already performed.
+	 * @param segRecog
+	 * @param startPt
+	 * @param endPt
+	 * @return
+	 * @throws Exception
+	 */
 	private Segment detectSeg(SegmentRecognizer segRecog, Point2D startPt, Point2D endPt) throws Exception
 	{
 
@@ -530,6 +544,11 @@ public class Stroke extends GeometryElement
 		return constraints;
 	}
 	
+	/**
+	 * 
+	 * @param strokeList
+	 * @return
+	 */
 	public Vector recognizeStrokeConstraints(Vector strokeList)
 	{
 		
@@ -962,13 +981,13 @@ public class Stroke extends GeometryElement
 
 	public String toXMLString()
 	{
-		String str = "";
+		String str = "<STROKE>";
 		str += this.getClass().getName()+":"+getM_strId()+":(";
 		Iterator iter = getM_ptList().iterator();
 		while (iter.hasNext())
 		{
 			PixelInfo pi = (PixelInfo) iter.next();
-			str += pi.toXMLString()+",";
+			str += pi.toString()+",";
 		}
 		
 		// remove the last comma

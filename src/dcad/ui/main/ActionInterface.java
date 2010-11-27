@@ -112,6 +112,10 @@ public ProcessManager m_processManager = ProcessManager.getInstance();
 public Vector<GeometryElement> m_highlightedElements = new Vector()  ;
     
 public Stroke last_stroke = null ;
+/**
+ * element is being moved (basically check if EDIT mode is on
+ */
+boolean m_elementDragged ;
 
  //   public Vector<GeometryElement> m_selectedElements ;
 
@@ -209,7 +213,7 @@ element.delete() ;
 return 1 ;
 }
 
-boolean m_elementDragged ;
+
 
 public boolean isM_elementDragged()
 {
@@ -396,6 +400,7 @@ public int A_add_all_markers()
 return 1;
 }
 
+
 /**
  * Applies the constraints which the markers represent.
  * Newly discovered constraints are also solved and enforced.
@@ -431,7 +436,12 @@ public int A_add_markers(Vector markers)
 	
 
 
-
+/**
+ * one attempt to add user specified markers. Not used, but could be useful in the future
+ * @param type : marker type
+ * @param segments : segments between which constraint of the type is to be enforced
+ * @return
+ */
 public int A_add_markers_simple(int type, Vector segments)
 {
 	Vector new_constraints; 
@@ -497,6 +507,7 @@ public int A_add_anchor_point(Vector<GeometryElement> elements, Point pt)
 	A_snapIPsAndRecalculateConstraints (new_constraints) ;
 	return 1;
 }
+
 
 /**
  * Delete the point.
@@ -1874,6 +1885,10 @@ public boolean Check_for_Collinearity(GeometryElement e)
 }
 
 
+/**
+ * For collinearity etc.
+ * This feature is NOT supported in this release.
+ */
 Point pt1,pt2 ;
 // added on 10-05-10
 // find the end point and starting point of other line according to orientation
