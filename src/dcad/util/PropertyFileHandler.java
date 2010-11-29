@@ -41,7 +41,7 @@ public class PropertyFileHandler
 		{
 //			///System.out.println(theFileName);
 			if(GMethods.getInputStream(theFileName)==null)
-				///System.out.println("!!! The property file couldn't be opened... !!! This is loadData() of PropertyFileHandler class. \n\n\n\n\n");
+				System.out.println("!!! The property file couldn't be opened... !!!" + theFileName );
 			m_prop.load(GMethods.getInputStream(theFileName));
 	    } 
 		catch (IOException e) 

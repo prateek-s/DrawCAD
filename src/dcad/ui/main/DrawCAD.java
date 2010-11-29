@@ -3,6 +3,10 @@ package dcad.ui.main;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Properties;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
@@ -22,6 +26,7 @@ public class DrawCAD{
 		    BufferedReader reader = null;
 		    PrintWriter writer = null;
 		    String absPath = System.getProperty("user.dir");
+		
 		    // to create a new file
 		   
 		    File f;
@@ -72,7 +77,10 @@ public class DrawCAD{
 	public static void main(String[] args){
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
-				GMethods.init(System.getProperty("user.dir")+"/src/DrawCAD.properties");
+				Properties properties = new Properties() ;
+				URL url =  ClassLoader.getSystemResource("DrawCAD.properties");
+				System.out.println(url.getFile().replace("!", "")) ;
+				GMethods.init(url.getFile().replace("!",""));
 				
 		        frame = new JFrame();
 				frame.setTitle(MainWindow.setAppName("III"));
