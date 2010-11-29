@@ -173,6 +173,7 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 	
 	private Vector highlightedSegWhileDragging = null;
 
+	public Stroke last_drawn_stroke = null ;
 	
 	/**
 	 * Mouse is over this segment.
@@ -1313,6 +1314,7 @@ if(type=="moved")
 			theStroke.drawSegments(getGraphics());
 	
 		repaint() ;	
+		
 		//UpdateUI(1,m_drawData.getM_constraints());
 		UpdateUI(1 , m_drawData.getConstraintsForStroke(theStroke) );
 		return constraints ;
