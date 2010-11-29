@@ -916,8 +916,8 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			// Delete the selected elements
 			deleteKeyPressed();
 			break;
-			
 		case KeyEvent.VK_ENTER :
+			System.out.println(e.toString()) ;
 			EnterKeyPressed() ;
 			break ;
 		default:
@@ -931,15 +931,29 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 */
 	public void EnterKeyPressed() 
 	{
+	SegmentProperties sgp = this.seg_properties ;
+	if(this.seg.getM_type()==Segment.LINE)
+	{
 		
+	}
+	
 	}
 
 	private void deleteKeyPressed()
 	{
 	}
 
-	public void keyPressed(KeyEvent e) {}
-
+	public void keyPressed(KeyEvent e) 
+	{
+		System.out.println(e.toString()) ;
+		char c = e.getKeyChar();
+		switch (c){
+	case KeyEvent.VK_ENTER :
+		
+		EnterKeyPressed() ;
+		break ;
+	}
+	}
 	public void keyReleased(KeyEvent e) {}
 
 	public boolean dispatchKeyEvent(KeyEvent e){

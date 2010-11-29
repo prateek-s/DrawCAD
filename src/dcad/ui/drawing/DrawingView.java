@@ -1313,8 +1313,8 @@ if(type=="moved")
 			theStroke.drawSegments(getGraphics());
 	
 		repaint() ;	
-		UpdateUI(1,m_drawData.getM_constraints());
-		
+		//UpdateUI(1,m_drawData.getM_constraints());
+		UpdateUI(1 , m_drawData.getConstraintsForStroke(theStroke) );
 		return constraints ;
 	}
 
