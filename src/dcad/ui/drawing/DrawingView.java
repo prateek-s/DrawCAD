@@ -1538,6 +1538,7 @@ if(type=="moved")
 			if (elementsToMove.size() > 0)
 			{
 			A.A_move_Elements( elementsToMove,m_mousePos,new Point(x,y),0) ;
+			
 
 			repaint();
 			}

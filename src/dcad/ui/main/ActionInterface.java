@@ -154,7 +154,7 @@ public Vector A_draw_Stroke(Stroke strk)
 	new_constraints = Recognize_Constraints(strk,0); //0 == default recognition, no user specified marker etc
 	
 	DSTATE(getMethod() + "STROKE COMPLETE") ;	 
-	System.out.println(ProcessManager.dump(m_drawData, 2,null)) ; //The dump prints values of all fields , recursively,too large!
+	//System.out.println(ProcessManager.dump(m_drawData, 2,null)) ; //The dump prints values of all fields , recursively,too large!
 	
 	return null ; //no one is supposed to use the return value, really.
 }
@@ -325,9 +325,10 @@ if (movedPts.size() > 0)
 		    {
 			updateConstraints(affectedCons, Constraint.HARD);
 		    }
+	A_snapIPsAndRecalculateConstraints(affectedCons) ;
+
 	    }
     }
-		
 		return 1;
 }
 

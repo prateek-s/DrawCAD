@@ -165,7 +165,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 				label2 = "Radius" ;
 
 				jlabel1 = new JLabel("Radius");
-				jfield1 = new JTextField(10);
+				jfield1 = new JTextField(10);  
 				jChange1 = new JButton("Change"); 	jChange1.setActionCommand("rChange") ;
 				jReset1 = new JButton("Reset");		jReset1.setActionCommand("rReset") ;
 
@@ -267,10 +267,11 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	public void displayCheckboxes(int seg_type) 
 	{
+		
 		CheckboxGroup group = new CheckboxGroup();
-	    Checkbox isLine = new Checkbox("Line", group, false);
-	    Checkbox isCircle = new Checkbox("Circle", group, false);
-	    Checkbox isMarker =new Checkbox("Marker", group, false);
+	    Checkbox isLine = new Checkbox("Line", group, seg_type==Segment.LINE);
+	    Checkbox isCircle = new Checkbox("Circle", group, seg_type==Segment.CIRCLE);
+	    Checkbox isMarker =new Checkbox("Marker", group, seg_type==Segment.NONE);
 	    isLine.addItemListener(this) ; isCircle.addItemListener(this) ; isMarker.addItemListener(this) ;
 	    
 	   
@@ -307,7 +308,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		super.add(jDelete) ; jDelete.setActionCommand("Delete") ; jDelete.addActionListener(this) ;
 		
 		/* Check boxes */
-		displayCheckboxes(seg_type) ;
+		displayCheckboxes(seg.getM_type()) ;
 
 		super.add(seg_properties.jlabel1) ; super.add(seg_properties.jfield1) ; super.add(seg_properties.jChange1) ; super.add(seg_properties.jReset1) ;
 		super.add(seg_properties.jlabel2) ; super.add(seg_properties.jfield2) ; super.add(seg_properties.jChange2) ; super.add(seg_properties.jReset2) ;   
@@ -915,9 +916,22 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 			// Delete the selected elements
 			deleteKeyPressed();
 			break;
+			
+		case KeyEvent.VK_ENTER :
+			EnterKeyPressed() ;
+			break ;
 		default:
 			break;
 		}
+	}
+	
+	/**
+	 * First determine current seg type
+	 * Then see which was changed ?
+	 */
+	public void EnterKeyPressed() 
+	{
+		
 	}
 
 	private void deleteKeyPressed()

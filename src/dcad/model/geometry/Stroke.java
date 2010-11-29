@@ -14,6 +14,7 @@ import dcad.model.constraint.Constraint;
 import dcad.model.constraint.constraintsHelper;
 import dcad.model.constraint.connect.lineCircularCurveTangencyConstraint;
 import dcad.model.constraint.pointOnSegment.pointOnCircularCurveConstraint;
+import dcad.model.constraint.pointOnSegment.pointOnLineConstraint;
 import dcad.model.geometry.segment.SegCircleCurve;
 import dcad.model.geometry.segment.SegLine;
 import dcad.model.geometry.segment.Segment;
@@ -545,13 +546,15 @@ public class Stroke extends GeometryElement
 	}
 	
 	/**
-	 * 
+	 * Stroke constraints are thos which are enforced because the stroke passed through certain points.
+	 * Tangency, enpoints etc. 
+	 * TO ADD: when a stroke passes through any AnchorPoint, add the constraint 
+	 * (Point On Segment). 
 	 * @param strokeList
 	 * @return
 	 */
 	public Vector recognizeStrokeConstraints(Vector strokeList)
 	{
-		
 		Vector constraints = new Vector();
 		int strkCount = strokeList.size();
 //		strkCount--;
@@ -578,12 +581,10 @@ public class Stroke extends GeometryElement
 							if(oldSeg instanceof SegLine)
 							{
 								l = (SegLine)oldSeg;
-								if
-								(
-									constraintsHelper.getConstraintBetween2Segments(c,l,lineCircularCurveTangencyConstraint.class) == null
-//									&& constraintsHelper.arePointsUnique(new AnchorPoint[]{l.getM_start(),l.getM_end(),c.getM_start(),c.getM_end(),c.getM_center()})
-									
-								)
+								
+								if (constraintsHelper.getConstraintBetween2Segments(c,l,lineCircularCurveTangencyConstraint.class) == null)
+									//&& constraintsHelper.arePointsUnique(new AnchorPoint[]{l.getM_start(),l.getM_end(),c.getM_start(),c.getM_end(),c.getM_center()}									
+								
 								{
 									Constraint cons = findAndAddLineCircularCurveTangency((SegLine)oldSeg,(SegCircleCurve)newSeg,rowPoints);
 									if(cons!=null)
@@ -597,8 +598,9 @@ public class Stroke extends GeometryElement
 										if(ap!=null && ap!=c.getM_start() && ap!=c.getM_end() && ap!=c.getM_center())
 										{
 											cons = pointOnSegmentRecognizer.getPointOnCircularCurveConstraint(c,ap,Constraint.HARD,true);
+										
 											if(cons!=null)
-											{
+											{	System.out.println("POINT ON SEGMENT"+ cons.toString()) ;
 												constraintsHelper.addCons2SegsAndRecogview(cons,new Segment[]{c});
 												constraints.add(cons);
 											}
@@ -620,19 +622,102 @@ public class Stroke extends GeometryElement
 								}
 							
 							}
+							
 							else if(oldSeg instanceof SegCircleCurve)
-							{
-								
+							{System.out.println(" OLD IS CIRCLE " + oldSeg.toString()) ;
+								AnchorPoint ap1 = intersectsSegment(this, oldSeg) ;
+								if (ap1!=null)
+								{
+									System.out.println("PASSES THROUGH CENTRE  "+ ap1.toString() + "SEG:  "+oldSeg.toString()) ;
+									pointOnLineConstraint constraint = new pointOnLineConstraint(newSeg, ap1, 1, false) ;
+									System.out.println("Constraint" + constraint.toString()) ;
+									constraints.add(constraint) ;
+									constraintsHelper.addCons2SegsAndRecogview(constraint,new Segment[]{newSeg,oldSeg});
+							}
 							}
 						}
 					}
 				}
 			}
+		
+			else if (newSeg instanceof SegLine)
+			{	
+				Vector ptlist = this.m_ptList;
+				for(int j=0;j<strkCount;j++)
+				{
+					Stroke oldStroke = (Stroke) strokeList.get(j);
+					if(oldStroke.isEnabled())
+					{
+						Vector oldSegments = oldStroke.getM_segList();
+						for(int k=0;k<oldSegments.size();k++)
+						{
+
+							Segment oldSeg = (Segment)oldSegments.get(k);
+							AnchorPoint ap = intersectsSegment(this, oldSeg) ;
+							if (ap!=null)
+							{
+								System.out.println("PASSES THROUGH..."+ ap.toString() + "SEG:  "+oldSeg.toString()) ;
+								pointOnLineConstraint constraint = new pointOnLineConstraint(newSeg, ap, 1, false) ;
+								System.out.println("Constraint" + constraint.toString()) ;
+								constraints.add(constraint) ;
+								constraintsHelper.addCons2SegsAndRecogview(constraint,new Segment[]{newSeg,oldSeg});
+
+							}
+							
+							
+							
+						} //END FOR
+						
+					} //END ENABLED
+					
+				} //FOR
+			} //END OUTER IF - SEGLINE
+			
 		}
 
-		
+		System.out.println("BEGIN C VECTOR" + constraints) ;
 		return constraints;
 	}
+	
+	public AnchorPoint intersectsSegment(Stroke strk, Segment seg) 
+	{
+	AnchorPoint ap = null ;
+	Vector ptList = strk.getM_ptList() ;
+	
+	if(strk.getM_segList().contains(seg)) 
+		return null;
+	
+	System.out.println("INTERSECT CALLSED" + seg.toString()) ;
+	
+	if(seg instanceof SegLine)
+	{
+		SegLine line = (SegLine) seg ;
+		if(strk.nearPt(line.getM_start().getX(), line.getM_start().getY()))
+		{
+		ap = line.getM_start() ;	
+		}
+	
+		else if(strk.nearPt(line.getM_end().getX(), line.getM_end().getY()))
+		{
+		ap = line.getM_end() ;	
+		}
+	}
+	
+	else if (seg instanceof SegCircleCurve) 
+	{
+		SegCircleCurve circle = (SegCircleCurve) seg ;
+		System.out.println("circle") ;
+		System.out.println("circle" + circle.getM_center()) ;
+		if (strk.nearPtCircle(circle.getM_center().getX() , circle.getM_center().getX() )) 
+		{
+		ap = circle.getM_center() ;	
+		}
+	}
+	
+	return ap ;
+	}
+
+	
 	
 	public boolean isAnchorPointOnStroke(AnchorPoint ap,Vector rowPoints)
 	{
@@ -909,6 +994,46 @@ public class Stroke extends GeometryElement
 		return null;
 	}
 
+	
+	/**
+	 * Whether any point in this stroke is near the point specified
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean nearPt (double x, double y)
+	{
+		double min_dist = 1000.0 ;
+		double touch_threshold = 10.0 ;
+		for (Object o : m_ptList) {
+			PixelInfo pi = (PixelInfo) o;
+			if (pi.distance(x,y) < min_dist) {
+						 min_dist = pi.distance(x,y) ; System.out.println("MIN DIST" + min_dist) ;
+			}
+			if(pi.distance(x, y) < touch_threshold ) {
+				return true ;
+			}
+		}
+		System.out.println("MIN DIST" + min_dist) ;
+		return false ;
+	}
+	
+	public boolean nearPtCircle (double x, double y)
+	{
+		double min_dist = 1000.0 ;
+		double touch_threshold = 150.0 ;
+		for (Object o : m_ptList) {
+			PixelInfo pi = (PixelInfo) o;
+			if (pi.distance(x,y) < min_dist) {
+						 min_dist = pi.distance(x,y) ; System.out.println("MIN DIST" + min_dist) ;
+			}
+			if(pi.distance(x, y) < touch_threshold ) {
+				return true ;
+			}
+		}
+		System.out.println("MIN DIST" + min_dist) ;
+		return false ;
+	}
 	
 	public boolean containsPt(double x, double y)
 	{
