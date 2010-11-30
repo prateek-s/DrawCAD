@@ -663,7 +663,8 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 			boolean dragged = handleMouseDragEditMode(x, y); 
 			if (dragged)
 			{
-				if (isM_elementDragged() && (A.m_highlightedElements.size() > 0)){
+				if (isM_elementDragged())  //&& (A.m_highlightedElements.size() > 0)
+				{
 					snapIPsAndRecalculateConstraints(newConstraints);		
 				}
 			}

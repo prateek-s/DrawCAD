@@ -90,7 +90,9 @@ KeyEventDispatcher
 		return str4DeletedCons + c.toString();
 	}
 
-	public void addConstraint(Constraint c){
+	public void addConstraint(Constraint c)
+	{
+		if(listModel.contains(c)) return ;
 		listModel.addElement(getStr4DeletedCons(c));
 		listConstraints.addElement(c);
 		allConstraints.addElement(c);

@@ -708,7 +708,7 @@ public class Stroke extends GeometryElement
 		SegCircleCurve circle = (SegCircleCurve) seg ;
 		System.out.println("circle") ;
 		System.out.println("circle" + circle.getM_center()) ;
-		if (strk.nearPtCircle(circle.getM_center().getX() , circle.getM_center().getX() )) 
+		if (strk.nearPtCircle(circle.getM_center().getX() , circle.getM_center().getY() )) 
 		{
 		ap = circle.getM_center() ;	
 		}
@@ -1020,8 +1020,9 @@ public class Stroke extends GeometryElement
 	
 	public boolean nearPtCircle (double x, double y)
 	{
+		System.out.println( "****CIRCLE CENTRE "+ x +"," +y) ;
 		double min_dist = 1000.0 ;
-		double touch_threshold = 150.0 ;
+		double touch_threshold = 10.0 ;
 		for (Object o : m_ptList) {
 			PixelInfo pi = (PixelInfo) o;
 			if (pi.distance(x,y) < min_dist) {

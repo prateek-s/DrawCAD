@@ -42,11 +42,17 @@ public class MarkerRecognizer
 		return m_markerRecog;
 	}
 	
+	/**
+	 * For equality marker
+	 * @param ap
+	 * @param pt
+	 * @return
+	 */
 	public boolean MarkerHang(AnchorPoint ap, Point2D pt)
 	{
 		double d =ap.distance(pt)/GConstants.cmScaleDrawingRatio  ; 
-		System.out.println("MARKER HANGS:"+d + " THRESHOLD IS " + Constraint.MAX_ALLOWED_CONNECT_GAP/5);
-		if (d > Constraint.MAX_ALLOWED_CONNECT_GAP/2.0) {
+		System.out.println("MARKER HANGS:"+d + " THRESHOLD IS " + Constraint.MAX_ALLOWED_CONNECT_GAP);
+		if (d > Constraint.MAX_ALLOWED_CONNECT_GAP) {
 			return true;
 		}
 		return false;
