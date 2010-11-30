@@ -466,13 +466,15 @@ public class MarkerToConstraintConverter
 				try
 				{
 					
-					if(selectedElements.size()==0)
+					if(true)
 					{
 						// check if this text is close to any of the constraints or geometric elements
 						// first check if its close to any constraint. if it is then dont check closeness to any segment
 						marker = text.getClosestMarker(markers, MarkerAngle.class);
+						
 						if(marker  != null)
 						{
+							System.out.println(" MARKER AS TEXT "+ marker.toString()) ;
 							String markerText = text.getM_text();
 							/*if(doesTextContainAChar(markerText,'a',-1,true))
 							{
@@ -481,8 +483,8 @@ public class MarkerToConstraintConverter
 								text.setM_text(angle);
 								((MarkerAngle)marker ).setM_text(text);
 							}*/
-							String angle=markerText.substring(0,markerText.length());
-							Double.parseDouble(angle);
+							String angle=markerText.substring(0,markerText.length()-1);
+						//	Double.parseDouble(angle);
 							text.setM_text(angle);
 							((MarkerAngle)marker ).setM_text(text);
 							
@@ -539,7 +541,7 @@ public class MarkerToConstraintConverter
 							}
 						}
 					}
-					else //Some segments are selected, meaning this is a distance constraint 
+					else if(selectedElements.size() > 1) //Some segments are selected, meaning this is a distance constraint 
 					{
 						Vector selectedLines=new Vector();
 						Vector selectedCircularCurves = new Vector();

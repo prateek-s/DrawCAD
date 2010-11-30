@@ -135,6 +135,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		JButton jReset2 ;
 
 		EditView ev ;
+		
 
 		/**********************************************************************************/
 		
@@ -149,12 +150,12 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 				// UI now
 				jlabel1 = new JLabel("Length");
-				jfield1 = new JTextField(5);
+				jfield1 = new JTextField(5); jfield1.addKeyListener(ev);
 				jChange1 = new JButton("Change"); 	jChange1.setActionCommand("lChange") ; 
 				jReset1 = new JButton("Reset");		jReset1.setActionCommand("lReset" ) ; 
 
 				jlabel2 = new JLabel("Angle");
-				jfield2 = new JTextField(5);
+				jfield2 = new JTextField(5); jfield2.addKeyListener(ev);
 				jChange2 = new JButton("Change"); 	jChange2.setActionCommand("aChange") ; 
 				jReset2 = new JButton("Reset");   	jReset2.setActionCommand("aReset") ; 
 			}
@@ -246,6 +247,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	public EditView() 
 	{
 		super(new FlowLayout());
+		this.addKeyListener(this) ;
 		init();	    
 		//displayOptions(seg) ;
 	}
@@ -315,9 +317,41 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 		/*********** UI is initialized now. FILL IN ALL PROPERTIES */
 		getProperties() ;
+		Vector v = new Vector() ;
+		v.add(seg) ;
+		System.out.println("KLAAAAAAAAAAAAR"+dv.A.A_clear_selection()) ;
+
+		dv.A.A_elements_selected(null, v);
+		dv.A.m_selectedElements.add(seg) ;
+		dv.repaint();
+	
+		dv.repaint() ;
 		
 	}
+/****************************************************************************************/
+	
+	Stroke strk = null ;
+	/**
+	 * Display options for markers
+	 */
+	public void displayOptionsMarker(Stroke strk)
+	{
+		this.seg_properties = null ; //empty 
+		this.strk = strk ;
+		//clear out the UI components.
+		super.removeAll();
+		//pt.setLocation(dv.getMousePointerLocation());	//TODO: is null
 
+		/****** Initialize UI now */
+		JButton jDelete = new JButton("Delete"); 
+		super.add(jDelete) ; jDelete.setActionCommand("Delete") ; jDelete.addActionListener(this) ;
+		
+		/* Check boxes */
+		displayCheckboxes(Segment.NONE) ;
+
+	}
+	
+	
 
 	/*************************************************************************/
 	
@@ -530,7 +564,35 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 */
 	public void ChangeSegment(Segment seg , int type) 
 	{
-		Stroke strk ;
+		Stroke strk = this.strk ;
+	//	strk.deleteSegments();
+		
+		if (this.seg_properties == null) {
+			//dv.A.A_delete_Element(strk) ;
+			Marker m = (Marker)dv.A.m_drawData.getM_markers().lastElement();
+			dv.A.m_drawData.removeUnusedMarker();
+			dv.A.m_drawData.removeMarker(m);
+			dv.A.m_drawData.removeStroke(strk);
+			dv.A.A_delete_Element(m) ;
+			dv.A.m_drawData.removeStroke(strk);
+		//	dv.A.A_delete_Element(strk) ;
+			dv.repaint() ;
+			//strk.user_given = type;
+			dv.A.DSTATE("AFTER REMOVING MARKER") ;
+			
+			System.out.println("STROKE IN EV:"+strk.toString());
+			strk.setM_type(Stroke.TYPE_NORMAL);
+		//	strk.setStrokeConvertedTo(Stroke.TYPE_NORMAL);
+			strk.user_given = type ;
+			
+			dv.setCurrentStroke(strk) ;
+			strk.deleteSegments();
+			
+			dv.Process_Stroke(this.strk) ;
+			displayOptions(this.strk.getM_segList().elementAt(0), pt) ;
+			UIUpdate() ;
+			return ;
+		}
 
 		strk = seg.getM_parentStk() ;
 		strk.user_given = type ; //This is the key flag. The stroke class checks if it is set etc.
@@ -904,12 +966,13 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		addKeyListener(this);
 		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
-		this.dv.A.Highlight_last_stroke() ;
+	//	this.dv.A.Highlight_last_stroke() ;
 		
 	}
 
 	public void keyTyped(KeyEvent e)
 	{
+		System.out.println(e.toString()) ;
 		char c = e.getKeyChar();
 		switch (c){
 		case KeyEvent.VK_DELETE:
@@ -931,10 +994,29 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	 */
 	public void EnterKeyPressed() 
 	{
+	System.out.println("ENTER PRESSED") ;
 	SegmentProperties sgp = this.seg_properties ;
 	if(this.seg.getM_type()==Segment.LINE)
 	{
-		
+	if (sgp.field1.compareTo(sgp.jfield1.getText())!=0)
+	{
+		ChangeProperty2(Segment.LINE, "length") ;
+	}
+	else if (sgp.field2.compareTo(sgp.jfield2.getText())!=0)
+	{
+		ChangeProperty2(Segment.LINE, "angle") ;
+	}
+	}
+	else if(this.seg.getM_type()==Segment.CIRCLE)
+	{
+	if (sgp.field1.compareTo(sgp.jfield1.getText())!=0)
+	{
+		ChangeProperty2(Segment.CIRCLE, "radius") ;
+	}
+	else if (sgp.field2.compareTo(sgp.jfield2.getText())!=0)
+	{			
+		ChangeProperty2(Segment.CIRCLE, "angle") ;
+	}	
 	}
 	
 	}

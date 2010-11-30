@@ -56,6 +56,7 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 	private static JSplitPane m_splitpane = null;
 	private static JSplitPane m_upperPane = null;
 	private static JSplitPane m_LowerPane = null;
+	private static JSplitPane m_LowerlowerPane = null ;
 	private static JSplitPane m_hzScaleDrawView = null;
 	private static JSplitPane m_vtScaleDraw = null;
 	private static JSplitPane m_LeftSplitPane = null;
@@ -76,7 +77,8 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 	private static int TOP_HORIZONTAL_DIVIDER = winHeight/25;
 	private static int LEFT_VERTICAL_DIVIDER = winWidth/35;
 	private static int RIGHT_VERTICAL_DIVIDER = (3*winWidth)/4;
-	private static int BOTTOM_DIVIDER = (2*winHeight)/3;
+	private static int EDIT_DIVIDER = (2*winHeight)/3;
+	private static int BOTTOM_DIVIDER = (3*winHeight)/4;
 	
 	
 	public static HelpDrawingView getHelpDrawingView() {
@@ -174,8 +176,6 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		
 		recognizedTab = new JScrollPane(new RecognizedView());
 		JTabbedPane tabbedPane = new JTabbedPane() ;
-		
-		
 
 		
 		// 25-09-09
@@ -190,8 +190,8 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 		drawingTab.setFocusable(true);
 		ev = new EditView();
 		EditTab = new JScrollPane (ev);
-		tabbedPane.add("EDIT",EditTab) ;
-		tabbedPane.add("CONSTRAINTS", recognizedTab) ;
+	//	tabbedPane.add("EDIT",EditTab) ;
+	//	tabbedPane.add("CONSTRAINTS", recognizedTab) ;
 		// add Scrollbar adjustment listener to Drawing Window - horizontal and vertical
 		
 		final JScrollBar drawHrBar = ((JScrollPane)drawingTab).getHorizontalScrollBar();
@@ -236,8 +236,10 @@ public class MainWindow extends ScrollPane implements ActionListener, Adjustment
 					
 		//m_upperPane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_vtScaleDraw,helpSubTab, RIGHT_VERTICAL_DIVIDER);
 
-		m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , tabbedPane , BOTTOM_DIVIDER);	
-		m_splitpane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_LowerPane, helpSubTab,RIGHT_VERTICAL_DIVIDER);
+		m_LowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT, m_vtScaleDraw , EditTab , EDIT_DIVIDER);	
+		m_LowerlowerPane = createSplitPane(JSplitPane.VERTICAL_SPLIT,m_LowerPane,recognizedTab , BOTTOM_DIVIDER) ;
+		
+		m_splitpane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_LowerlowerPane, helpSubTab,RIGHT_VERTICAL_DIVIDER);
 		//m_splitpane.setResizeWeight(0.7);
 		
 		//tabbedPane.add(m_LowerPane);

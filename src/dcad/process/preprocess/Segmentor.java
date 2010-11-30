@@ -241,7 +241,13 @@ public class Segmentor
 	}
 	
 	
-	
+	/**
+	 * Returns vector of segmentation points for the stroke, given the 
+	 * segmentation scheme.
+	 * @param theStroke
+	 * @param segScheme
+	 * @return
+	 */
 	public Vector performSegmentation(Stroke theStroke,int segScheme)
 	{
 		

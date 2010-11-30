@@ -41,6 +41,18 @@ public class MarkerRecognizer
 		if(m_markerRecog == null) m_markerRecog = new MarkerRecognizer();
 		return m_markerRecog;
 	}
+	
+	public boolean MarkerHang(AnchorPoint ap, Point2D pt)
+	{
+		double d =ap.distance(pt)/GConstants.cmScaleDrawingRatio  ; 
+		System.out.println("MARKER HANGS:"+d + " THRESHOLD IS " + Constraint.MAX_ALLOWED_CONNECT_GAP/5);
+		if (d > Constraint.MAX_ALLOWED_CONNECT_GAP/2.0) {
+			return true;
+		}
+		return false;
+	}
+	
+	
 	/**
 	 * Check if the stroke is actually a marker
 	 * @param stroke
@@ -102,10 +114,13 @@ public class MarkerRecognizer
 					if(consSeg instanceof SegLine)
 					{
 						SegLine segLine = (SegLine)consSeg;
-						if((segLine.getM_start().distance(contactPt) >= Constraint.MAX_ALLOWED_CONNECT_GAP)&&(segLine.getM_end().distance(contactPt) >= Constraint.MAX_ALLOWED_CONNECT_GAP))
+						if((segLine.getM_start().distance(contactPt)/GConstants.cmScaleDrawingRatio >= Constraint.MAX_ALLOWED_CONNECT_GAP)&&(segLine.getM_end().distance(contactPt)/GConstants.cmScaleDrawingRatio >= Constraint.MAX_ALLOWED_CONNECT_GAP))
 						{
+							System.out.println(" MARKER FOR EQUALITY.." + segLine.getM_start().distance(contactPt)) ;
+							if(segLine.getM_start().distance(contactPt) >= (segLine.getM_length()/3)) {
 							m_marker = new MarkerEquality(stroke, consSeg);	
 							markerType = m_marker.getM_type();
+							}
 						}
 					}
 					else if(consSeg instanceof SegCircleCurve)
@@ -268,7 +283,8 @@ public class MarkerRecognizer
 					if(consSeg instanceof SegLine)
 					{
 						SegLine segLine = (SegLine)consSeg;
-						if((segLine.getM_start().distance(contactPt) >= Constraint.MAX_ALLOWED_CONNECT_GAP)&&(segLine.getM_end().distance(contactPt) >= Constraint.MAX_ALLOWED_CONNECT_GAP))
+						System.out.println(segLine.getM_start().distance(contactPt));
+						if(MarkerHang(segLine.getM_start(), contactPt)  && MarkerHang (segLine.getM_end(),contactPt) )
 						{
 							m_marker = new MarkerEquality(stroke, consSeg);	
 							markerType = m_marker.getM_type();

@@ -35,6 +35,9 @@ public class StrokeRecognizer
 		m_markerRecog = recogMan.getMarkerRecognitionMan().getMarkerRecognizer();
 		m_stroke = stroke;
 
+		if(stroke.user_given > 0) 
+			return Stroke.TYPE_NORMAL ;
+		
 		if(stroke.isStrokeConverted()) {
 			if(stroke.getStrokeConvertedTo() == NORMAL_STROKE) {
 				return Stroke.TYPE_NORMAL;

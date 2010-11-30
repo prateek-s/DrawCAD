@@ -565,6 +565,8 @@ public int A_add_text(String text, Point pt)
 	
 	m_drawData.getM_markers().addAll(newMarkers) ;
 	
+	//System.out.println("TEXT MARKER" + newMarkers.elementAt(0)) ;
+	
 	A_add_markers(newMarkers) ;
 	return 1;
 }
@@ -770,13 +772,14 @@ return null ;
  */
 public Vector<GeometryElement>  A_elements_selected (Point pt,Vector m_selectedElements1) 
 {
-    int x = pt.x ;
-    int y = pt.y ;
+    //int x = pt.x ;
+    //int y = pt.y ;
     Vector<GeometryElement> m_selectedElements = m_selectedElements1;
-		
+    Iterator iter =null;
     // check if the mouse is close to any  geometry element
+    if(pt!=null) {
     Vector gEles = isPtOnGeometryElement(pt);
-    Iterator iter = gEles.iterator();
+    iter = gEles.iterator();
     while (iter.hasNext()) 
 	{
 	    GeometryElement ele = (GeometryElement) iter.next();
@@ -805,7 +808,7 @@ public Vector<GeometryElement>  A_elements_selected (Point pt,Vector m_selectedE
 		}
 	    }
 	}
-		
+    }
     iter = m_selectedElements.iterator(); 
     while (iter.hasNext())
 	{
@@ -1505,7 +1508,7 @@ public Vector  A_addConstraintsForMarkers()
 		Vector constraints = converter.recognizeMarkersAsConstraints(m_drawData.getM_markers(),
 				m_drawData.getM_textElements(), m_drawData.getAllSegments());
 
-		System.out.println("IMMEDIATE CONS"+constraints.elementAt(0).toString());
+		//System.out.println("IMMEDIATE CONS"+constraints.elementAt(0).toString());
 		
 		if (constraints != null && constraints.size() > 0)
 		{
@@ -2304,7 +2307,14 @@ public int Highlight(Point m_mousePos, int type)
 	
 }
 
-public void Highlight_element(GeometryElement e) {
+public void Highlight_element(GeometryElement e) 
+{
+	if(!m_highlightedElements.contains(e))
+		m_highlightedElements.add(e);
+	
+	else
+		m_highlightedElements.add(e) ;
+	
 	e.setHighlighted(true) ;
 	
 }

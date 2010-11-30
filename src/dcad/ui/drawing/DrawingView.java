@@ -1630,7 +1630,7 @@ public void UI_log(String s)
 			setM_logBetweenKeyPress(false);
 		}
 		repaint();
-
+		System.out.println("TEXT"+c);
 		// Added on 6-5-2008
 		// This was added in mousemoved function where writeText is called
 		// But, because of that, this was not done while loading a file
@@ -1838,23 +1838,20 @@ public void UI_log(String s)
 			segm = A.isPtOnAnySegment((Point2D)pt2); 
 
 		}
-		else {
+		else  {
 			segL = stroke.getM_segList();
-
 			segm = (Segment)segL.elementAt(0) ;
 		}
 			//lineWindow = new LineParameterWindow();
-			if(segm!=null)
-			{
-				//Point pt = getMousePointerLocation() ;
-				Point pt = getM_mousePos() ;
-				
-				Point pt3 = getLocationOnScreen() ;
-				Point pt4 = getLocation() ;
-				///System.out.println("BEGIN POINT CO_ORDINATES......................") ;
-				
-				ev.displayOptions(segm,pt2) ;
-			}
+		if(stroke.getM_type() == Stroke.TYPE_NORMAL &&  segm!=null)
+		{
+			ev.displayOptions(segm,pt2) ;
+		}
+		else if (stroke.getM_type() == Stroke.TYPE_MARKER){
+			System.out.println("**********MARKER OPTIONS ********") ;
+			ev.displayOptionsMarker(stroke) ;
+		}
+			
 			//A.m_highlightedElements.clear();		
 	//	}
 	}
