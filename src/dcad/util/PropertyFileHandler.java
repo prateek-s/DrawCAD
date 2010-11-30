@@ -71,7 +71,7 @@ public class PropertyFileHandler
 	    {
     		Prefs.setSegScheme(GConstants.SEG_SCHEME_SIMPLE);
 	    }
-	    	
+	    Prefs.setSegScheme(GConstants.SEG_SCHEME_SIMPLE) ;
 
 	    // read the type of acceptable number of votes for a segment point.
 	    // This denotes minimum number of votes required for a point to be considered as segment point

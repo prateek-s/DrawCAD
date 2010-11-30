@@ -25,12 +25,13 @@ public class DrawCAD{
 	{
 		    BufferedReader reader = null;
 		    PrintWriter writer = null;
-		    String absPath = System.getProperty("user.dir");
-		
+		   // String absPath = System.getProperty("user.dir");
+		    URL url =  ClassLoader.getSystemResource("DrawCAD.properties");
+		    String path= url.getFile() ;
 		    // to create a new file
 		   
-		    File f;
-		      f = new File(absPath + "/src/DrawCAD.txt");
+		    File f = new File(path) ;
+		  //    f = new File(absPath + "/src/DrawCAD.txt");
 		      if(!f.exists()){
 		          f.createNewFile();
 		      }
@@ -38,14 +39,15 @@ public class DrawCAD{
 		      // copying modified data + Previous data (DrawCAD.properties) to DrawCAD.txt
 		      
 		    try {
-		        reader = new BufferedReader(new FileReader(absPath + "/src/DrawCAD.properties"));
-		        writer = new PrintWriter(new FileWriter(absPath + "/src/DrawCAD.txt"));
+		        reader = new BufferedReader(new FileReader(path));
+		        writer = new PrintWriter(new FileWriter(path+".txt"));
 		        String  line;
 		        int segScheme = Prefs.getSegScheme();
 		        int lineNumber = 1;
 		        while ((line = reader.readLine()) != null) {
 		        	if(lineNumber == 7){
 		        		writer.println("segScheme="+ segScheme);
+		        		System.out.println( "SETTING SCHEME AS "+ segScheme) ;
 		        	}
 		        	else if(lineNumber == 15){
 		        		writer.println("speedScalingFactor="+Double.toString(Prefs.getSpeedScalingFactor()));
@@ -66,12 +68,13 @@ public class DrawCAD{
 		    }
 		    
 		    // delete file DrawCAD.properties
-		    f = new File(absPath + "/src/DrawCAD.properties");
+		    f = new File(path);
 		    f.delete();
 		    
 		    //rename DrawCAD.txt to DrawCAD.properties
-		    f = new File(absPath + "/src/DrawCAD.txt"); 
-		    f.renameTo(new File(absPath + "/src/DrawCAD.properties"));
+		    f = new File(path+".txt"); 
+		    f.renameTo(new File(path));
+		    System.out.println(" WROTE "+ path);
 	}
 	
 	public static void main(String[] args){
@@ -79,7 +82,8 @@ public class DrawCAD{
 			public void run(){
 				Properties properties = new Properties() ;
 				URL url =  ClassLoader.getSystemResource("DrawCAD.properties");
-				System.out.println(url.getFile().replace("!", "")) ;
+				System.out.println("READING FILE" + url.getFile().replace("!", "")) ;
+				
 				GMethods.init(url.getFile().replace("!",""));
 				
 		        frame = new JFrame();
