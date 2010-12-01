@@ -401,7 +401,7 @@ public class GMethods
 	
 	public static void addConstraintToRecogView(Constraint c)
 	{
-		MainWindow.getRecognizedView().addConstraint(c);
+	//	MainWindow.getRecognizedView().addConstraint(c);
 	}
 
 	public static void addCommandToCommandQueue(Command comm)

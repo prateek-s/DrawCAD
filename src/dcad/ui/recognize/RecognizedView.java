@@ -93,6 +93,7 @@ KeyEventDispatcher
 	public void addConstraint(Constraint c)
 	{
 		if(listModel.contains(c)) return ;
+		
 		listModel.addElement(getStr4DeletedCons(c));
 		listConstraints.addElement(c);
 		allConstraints.addElement(c);
@@ -113,6 +114,8 @@ KeyEventDispatcher
 	public void reset(Vector cons){
 		clear();
 		Iterator iterator = cons.iterator();
+	//	Vector selected = MainWindow.getDv().A.m_selectedElements ;
+	//	Vector c = MainWindow.getDv().A.m_drawData.getConstraintsForStroke(stroke) selected.elementAt(0) ;
 		while (iterator.hasNext())
 			addConstraint((Constraint) iterator.next());
 		updateUI();

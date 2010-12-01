@@ -621,9 +621,12 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 		//added on 19-04-10 for showing GUI to set properties of an element
 
 		///System.out.println("Enter show elements properties ");
-		showElementPropertiesWindow(x, y, buttonType);
-
-		
+		//showElementPropertiesWindow(x, y, buttonType);
+		Segment segment = A.isPtOnAnySegment(pt1) ;
+		if(segment!=null) {
+		Vector c = segment.getM_constraints() ;
+		UpdateUI(1,c ) ;
+		}
 		//If the user is clicking in the blank area of the screen, do nothing. Don't show the point
 		//If user clicks twice at the same place, 2nd time, m_currStroke is set to null. So, the condition checking it for null is required 
 		if( m_keyEventCode == -1 && m_currStroke!=null && m_currStroke.getLength() < Prefs.getAnchorPtSize() )
@@ -676,13 +679,14 @@ public class DrawingView extends JPanel implements MouseListener, MouseMotionLis
 				repaint();
 			}		
 			this.setCursor(Cursor.getDefaultCursor());
-		}		
+		}	
+		
 		//Show all constraints in the system
-		if(extraClick) 
-		{
-			Vector c = m_drawData.getM_constraints();
-			UpdateUI(1, c) ;
-		}
+	//	if(extraClick) 
+	//	{
+	//		Vector c = m_drawData.getM_constraints();
+	//		UpdateUI(1, c) ;
+	//	}
 		
 		// do common housekeeping
 		m_currStroke = null;
@@ -1371,11 +1375,11 @@ if(type=="moved")
 			//else, not draw mode, or no strokes.
 			else	
 			{
-				if (A.m_highlightedElements.size() > 0)
+			//	if (A.m_highlightedElements.size() > 0)
 //FIXME				//if (isM_elementDragged() && (A.m_highlightedElements.size() > 0))
-				{
+			//	{
 					A.Snap_IP_drag(A.m_highlightedElements) ; 
-				}
+			//	}
 			}
 		}
 	}
@@ -1541,8 +1545,14 @@ if(type=="moved")
 			if (elementsToMove.size() > 0)
 			{
 			A.A_move_Elements( elementsToMove,m_mousePos,new Point(x,y),0) ;
-			
-
+			//snapIPsAndRecalculateConstraints(null) ;
+			/**
+			 * This is for snapping points when moving. 
+			 * Recalculation of constraints is overkill. also it aggressively seeks constraints when
+			 * moving and then doesnt allow unconstraining. Users might not want that. 
+			 * Snapping is this a much lighter alternative.
+			 */
+			snapIPs() ;
 			repaint();
 			}
 		}
@@ -1610,7 +1620,8 @@ public void UI_log(String s)
 		
 		newConstraints = A.A_snapIPsAndRecalculateConstraints(NewConstraints) ;
 		
-		UpdateUI(1,newConstraints);
+		 UpdateUI(1,newConstraints);
+		
 	}
 
 /**

@@ -166,12 +166,12 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 				label2 = "Radius" ;
 
 				jlabel1 = new JLabel("Radius");
-				jfield1 = new JTextField(10);  
+				jfield1 = new JTextField(10);  jfield1.addKeyListener(ev);
 				jChange1 = new JButton("Change"); 	jChange1.setActionCommand("rChange") ;
 				jReset1 = new JButton("Reset");		jReset1.setActionCommand("rReset") ;
 
 				jlabel2 = new JLabel("Arc Angle");
-				jfield2 = new JTextField(5);
+				jfield2 = new JTextField(5); jfield2.addKeyListener(ev);
 				jChange2 = new JButton("Change");	jChange2.setActionCommand("aaChange") ;
 				jReset2 = new JButton("Reset");     jReset2.setActionCommand("aaReset") ;
 			}	
@@ -542,13 +542,15 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		String val="" ;
 		if (property=="length" || property =="radius") {
  			val = seg_properties.jfield1.getText().trim();
+ 			this.seg_properties.field1 = val ;
  		}
 		else if (property == "angle" || property == "angle") {
 			val = seg_properties.jfield2.getText().trim() ;
+			this.seg_properties.field2 = val ;
 		}
 	
-
 		dv.A.A_change_Seg_property(seg, property, val) ;
+		dv.repaint();
 		dv.addToUndoVector() ;
 
 		UIUpdate() ;
@@ -567,7 +569,8 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 		Stroke strk = this.strk ;
 	//	strk.deleteSegments();
 		
-		if (this.seg_properties == null) {
+		if (this.seg_properties == null) 
+		{
 			//dv.A.A_delete_Element(strk) ;
 			Marker m = (Marker)dv.A.m_drawData.getM_markers().lastElement();
 			dv.A.m_drawData.removeUnusedMarker();
@@ -828,7 +831,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 
 	public void actionPerformed(ActionEvent e)
 	{
-		System.out.println("EVENT"+e.paramString());
+		System.out.println("EEEEEEEEEEEEEEVENT"+e.paramString());
 		String cmd = e.getActionCommand();
 
 		if(cmd.compareToIgnoreCase("Delete")==0) {
@@ -884,7 +887,8 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	/**
 	 * Implementation of the checkbox action listener
 	 */
-	public void itemStateChanged(ItemEvent arg0) {
+	public void itemStateChanged(ItemEvent arg0) 
+	{
 	
 		String item = arg0.getItem().toString();
 		System.out.println(item) ;
@@ -990,7 +994,7 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	
 	/**
 	 * First determine current seg type
-	 * Then see which was changed ?
+	 * Then see which field was changed by comparing field1 and jfield1 
 	 */
 	public void EnterKeyPressed() 
 	{
@@ -1019,17 +1023,23 @@ public class EditView extends JPanel implements ActionListener,MouseListener,Mou
 	}	
 	}
 	
+	UIUpdate();
+	displayOptions(seg, pt);
 	}
 
 	private void deleteKeyPressed()
 	{
 	}
 
+	/**
+	 * Dont know if i need the enter listener here?
+	 */
 	public void keyPressed(KeyEvent e) 
 	{
 		System.out.println(e.toString()) ;
 		char c = e.getKeyChar();
 		switch (c){
+		
 	case KeyEvent.VK_ENTER :
 		
 		EnterKeyPressed() ;

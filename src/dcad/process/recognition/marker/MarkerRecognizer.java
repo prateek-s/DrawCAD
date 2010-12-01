@@ -5,6 +5,8 @@ import ij.Prefs;
 import java.awt.geom.Point2D;
 import java.util.Vector;
 
+import sun.awt.windows.ThemeReader;
+
 import dcad.model.constraint.Constraint;
 import dcad.model.constraint.constraintsHelper;
 import dcad.model.constraint.connect.IntersectionConstraint;
@@ -51,8 +53,8 @@ public class MarkerRecognizer
 	public boolean MarkerHang(AnchorPoint ap, Point2D pt)
 	{
 		double d =ap.distance(pt)/GConstants.cmScaleDrawingRatio  ; 
-		System.out.println("MARKER HANGS:"+d + " THRESHOLD IS " + Constraint.MAX_ALLOWED_CONNECT_GAP);
-		if (d > Constraint.MAX_ALLOWED_CONNECT_GAP) {
+		System.out.println("MARKER HANGS:"+d + " THRESHOLD IS " + Constraint.MAX_ALLOWED_CONNECT_GAP/2.0);
+		if (d > Constraint.MAX_ALLOWED_CONNECT_GAP/2.0) {
 			return true;
 		}
 		return false;
@@ -288,13 +290,19 @@ public class MarkerRecognizer
 					Point2D contactPt = iCons.getM_seg1().equals(seg)? iCons.getM_contactPt2():iCons.getM_contactPt1();
 					if(consSeg instanceof SegLine)
 					{
+						System.out.println ("CONS SEG LEN"+consSeg.getM_length());
 						SegLine segLine = (SegLine)consSeg;
-						System.out.println(segLine.getM_start().distance(contactPt));
-						if(MarkerHang(segLine.getM_start(), contactPt)  && MarkerHang (segLine.getM_end(),contactPt) )
-						{
+						System.out.println ( "CONTACT PT"+ contactPt);
+
+					//	if(MarkerHang(segLine.getM_start(), contactPt)  && MarkerHang (segLine.getM_end(),contactPt) )
+					//	{
+						 if(!stroke.nearPt(consSeg.getSegEnd().getX() , consSeg.getSegEnd().getY())  && 
+								 !stroke.nearPt(consSeg.getSegStart().getX() , consSeg.getSegStart().getY())) 
+						 {
 							m_marker = new MarkerEquality(stroke, consSeg);	
 							markerType = m_marker.getM_type();
-						}
+						 }
+					//	}
 					}
 					else if(consSeg instanceof SegCircleCurve)
 					{

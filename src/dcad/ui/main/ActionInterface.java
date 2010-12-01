@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import dcad.model.constraint.Constraint;
 import dcad.model.constraint.RelativeConstraint;
 import dcad.model.constraint.constraintsHelper;
+import dcad.model.constraint.angle.IndAngleConstraint;
 import dcad.model.constraint.circleArc.circularArcConstraint;
 import dcad.model.constraint.collinearity.CollinearLinesConstraint;
 import dcad.model.constraint.collinearity.CollinearPointsConstraint;
@@ -602,6 +603,7 @@ public int A_change_Seg_property(Segment seg,String type, String val)
 	Text t = new Text(val) ; 
 	Marker  marker = null;
 	if(type=="angle") {
+		System.out.println("*****ANGLE ALREADY SET" + seg.getConstraintByType(IndAngleConstraint.class)) ;
 		if(seg instanceof SegLine) {
 			 marker = new MarkerLineAngle((SegLine)seg, t);
 		}
